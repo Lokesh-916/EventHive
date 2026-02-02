@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support - EventHive</title>
+    <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Satisfy&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        eh: {
+                            teal: '#026670',  /* Deep Teal */
+                            mint: '#9FEDD7',  /* Mint Green */
+                            cream: '#EDEAE5', /* Off White BG */
+                            yellow: '#FCE181', /* Bright Yellow */
+                            pale: '#FEF9C7',  /* Pale Yellow */
+                            pink: '#9FEDD7',
+                            orange: '#FCE181'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        brand: ['Satisfy', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        html::-webkit-scrollbar {
+            display: none;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #EDEAE5;
+            color: #026670;
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        .satisfy-regular {
+            font-family: "Satisfy", cursive;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        /* Hover Effects */
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: #FCE181;
+            transition: width 0.3s;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* FAQ Accordion Transitions */
+        details>summary {
+            list-style: none;
+        }
+
+        details>summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details[open] summary~* {
+            animation: sweep .3s ease-in-out;
+        }
+
+        @keyframes sweep {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px)
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+    </style>
+</head>
+
+<body class="antialiased overflow-x-hidden">
+
+    <!-- Sticky Header -->
+    <header id="main-header"
+        class="fixed w-full top-0 z-50 transition-all duration-300 bg-eh-cream/90 backdrop-blur-md border-b border-eh-pale shadow-sm">
+        <div class="container mx-auto px-6 py-2 flex justify-between items-center">
+
+            <!-- Left: Brand Logo -->
+            <div class="relative cursor-pointer h-16 w-64 flex items-center justify-center overflow-hidden">
+                <a href="index.html"
+                    class="satisfy-regular text-4xl text-eh-teal select-none z-10 relative no-underline">EventHive</a>
+            </div>
+
+            <!-- Center: Navigation -->
+            <nav class="hidden md:flex space-x-8 text-eh-teal font-medium absolute left-1/2 transform -translate-x-1/2">
+                <a href="index.html#home" class="nav-link hover:text-eh-yellow transition-colors">Home</a>
+                <a href="index.html#features" class="nav-link hover:text-eh-yellow transition-colors">Features</a>
+                <a href="index.html#how-it-works" class="nav-link hover:text-eh-yellow transition-colors">How It
+                    Works</a>
+                <a href="index.html#contact" class="nav-link hover:text-eh-yellow transition-colors">Contact</a>
+            </nav>
+
+            <!-- Right: Auth Buttons -->
+            <div class="hidden md:flex items-center space-x-4">
+                <button onclick="openLoginModal()"
+                    class="px-5 py-2 border-2 border-eh-teal text-eh-teal font-bold rounded-full hover:bg-eh-teal hover:text-white transition-colors">Login</button>
+                <a href="#"
+                    class="px-5 py-2 bg-eh-teal text-white rounded-full hover:bg-eh-yellow transition-colors shadow-md">Sign
+                    Up</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-eh-teal focus:outline-none ml-auto">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
+                    </path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-eh-cream border-t border-eh-pale absolute w-full">
+            <div class="flex flex-col px-6 py-4 space-y-4 text-center">
+                <a href="index.html#home" class="text-eh-teal font-medium hover:text-eh-mint">Home</a>
+                <a href="index.html#features" class="text-eh-teal font-medium hover:text-eh-mint">Features</a>
+                <a href="index.html#how-it-works" class="text-eh-teal font-medium hover:text-eh-mint">How It Works</a>
+                <button onclick="openLoginModal()" class="text-eh-teal font-bold">Login</button>
+                <a href="#" class="px-4 py-2 bg-eh-teal text-white rounded-full hover:bg-eh-mint mx-auto w-32">Sign
+                    Up</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Support Hero Section -->
+    <section class="pt-32 pb-20 bg-eh-teal text-eh-cream relative overflow-hidden">
+        <!-- Decorative blobs -->
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-eh-mint rounded-full opacity-10 blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-eh-yellow rounded-full opacity-10 blur-3xl">
+        </div>
+
+        <div class="container mx-auto px-6 text-center relative z-10">
+            <h1 class="satisfy-regular text-5xl md:text-6xl mb-6 drop-shadow-md">How can we help?</h1>
+            <p class="text-xl md:text-2xl text-eh-pale mb-10 font-light max-w-2xl mx-auto">Find answers, troubleshoot
+                issues, and get back to orchestrating your event.</p>
+
+            <!-- Search Bar -->
+            <div class="max-w-2xl mx-auto relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg class="h-6 w-6 text-eh-teal/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <input type="text"
+                    class="block w-full pl-12 pr-4 py-4 rounded-full border-none ring-4 ring-eh-mint/20 focus:ring-eh-mint/50 focus:outline-none text-eh-teal placeholder-eh-teal/40 bg-eh-cream shadow-xl transition-all"
+                    placeholder="Search for articles, topics, or keywords...">
+            </div>
+        </div>
+    </section>
+
+    <!-- Help Topics Grid -->
+    <section class="py-16 -mt-10">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div
+                    class="bg-white p-8 rounded-3xl shadow-lg border border-eh-pale hover:shadow-xl transition-all transform hover:-translate-y-1 cursor-pointer group">
+                    <div
+                        class="w-14 h-14 bg-eh-teal/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-eh-teal/20 transition-colors">
+                        <svg class="w-8 h-8 text-eh-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-eh-teal mb-3">Getting Started</h3>
+                    <p class="text-gray-500">Learn the basics of setting up your first event and inviting team members.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div
+                    class="bg-white p-8 rounded-3xl shadow-lg border border-eh-pale hover:shadow-xl transition-all transform hover:-translate-y-1 cursor-pointer group">
+                    <div
+                        class="w-14 h-14 bg-eh-yellow/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-eh-yellow/30 transition-colors">
+                        <svg class="w-8 h-8 text-eh-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-eh-teal mb-3">Live Operations</h3>
+                    <p class="text-gray-500">Master the command center, track tasks in real-time, and handle alerts.</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div
+                    class="bg-white p-8 rounded-3xl shadow-lg border border-eh-pale hover:shadow-xl transition-all transform hover:-translate-y-1 cursor-pointer group">
+                    <div
+                        class="w-14 h-14 bg-eh-mint/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-eh-mint/30 transition-colors">
+                        <svg class="w-8 h-8 text-eh-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-eh-teal mb-3">Billing & Account</h3>
+                    <p class="text-gray-500">Manage subscriptions, invoices, and update your organization details.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQs -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-6 max-w-4xl">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-eh-teal mb-4">Frequently Asked Questions</h2>
+                <div class="w-24 h-1 bg-eh-yellow mx-auto rounded-full"></div>
+            </div>
+
+            <div class="space-y-4">
+                <!-- FAQ Item 1 -->
+                <details
+                    class="group bg-eh-cream/30 rounded-2xl p-4 [&_summary::-webkit-details-marker]:hidden border border-transparent hover:border-eh-pale transition-colors open:bg-eh-cream/50 open:shadow-sm">
+                    <summary
+                        class="flex cursor-pointer items-center justify-between gap-1.5 text-eh-teal font-bold text-lg">
+                        <span>How do I invite my team?</span>
+                        <span class="relative size-5 shrink-0">
+                            <svg class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                            <svg class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" />
+                            </svg>
+                        </span>
+                    </summary>
+                    <p class="mt-4 leading-relaxed text-gray-600 pl-1">
+                        Navigate to your Organization Settings > Team Members. Click on "Invite Member" and enter their
+                        email address. They will receive an invitation link to create their account and join your
+                        workspace.
+                    </p>
+                </details>
+
+                <!-- FAQ Item 2 -->
+                <details
+                    class="group bg-eh-cream/30 rounded-2xl p-4 [&_summary::-webkit-details-marker]:hidden border border-transparent hover:border-eh-pale transition-colors open:bg-eh-cream/50 open:shadow-sm">
+                    <summary
+                        class="flex cursor-pointer items-center justify-between gap-1.5 text-eh-teal font-bold text-lg">
+                        <span>Can I export event data?</span>
+                        <span class="relative size-5 shrink-0">
+                            <svg class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                            <svg class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" />
+                            </svg>
+                        </span>
+                    </summary>
+                    <p class="mt-4 leading-relaxed text-gray-600 pl-1">
+                        Yes! You can export usage reports, task logs, and volunteer hours as CSV or PDF files from the
+                        Reports tab in your dashboard.
+                    </p>
+                </details>
+
+                <!-- FAQ Item 3 -->
+                <details
+                    class="group bg-eh-cream/30 rounded-2xl p-4 [&_summary::-webkit-details-marker]:hidden border border-transparent hover:border-eh-pale transition-colors open:bg-eh-cream/50 open:shadow-sm">
+                    <summary
+                        class="flex cursor-pointer items-center justify-between gap-1.5 text-eh-teal font-bold text-lg">
+                        <span>What happens if I lose internet connection?</span>
+                        <span class="relative size-5 shrink-0">
+                            <svg class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                            <svg class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" />
+                            </svg>
+                        </span>
+                    </summary>
+                    <p class="mt-4 leading-relaxed text-gray-600 pl-1">
+                        EventHive has an offline mode for the mobile app. Task updates are saved locally and
+                        automatically synced once your connection is restored.
+                    </p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- Still Need Help? -->
+    <section class="py-20 bg-eh-pale text-center">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-eh-teal mb-4">Still need help?</h2>
+            <p class="text-gray-600 mb-8 max-w-xl mx-auto">Our support team is available 24/7 to assist you with any
+                critical issues during your events.</p>
+            <a href="#"
+                class="inline-block px-8 py-3 bg-eh-teal text-white font-bold rounded-full shadow-lg hover:bg-eh-mint hover:text-eh-teal transition-all">Contact
+                Support</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-eh-cream py-10 text-center border-t border-eh-pale">
+        <p class="text-eh-teal font-medium">&copy; 2026 EventHive. All rights reserved.</p>
+        <div class="mt-4 flex justify-center space-x-6 text-eh-teal/70">
+            <a href="#" class="hover:text-eh-teal">Privacy</a>
+            <a href="#" class="hover:text-eh-teal">Terms</a>
+            <a href="#" class="hover:text-eh-teal">Contact</a>
+            <a href="support.html" class="hover:text-eh-teal font-bold">Support</a>
+        </div>
+    </footer>
+
+    <!-- Login Modal (Copied from Index) -->
+    <div id="login-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog"
+        aria-modal="true">
+        <div class="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity opacity-0" id="login-backdrop"></div>
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                <div class="relative transform overflow-hidden rounded-3xl bg-eh-cream/80 backdrop-blur-xl border border-white/50 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md scale-95 opacity-0"
+                    id="login-panel">
+                    <div class="absolute right-4 top-4">
+                        <button onclick="closeLoginModal()"
+                            class="text-eh-teal/50 hover:text-eh-teal transition-colors">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="px-8 py-10">
+                        <div class="text-center mb-8">
+                            <h3 class="text-3xl font-bold text-eh-teal satisfy-regular mb-2">Welcome Back</h3>
+                            <p class="text-sm text-gray-500 font-sans">Enter your details to login</p>
+                        </div>
+                        <form class="space-y-6">
+                            <div>
+                                <label for="email"
+                                    class="block text-sm font-medium leading-6 text-eh-teal/80 ml-1">Email
+                                    address</label>
+                                <div class="mt-2">
+                                    <input id="email" name="email" type="email" autocomplete="email" required
+                                        class="block w-full rounded-2xl border-0 py-3 px-4 text-eh-teal shadow-sm ring-1 ring-inset ring-black/5 bg-white/60 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-eh-teal sm:text-sm sm:leading-6 outline-none transition-all">
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between ml-1">
+                                    <label for="password"
+                                        class="block text-sm font-medium leading-6 text-eh-teal/80">Password</label>
+                                    <div class="text-sm"><a href="#"
+                                            class="font-semibold text-eh-teal hover:text-eh-mint transition-colors">Forgot
+                                            password?</a></div>
+                                </div>
+                                <div class="mt-2">
+                                    <input id="password" name="password" type="password" autocomplete="current-password"
+                                        required
+                                        class="block w-full rounded-2xl border-0 py-3 px-4 text-eh-teal shadow-sm ring-1 ring-inset ring-black/5 bg-white/60 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-eh-teal sm:text-sm sm:leading-6 outline-none transition-all">
+                                </div>
+                            </div>
+                            <div>
+                                <button type="submit"
+                                    class="flex w-full justify-center rounded-full bg-eh-teal px-3 py-3 text-sm font-bold leading-6 text-white shadow-lg hover:bg-eh-mint hover:text-eh-teal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eh-teal transition-all duration-300 transform hover:-translate-y-0.5">Sign
+                                    in</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Header Scroll Effect
+        const header = document.getElementById('main-header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('shadow-md');
+                header.classList.add('bg-opacity-95');
+            } else {
+                header.classList.remove('shadow-md');
+                header.classList.remove('bg-opacity-95');
+            }
+        });
+
+        // Mobile Menu
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileBtn) {
+            mobileBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        // Login Modal Logic
+        const loginModal = document.getElementById('login-modal');
+        const loginBackdrop = document.getElementById('login-backdrop');
+        const loginPanel = document.getElementById('login-panel');
+
+        function openLoginModal() {
+            loginModal.classList.remove('hidden');
+            setTimeout(() => {
+                loginBackdrop.classList.remove('opacity-0');
+                loginPanel.classList.remove('scale-95', 'opacity-0');
+                loginPanel.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLoginModal() {
+            loginBackdrop.classList.add('opacity-0');
+            loginPanel.classList.remove('scale-100', 'opacity-100');
+            loginPanel.classList.add('scale-95', 'opacity-0');
+
+            setTimeout(() => {
+                loginModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginBackdrop || e.target.closest('#login-backdrop')) {
+                closeLoginModal();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !loginModal.classList.contains('hidden')) {
+                closeLoginModal();
+            }
+        });
+    </script>
+</body>
+
+</html>

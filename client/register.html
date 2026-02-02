@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - EventHive</title>
+    <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Satisfy&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="src/styles/output.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #EDEAE5;
+            color: #026670;
+        }
+
+        .satisfy-regular {
+            font-family: "Satisfy", cursive;
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen bg-eh-cream">
+
+    <div class="text-center p-10">
+        <h1 class="satisfy-regular text-6xl text-eh-teal mb-6">Welcome to EventHive</h1>
+        <p class="text-xl text-gray-600 mb-8 max-w-lg mx-auto">You are on your way to becoming part of the best event
+            management platform.</p>
+
+        <div id="role-display"
+            class="bg-white/50 backdrop-blur-md p-8 rounded-3xl border border-eh-pale shadow-lg inline-block">
+            <p class="text-lg font-bold text-eh-teal">Registration Page</p>
+            <p class="text-gray-500 mt-2">Loading your preference...</p>
+        </div>
+
+        <div class="mt-10">
+            <a href="index.html" class="text-eh-teal font-medium hover:text-eh-mint underline">Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const type = urlParams.get('type');
+        const display = document.getElementById('role-display');
+
+        if (type === 'organizer') {
+            display.innerHTML = `
+                <h2 class="text-2xl font-bold text-eh-teal mb-2">Organizer Registration</h2>
+                <p>Create your team and start managing events.</p>
+                <!-- Add form here later -->
+            `;
+        } else if (type === 'volunteer') {
+            display.innerHTML = `
+                <h2 class="text-2xl font-bold text-eh-teal mb-2">Volunteer Registration</h2>
+                <p>Join events and make a difference.</p>
+                <!-- Add form here later -->
+            `;
+        } else {
+            display.innerHTML = `
+                <h2 class="text-2xl font-bold text-eh-teal mb-2">Registration</h2>
+                <p>Please select a role from the home page.</p>
+            `;
+        }
+    </script>
+</body>
+
+</html>

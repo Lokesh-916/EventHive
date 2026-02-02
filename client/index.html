@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventHive - Operations-First Event Platform</title>
+    <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Satisfy&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="src/styles/output.css">
+
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        html::-webkit-scrollbar {
+            display: none;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #EDEAE5;
+            /* New Cream background */
+            color: #026670;
+            /* New Teal text */
+        }
+
+        .satisfy-regular {
+            font-family: "Satisfy", cursive;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #EBD6D7;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #439093;
+            border-radius: 4px;
+        }
+
+        /* Animations */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hero-animation {
+            background: linear-gradient(120deg, #F9EBD9, #EBD6D7, #E07A5F);
+            /* Updated gradient end color */
+            background-size: 200% 200%;
+            animation: gradientMove 8s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Hover Effects */
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: #FCE181;
+            transition: width 0.3s;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body class="antialiased overflow-x-hidden">
+
+    <!-- Sticky Header -->
+    <header id="main-header"
+        class="fixed w-full top-0 z-50 transition-all duration-300 bg-eh-cream/90 backdrop-blur-md border-b border-eh-pale shadow-sm">
+        <div class="container mx-auto px-6 py-2 flex justify-between items-center">
+
+            <!-- Left: Brand Logo & Animation -->
+            <div class="relative cursor-pointer h-16 w-64 flex items-center justify-center overflow-hidden"
+                onclick="playFrameAnimation()">
+                <!-- Static Text (Visible initially) -->
+                <span id="static-logo"
+                    class="satisfy-regular text-4xl text-eh-teal select-none z-10 relative">EventHive</span>
+
+                <!-- Frame Animation -->
+                <!-- Reduced scale to 145% (slight increase). Clip-path 25%. -->
+                <canvas id="logo-canvas" class="hidden absolute"
+                    style="height: 145%; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; clip-path: inset(25% 0 25% 0);">
+                </canvas>
+            </div>
+
+            <!-- Center: Navigation -->
+            <nav class="hidden md:flex space-x-8 text-eh-teal font-medium absolute left-1/2 transform -translate-x-1/2">
+                <a href="#home" class="nav-link hover:text-eh-yellow transition-colors">Home</a>
+                <a href="#features" class="nav-link hover:text-eh-yellow transition-colors">Features</a>
+                <a href="#how-it-works" class="nav-link hover:text-eh-yellow transition-colors">How It Works</a>
+                <a href="#contact" class="nav-link hover:text-eh-yellow transition-colors">Contact</a>
+            </nav>
+
+            <!-- Right: Auth Buttons -->
+            <div class="hidden md:flex items-center space-x-4">
+                <button onclick="openLoginModal()"
+                    class="px-5 py-2 border-2 border-eh-teal text-eh-teal font-bold rounded-full hover:bg-eh-teal hover:text-white transition-colors">Login</button>
+                <button onclick="openSignupModal()"
+                    class="px-5 py-2 bg-eh-teal text-white font-bold rounded-full hover:bg-eh-yellow transition-colors shadow-md">Sign
+                    Up</button>
+            </div>
+
+            <!-- Mobile Menu Button (Right aligned for mobile) -->
+            <button id="mobile-menu-btn" class="md:hidden text-eh-teal focus:outline-none ml-auto">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
+                    </path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu (Hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-eh-cream border-t border-eh-pale absolute w-full">
+            <div class="flex flex-col px-6 py-4 space-y-4 text-center">
+                <a href="#home" class="text-eh-teal font-medium hover:text-eh-mint">Home</a>
+                <a href="#features" class="text-eh-teal font-medium hover:text-eh-mint">Features</a>
+                <a href="#how-it-works" class="text-eh-teal font-medium hover:text-eh-mint">How It Works</a>
+                <button onclick="openLoginModal()" class="text-eh-teal font-bold">Login</button>
+                <button onclick="openSignupModal()"
+                    class="px-4 py-2 bg-eh-teal text-white font-bold rounded-full hover:bg-eh-mint mx-auto w-32">Sign
+                    Up</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- New Hero Section -->
+    <!-- The hero section background is now the video-container (fixed) -->
+    <section id="home" class="h-screen flex flex-col justify-center relative bg-no-repeat bg-cover bg-center"
+        style="background-image: url('public/assets/images/hero-bg.png');">
+        <!-- Hero Content (z-10 to sit above the fixed video) -->
+        <div class="container mx-auto px-6 z-10 fade-in-up pointer-events-auto">
+            <div class="md:w-1/2 text-left">
+                <h1 class="satisfy-regular text-eh-cream text-6xl md:text-8xl mb-4 leading-tight drop-shadow-sm">
+                    Orchestrate Flawless Events
+                </h1>
+                <!-- Added backdrop-blur to text for readability against video -->
+                <div class="inline-block p-4 -ml-4 rounded-3xl bg-white/10 backdrop-blur-md border border-white/20">
+                    <p class="text-xl md:text-3xl text-eh-cream mb-0 max-w-3xl font-medium leading-relaxed">
+                        Precision is not an accident. <br> It's designed.
+                    </p>
+                </div>
+
+                <div class="flex flex-col md:flex-row justify-start gap-6 mt-8">
+                    <button onclick="openSignupModal()"
+                        class="px-10 py-4 bg-eh-cream text-eh-teal text-lg font-bold rounded-full shadow-xl hover:bg-white transition-all transform hover:-translate-y-1 hover:shadow-2xl border-2 border-transparent">
+                        Join Now
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll Down Indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce text-eh-cream/90 cursor-pointer pointer-events-auto"
+            onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">
+            <span
+                class="text-sm font-bold mb-2 block text-center uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full backdrop-blur-md border border-white/20">Scroll
+            </span>
+            <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3">
+                </path>
+            </svg>
+        </div>
+    </section>
+
+
+
+
+
+    <!-- Features Section -->
+    <section id="features" class="py-24 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 fade-in-up">
+                <h2 class="text-4xl font-bold text-eh-teal mb-4">Why EventHive?</h2>
+                <p class="text-lg text-gray-500">The operations-first platform for flawless execution.</p>
+            </div>
+
+            <div class="space-y-32">
+
+                <!-- Feature 1: Right Aligned -->
+                <!-- Feature 1: The Destination -->
+                <div class="flex flex-col md:flex-row items-center justify-between gap-12" id="feature-1-container">
+
+                    <!-- Destination Placeholder for the Video -->
+                    <!-- Static Video Card -->
+                    <div
+                        class="md:w-1/2 w-full relative group shadow-2xl rounded-3xl overflow-hidden transform translate-z-0">
+                        <!-- scaled slightly to crop edges/bottom border -->
+                        <video id="feature-video-1" class="w-full aspect-video object-cover scale-[1.02]" autoplay loop
+                            muted playsinline>
+                            <source src="public/assets/videos/feature.mp4" type="video/mp4">
+                        </video>
+
+                        <!-- Toggle Button -->
+                        <button id="feature-btn-1"
+                            class="absolute bottom-1 right-1 bg-white/20 backdrop-blur-md border border-white/30 text-eh-cream p-3 rounded-full hover:bg-white/30 transition-all shadow-lg z-10">
+                            <svg id="icon-pause-1" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                            </svg>
+                            <svg id="icon-play-1" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="md:w-5/12 fade-in-up">
+                        <h3 class="text-4xl md:text-5xl font-bold text-eh-teal mb-6 leading-tight">
+                            From Chaos to <br><span class="text-eh-mint">Choreography.</span>
+                        </h3>
+                        <p class="text-xl text-gray-600 leading-relaxed font-light">
+                            Imagine a command center that breathes. We engineered a pulse.
+                            Watch the clutter vanish into a synchronized masterpiece.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Feature 2: Left Aligned -->
+                <div class="flex flex-col md:flex-row-reverse items-center justify-between gap-12 fade-in-up">
+                    <div class="md:w-1/2">
+                        <div
+                            class="bg-eh-cream p-12 rounded-3xl shadow-lg border border-eh-pale relative overflow-hidden group">
+                            <div
+                                class="absolute -left-10 -top-10 w-48 h-48 bg-eh-yellow rounded-full opacity-20 group-hover:scale-150 transition-transform duration-700">
+                            </div>
+                            <span class="text-6xl text-eh-teal mb-6 block font-bold">✓</span>
+                            <div
+                                class="h-40 bg-white/50 rounded-xl backdrop-blur-sm flex items-center justify-center text-eh-teal/50 font-bold border border-eh-pale">
+                                UI Placeholder: Task List
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:w-5/12">
+                        <h3 class="text-4xl md:text-5xl font-bold text-eh-teal mb-6 leading-tight">
+                            Command without <br><span class="text-eh-yellow">Control.</span>
+                        </h3>
+                        <p class="text-xl text-gray-600 leading-relaxed font-light">
+                            Static to-do lists are where events go to die. <br><br>
+                            We replaced them with dynamic workflows that adapt to the chaos. Assign a role, and watch
+                            the system self-organize around your vision.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Feature 3: Right Aligned -->
+                <div class="flex flex-col md:flex-row items-center justify-between gap-12 fade-in-up">
+                    <div class="md:w-1/2">
+                        <div
+                            class="bg-eh-cream p-12 rounded-3xl shadow-lg border border-eh-pale relative overflow-hidden group">
+                            <div
+                                class="absolute -right-10 -top-10 w-48 h-48 bg-eh-teal rounded-full opacity-10 group-hover:scale-150 transition-transform duration-700">
+                            </div>
+                            <span class="text-6xl text-eh-teal mb-6 block font-bold">⌘</span>
+                            <div
+                                class="h-40 bg-white/50 rounded-xl backdrop-blur-sm flex items-center justify-center text-eh-teal/50 font-bold border border-eh-pale">
+                                UI Placeholder: Dashboard
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:w-5/12">
+                        <h3 class="text-4xl md:text-5xl font-bold text-eh-teal mb-6 leading-tight">
+                            The <span class="text-eh-teal">God View.</span>
+                        </h3>
+                        <p class="text-xl text-gray-600 leading-relaxed font-light">
+                            See the pulse of your entire event in one living, breathing interface. <br><br>
+                            Track every moving part, every volunteer, and every crisis before it happens. Pure signal,
+                            zero noise.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <!-- Organizer Team Section (Moved) -->
+    <section class="py-24 bg-eh-teal text-white relative overflow-hidden">
+        <div class="container mx-auto px-6 relative z-10 fade-in-up text-center">
+            <h2 class="satisfy-regular text-4xl text-eh-mint mb-2">Partner with Excellence</h2>
+            <h3 class="text-3xl md:text-5xl font-bold text-white mb-6">Want to become an organizer?</h3>
+            <p class="text-eh-mint text-lg md:text-xl leading-relaxed max-w-2xl mx-auto mb-10">
+                Register as an event organizing team to negotiate with clients and use our powerful platform to
+                implement flawless events.
+            </p>
+
+            <button onclick="window.location.href='register.html?type=organizer'"
+                class="px-10 py-4 bg-white text-eh-teal font-bold text-lg rounded-full shadow-xl hover:bg-eh-mint hover:text-white transition-all transform hover:-translate-y-1">
+                Start Organizing
+            </button>
+        </div>
+    </section>
+
+
+
+    <!-- Footer -->
+    <footer class="bg-eh-pale py-10 text-center">
+        <p class="text-eh-teal font-medium">&copy; 2026 EventHive. All rights reserved.</p>
+        <div class="mt-4 flex justify-center space-x-6 text-eh-teal/70">
+            <a href="#" class="hover:text-eh-teal">Privacy</a>
+            <a href="#" class="hover:text-eh-teal">Terms</a>
+            <a href="#" class="hover:text-eh-teal">Contact</a>
+            <a href="support.html" target="_blank" class="hover:text-eh-teal">Support</a>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Intersection Observer for Animation on Scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in-up').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Header Scroll Effect
+        const header = document.getElementById('main-header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('shadow-md');
+                header.classList.add('bg-opacity-95');
+            } else {
+                header.classList.remove('shadow-md');
+                header.classList.remove('bg-opacity-95');
+            }
+        });
+
+        // Frame Animation Logic (Canvas Version)
+        const totalFrames = 54;
+        const processedFrames = []; // Stores cleaned ImageBitmaps
+        let framesLoaded = false;
+
+        // Canvas Setup
+        const canvas = document.getElementById('logo-canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+        // Preload & Process Images (Remove White Background)
+        async function preloadAndProcessFrames() {
+            if (framesLoaded) return;
+
+            const framePrefix = "public/assets/images/frames/ezgif-frame-";
+            const frameSuffix = ".jpg";
+
+            // Temporary helper canvas for pixel manipulation
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+
+            console.log("Starting frame processing...");
+
+            for (let i = 1; i <= totalFrames; i++) {
+                const num = i.toString().padStart(3, '0');
+                const src = `${framePrefix}${num}${frameSuffix}`;
+
+                // Load raw image
+                const img = await new Promise((resolve, reject) => {
+                    const image = new Image();
+                    image.onload = () => resolve(image);
+                    image.onerror = reject;
+                    image.src = src;
+                });
+
+                // Set dimensions once based on first frame
+                if (i === 1) {
+                    tempCanvas.width = img.naturalWidth;
+                    tempCanvas.height = img.naturalHeight;
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                }
+
+                // Draw to temp canvas
+                tempCtx.drawImage(img, 0, 0);
+
+                // Get pixel data
+                const frameData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+                const data = frameData.data;
+
+                // Pixel manipulation: 
+                // 1. Turn white/near-white to transparent
+                // 2. Tint black text to Teal (#439093 -> R:67, G:144, B:147)
+                for (let j = 0; j < data.length; j += 4) {
+                    const r = data[j];
+                    const g = data[j + 1];
+                    const b = data[j + 2];
+
+                    // If pixel is very bright (near white), make it transparent
+                    if (r > 230 && g > 230 && b > 230) {
+                        data[j + 3] = 0; // Alpha = 0
+                    } else {
+                        // Tint to Teal if it's not transparent
+                        // New Teal: #026670 -> R:2, G:102, B:112
+                        data[j] = 2;     // R
+                        data[j + 1] = 102; // G
+                        data[j + 2] = 112; // B
+                        // Keep original alpha
+                    }
+                }
+
+                // Create clean ImageBitmap
+                tempCtx.putImageData(frameData, 0, 0);
+                const cleanBitmap = await createImageBitmap(tempCanvas);
+                processedFrames.push(cleanBitmap);
+            }
+
+            framesLoaded = true;
+            console.log("All frames processed and ready.");
+        }
+
+        // Trigger preload
+        window.addEventListener('load', preloadAndProcessFrames);
+
+        function playFrameAnimation() {
+            if (!framesLoaded) {
+                console.warn("Frames not ready yet!");
+                return;
+            }
+
+            const staticLogo = document.getElementById('static-logo');
+            const canvas = document.getElementById('logo-canvas');
+
+            // Swap to canvas
+            staticLogo.classList.add('hidden');
+            canvas.classList.remove('hidden');
+
+            let currentFrameIndex = 0;
+            const fps = 24;
+            const interval = 1000 / fps;
+
+            const animInterval = setInterval(() => {
+                if (currentFrameIndex >= totalFrames) {
+                    clearInterval(animInterval);
+                    // Reset
+                    canvas.classList.add('hidden');
+                    staticLogo.classList.remove('hidden');
+                    // Clear canvas for next run
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    return;
+                }
+
+                // Draw clean frame
+                ctx.clearRect(0, 0, canvas.width, canvas.height); // Optional clean
+                ctx.drawImage(processedFrames[currentFrameIndex], 0, 0);
+
+                currentFrameIndex++;
+            }, interval);
+        }
+    </script>
+    <script>
+        // ... (Existing header script) ...
+    </script>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // General auto-play
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => {
+                video.muted = true;
+                video.play().catch(e => console.log("Video play failed:", e));
+            });
+
+            // Feature 1 Play/Pause Logic
+            const f1Btn = document.getElementById('feature-btn-1');
+            const f1Video = document.getElementById('feature-video-1');
+            const iconPause = document.getElementById('icon-pause-1');
+            const iconPlay = document.getElementById('icon-play-1');
+
+            if (f1Btn && f1Video) {
+                f1Btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (f1Video.paused) {
+                        f1Video.play();
+                        iconPause.classList.remove('hidden');
+                        iconPlay.classList.add('hidden');
+                    } else {
+                        f1Video.pause();
+                        iconPause.classList.add('hidden');
+                        iconPlay.classList.remove('hidden');
+                    }
+                });
+            }
+        });
+    </script>
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog"
+        aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity opacity-0" id="login-backdrop"></div>
+
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                <!-- Modal Panel -->
+                <div class="relative transform overflow-hidden rounded-3xl bg-eh-cream/80 backdrop-blur-xl border border-white/50 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md scale-95 opacity-0"
+                    id="login-panel">
+
+                    <!-- Close Button -->
+                    <div class="absolute right-4 top-4">
+                        <button onclick="closeLoginModal()"
+                            class="text-eh-teal/50 hover:text-eh-teal transition-colors">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="px-8 py-10">
+                        <div class="text-center mb-8">
+                            <h3 class="text-3xl font-bold text-eh-teal satisfy-regular mb-2" id="modal-title">Welcome
+                                Back</h3>
+                            <p class="text-sm text-gray-500 font-sans">Enter your details to login</p>
+                        </div>
+
+                        <form class="space-y-6" method="POST" action="">
+                            <div>
+                                <label for="email"
+                                    class="block text-sm font-medium leading-6 text-eh-teal/80 ml-1">Email
+                                    address</label>
+                                <div class="mt-2">
+                                    <input id="email" name="email" type="email" autocomplete="email" required
+                                        class="block w-full rounded-2xl border-0 py-3 px-4 text-eh-teal shadow-sm ring-1 ring-inset ring-black/5 bg-white/60 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-eh-teal sm:text-sm sm:leading-6 outline-none transition-all">
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex items-center justify-between ml-1">
+                                    <label for="password"
+                                        class="block text-sm font-medium leading-6 text-eh-teal/80">Password</label>
+                                    <div class="text-sm">
+                                        <a href="#"
+                                            class="font-semibold text-eh-teal hover:text-eh-mint transition-colors">Forgot
+                                            password?</a>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <input id="password" name="password" type="password" autocomplete="current-password"
+                                        required
+                                        class="block w-full rounded-2xl border-0 py-3 px-4 text-eh-teal shadow-sm ring-1 ring-inset ring-black/5 bg-white/60 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-eh-teal sm:text-sm sm:leading-6 outline-none transition-all">
+                                </div>
+                            </div>
+
+                            <div>
+                                <button type="submit"
+                                    class="flex w-full justify-center rounded-full bg-eh-teal px-3 py-3 text-sm font-bold leading-6 text-white shadow-lg hover:bg-eh-mint hover:text-eh-teal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eh-teal transition-all duration-300 transform hover:-translate-y-0.5">Sign
+                                    in</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const loginModal = document.getElementById('login-modal');
+        const loginBackdrop = document.getElementById('login-backdrop');
+        const loginPanel = document.getElementById('login-panel');
+
+        function openLoginModal() {
+            loginModal.classList.remove('hidden');
+            // Small delay to allow display:block to apply before opacity transition
+            setTimeout(() => {
+                loginBackdrop.classList.remove('opacity-0');
+                loginPanel.classList.remove('scale-95', 'opacity-0');
+                loginPanel.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+
+        function closeLoginModal() {
+            loginBackdrop.classList.add('opacity-0');
+            loginPanel.classList.remove('scale-100', 'opacity-100');
+            loginPanel.classList.add('scale-95', 'opacity-0');
+
+            setTimeout(() => {
+                loginModal.classList.add('hidden');
+                document.body.style.overflow = ''; // Restore scrolling
+            }, 300); // Match transition duration
+        }
+
+        // Close on backdrop click
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginBackdrop || e.target.closest('#login-backdrop')) {
+                closeLoginModal();
+            }
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !loginModal.classList.contains('hidden')) {
+                closeLoginModal();
+            }
+        });
+    </script>
+    <!-- Signup Choice Modal -->
+    <div id="signup-choice-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog"
+        aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity opacity-0" id="signup-backdrop"></div>
+
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                <!-- Modal Panel -->
+                <div class="relative transform overflow-hidden rounded-3xl bg-eh-cream/80 backdrop-blur-xl border border-white/50 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md scale-95 opacity-0"
+                    id="signup-panel">
+
+                    <!-- Close Button -->
+                    <button onclick="closeSignupModal()" type="button"
+                        class="absolute right-4 top-4 text-eh-teal/50 hover:text-eh-teal transition-colors focus:outline-none z-50 cursor-pointer">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+
+                    <div class="px-8 py-10 text-center relative z-10">
+                        <h3 class="text-3xl font-bold text-eh-teal satisfy-regular mb-4">Join EventHive</h3>
+                        <p class="text-gray-500 font-sans mb-8">Select your role to continue</p>
+
+                        <div class="space-y-4">
+                            <!-- Option 1: Volunteer -->
+                            <button onclick="window.location.href='register.html?type=volunteer'"
+                                class="w-full flex items-center justify-between p-4 bg-white/60 rounded-2xl border border-transparent hover:border-eh-teal hover:bg-white shadow-sm hover:shadow-md transition-all duration-300 group">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-10 h-10 bg-eh-mint/20 text-eh-teal rounded-full flex items-center justify-center">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div class="text-left">
+                                        <h4 class="text-lg font-bold text-eh-teal">Volunteer</h4>
+                                        <p class="text-xs text-gray-500">I want to help organize events.</p>
+                                    </div>
+                                </div>
+                                <span class="text-eh-teal opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                            </button>
+
+                            <!-- Option 2: Client -->
+                            <button onclick="window.location.href='register.html?type=client'"
+                                class="w-full flex items-center justify-between p-4 bg-white/60 rounded-2xl border border-transparent hover:border-eh-yellow hover:bg-white shadow-sm hover:shadow-md transition-all duration-300 group">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-10 h-10 bg-eh-yellow/20 text-eh-yellow-dark rounded-full flex items-center justify-center">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                    </div>
+                                    <div class="text-left">
+                                        <h4 class="text-lg font-bold text-eh-teal">Client</h4>
+                                        <p class="text-xs text-gray-500">I want to hire a team.</p>
+                                    </div>
+                                </div>
+                                <span class="text-eh-teal opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script for Signup Choice Modal -->
+    <script>
+        const signupBackdrop = document.getElementById('signup-backdrop');
+        const signupModal = document.getElementById('signup-choice-modal');
+        const signupPanel = document.getElementById('signup-panel');
+
+        function openSignupModal() {
+            signupModal.classList.remove('hidden');
+            setTimeout(() => {
+                signupBackdrop.classList.remove('opacity-0');
+                signupPanel.classList.remove('scale-95', 'opacity-0');
+                signupPanel.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSignupModal() {
+            signupBackdrop.classList.add('opacity-0');
+            signupPanel.classList.remove('scale-100', 'opacity-100');
+            signupPanel.classList.add('scale-95', 'opacity-0');
+
+            setTimeout(() => {
+                signupModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        signupModal.addEventListener('click', (e) => {
+            if (e.target === signupBackdrop || e.target.closest('#signup-backdrop')) {
+                closeSignupModal();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !signupModal.classList.contains('hidden')) {
+                closeSignupModal();
+            }
+        });
+    </script>
+</body>
+
+</html>
