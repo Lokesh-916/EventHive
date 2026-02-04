@@ -139,9 +139,9 @@
             <div class="hidden md:flex items-center space-x-4">
                 <button onclick="openLoginModal()"
                     class="px-5 py-2 border-2 border-eh-teal text-eh-teal font-bold rounded-full hover:bg-eh-teal hover:text-white transition-colors">Login</button>
-                <a href="#"
-                    class="px-5 py-2 bg-eh-teal text-white rounded-full hover:bg-eh-yellow transition-colors shadow-md">Sign
-                    Up</a>
+                <button onclick="openSignupModal()"
+                    class="px-5 py-2 bg-eh-teal text-white font-bold rounded-full hover:bg-eh-yellow transition-colors shadow-md">Sign
+                    Up</button>
             </div>
 
             <!-- Mobile Menu Button -->
@@ -160,8 +160,9 @@
                 <a href="index.html#features" class="text-eh-teal font-medium hover:text-eh-mint">Features</a>
                 <a href="index.html#how-it-works" class="text-eh-teal font-medium hover:text-eh-mint">How It Works</a>
                 <button onclick="openLoginModal()" class="text-eh-teal font-bold">Login</button>
-                <a href="#" class="px-4 py-2 bg-eh-teal text-white rounded-full hover:bg-eh-mint mx-auto w-32">Sign
-                    Up</a>
+                <button onclick="openSignupModal()"
+                    class="px-4 py-2 bg-eh-teal text-white font-bold rounded-full hover:bg-eh-mint mx-auto w-32">Sign
+                    Up</button>
             </div>
         </div>
     </header>
@@ -406,67 +407,77 @@
         </div>
     </div>
 
+    <!-- Signup Choice Modal -->
+    <div id="signup-choice-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog"
+        aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity opacity-0" id="signup-backdrop"></div>
+
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                <!-- Modal Panel -->
+                <div class="relative transform overflow-hidden rounded-3xl bg-eh-cream/80 backdrop-blur-xl border border-white/50 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md scale-95 opacity-0"
+                    id="signup-panel">
+
+                    <!-- Close Button -->
+                    <button onclick="closeSignupModal()" type="button"
+                        class="absolute right-4 top-4 text-eh-teal/50 hover:text-eh-teal transition-colors focus:outline-none z-50 cursor-pointer">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+
+                    <div class="px-8 py-10 text-center relative z-10">
+                        <h3 class="text-3xl font-bold text-eh-teal satisfy-regular mb-4">Join EventHive</h3>
+                        <p class="text-gray-500 font-sans mb-8">Select your role to continue</p>
+
+                        <div class="space-y-8">
+                            <!-- Option 1: Volunteer -->
+                            <button onclick="window.location.href='register.html?type=volunteer'"
+                                class="w-full flex items-center justify-between p-6 bg-white/60 rounded-2xl border border-transparent hover:border-eh-teal hover:bg-white shadow-sm hover:shadow-md transition-all duration-300 group">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-10 h-10 bg-eh-mint/20 text-eh-teal rounded-full flex items-center justify-center">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div class="text-left">
+                                        <h4 class="text-lg font-bold text-eh-teal">Volunteer</h4>
+                                        <p class="text-xs text-gray-500">I want to help organize events.</p>
+                                    </div>
+                                </div>
+                                <span class="text-eh-teal opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                            </button>
+
+                            <!-- Option 2: Client -->
+                            <button onclick="window.location.href='register.html?type=client'"
+                                class="w-full flex items-center justify-between p-6 bg-white/60 rounded-2xl border border-transparent hover:border-eh-yellow hover:bg-white shadow-sm hover:shadow-md transition-all duration-300 group">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-10 h-10 bg-eh-yellow/20 text-eh-yellow-dark rounded-full flex items-center justify-center">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                    </div>
+                                    <div class="text-left">
+                                        <h4 class="text-lg font-bold text-eh-teal">Client</h4>
+                                        <p class="text-xs text-gray-500">I want to hire a team.</p>
+                                    </div>
+                                </div>
+                                <span class="text-eh-teal opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
-    <script>
-        // Header Scroll Effect
-        const header = document.getElementById('main-header');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                header.classList.add('shadow-md');
-                header.classList.add('bg-opacity-95');
-            } else {
-                header.classList.remove('shadow-md');
-                header.classList.remove('bg-opacity-95');
-            }
-        });
-
-        // Mobile Menu
-        const mobileBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        if (mobileBtn) {
-            mobileBtn.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-        }
-
-        // Login Modal Logic
-        const loginModal = document.getElementById('login-modal');
-        const loginBackdrop = document.getElementById('login-backdrop');
-        const loginPanel = document.getElementById('login-panel');
-
-        function openLoginModal() {
-            loginModal.classList.remove('hidden');
-            setTimeout(() => {
-                loginBackdrop.classList.remove('opacity-0');
-                loginPanel.classList.remove('scale-95', 'opacity-0');
-                loginPanel.classList.add('scale-100', 'opacity-100');
-            }, 10);
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeLoginModal() {
-            loginBackdrop.classList.add('opacity-0');
-            loginPanel.classList.remove('scale-100', 'opacity-100');
-            loginPanel.classList.add('scale-95', 'opacity-0');
-
-            setTimeout(() => {
-                loginModal.classList.add('hidden');
-                document.body.style.overflow = '';
-            }, 300);
-        }
-
-        loginModal.addEventListener('click', (e) => {
-            if (e.target === loginBackdrop || e.target.closest('#login-backdrop')) {
-                closeLoginModal();
-            }
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !loginModal.classList.contains('hidden')) {
-                closeLoginModal();
-            }
-        });
-    </script>
+    <script src="src/js/index.js"></script>
 </body>
 
 </html>
