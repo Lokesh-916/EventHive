@@ -72,26 +72,7 @@
             transform: translateY(0);
         }
 
-        .hero-animation {
-            background: linear-gradient(120deg, #F9EBD9, #EBD6D7, #E07A5F);
-            /* Updated gradient end color */
-            background-size: 200% 200%;
-            animation: gradientMove 8s ease infinite;
-        }
 
-        @keyframes gradientMove {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
-        }
 
         /* Hover Effects */
         .nav-link {
@@ -105,7 +86,7 @@
             height: 2px;
             bottom: -2px;
             left: 0;
-            background-color: #FCE181;
+            background-color: #D6843C;
             transition: width 0.3s;
         }
 
@@ -157,10 +138,10 @@
 
             <!-- Center: Navigation -->
             <nav class="hidden md:flex space-x-8 text-eh-teal font-medium absolute left-1/2 transform -translate-x-1/2">
-                <a href="#home" class="nav-link hover:text-eh-yellow transition-colors">Home</a>
-                <a href="#features" class="nav-link hover:text-eh-yellow transition-colors">Features</a>
-                <a href="#how-it-works" class="nav-link hover:text-eh-yellow transition-colors">How It Works</a>
-                <a href="#contact" class="nav-link hover:text-eh-yellow transition-colors">Contact</a>
+                <a href="#home" class="nav-link hover:text-eh-tan transition-colors">Home</a>
+                <a href="#features" class="nav-link hover:text-eh-tan transition-colors">Features</a>
+                <a href="#how-it-works" class="nav-link hover:text-eh-tan transition-colors">How It Works</a>
+                <a href="support.html" class="nav-link hover:text-eh-tan transition-colors">Contact</a>
             </nav>
 
             <!-- Right: Auth Buttons -->
@@ -168,7 +149,7 @@
                 <button onclick="openLoginModal()"
                     class="px-5 py-2 border-2 border-eh-teal text-eh-teal font-bold rounded-full hover:bg-eh-teal hover:text-white transition-colors">Login</button>
                 <button onclick="openSignupModal()"
-                    class="px-5 py-2 bg-eh-teal text-white font-bold rounded-full hover:bg-eh-yellow transition-colors shadow-md">Sign
+                    class="px-5 py-2 bg-eh-teal text-white font-bold rounded-full hover:bg-eh-tan transition-colors shadow-md">Sign
                     Up</button>
             </div>
 
@@ -189,14 +170,13 @@
                 <a href="#how-it-works" class="text-eh-teal font-medium hover:text-eh-mint">How It Works</a>
                 <button onclick="openLoginModal()" class="text-eh-teal font-bold">Login</button>
                 <button onclick="openSignupModal()"
-                    class="px-4 py-2 bg-eh-teal text-white font-bold rounded-full hover:bg-eh-mint mx-auto w-32">Sign
+                    class="px-4 py-2 bg-eh-teal text-white font-bold rounded-full hover:bg-eh-tan mx-auto w-32">Sign
                     Up</button>
             </div>
         </div>
     </header>
 
-    <!-- New Hero Section -->
-    <!-- The hero section background is now the video-container (fixed) -->
+    <!-- Hero Section -->
     <section id="home" class="h-screen flex flex-col justify-center relative bg-no-repeat bg-cover bg-center"
         style="background-image: url('public/assets/images/hero-bg.png');">
         <!-- Hero Content (z-10 to sit above the fixed video) -->
@@ -249,11 +229,8 @@
             <div class="space-y-32">
 
                 <!-- Feature 1: Right Aligned -->
-                <!-- Feature 1: The Destination -->
                 <div class="flex flex-col md:flex-row items-center justify-between gap-12" id="feature-1-container">
 
-                    <!-- Destination Placeholder for the Video -->
-                    <!-- Static Video Card -->
                     <div
                         class="md:w-1/2 w-full relative group shadow-2xl rounded-3xl overflow-hidden transform translate-z-0">
                         <!-- scaled slightly to crop edges/bottom border -->
@@ -344,7 +321,7 @@
     </section>
 
     <!-- Metrics Section -->
-    <section class="py-24 bg-eh-mint">
+    <section class="py-24 bg-eh-tan">
         <div class="container mx-auto px-6 sequence-animate">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
 
@@ -408,7 +385,7 @@
     </section>
 
     <!-- CTA Section -->
-    <!-- Organizer Team Section (Moved) -->
+
 
     <section class="py-24 bg-eh-teal text-white relative overflow-hidden">
         <div class="container mx-auto px-6 relative z-10 fade-in-up text-center">
@@ -434,7 +411,7 @@
         <div class="mt-4 flex justify-center space-x-6 text-eh-teal/70">
             <a href="#" class="hover:text-eh-teal">Privacy</a>
             <a href="#" class="hover:text-eh-teal">Terms</a>
-            <a href="#" class="hover:text-eh-teal">Contact</a>
+            <a href="support.html" class="hover:text-eh-teal">Contact</a>
             <a href="support.html" target="_blank" class="hover:text-eh-teal">Support</a>
         </div>
     </footer>

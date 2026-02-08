@@ -147,6 +147,7 @@ async function preloadAndProcessFrames() {
 
     framesLoaded = true;
     console.log("All frames processed and ready.");
+    playFrameAnimation();
 }
 
 // Trigger preload

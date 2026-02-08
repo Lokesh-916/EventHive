@@ -10,9 +10,17 @@ module.exports = {
                     cream: '#EDEAE5',
                     yellow: '#FCE181',
                     pale: '#FEF9C7',
+                    // tan: '#D6843C',
+                    tan: '#E8B86D',
                     // legacy aliases
                     pink: '#9FEDD7',
                     orange: '#FCE181',
+                },
+                incident: {
+                    red: '#F38181',
+                    yellow: '#FCE38A',
+                    green: '#EAFFD0',
+                    teal: '#95E1D3',
                 },
             },
             fontFamily: {
