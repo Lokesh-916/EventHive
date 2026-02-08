@@ -123,9 +123,9 @@
         }
 
         .progress-step.completed .step-marker {
-            background-color: #FCE181;
-            /* eh-yellow */
-            border-color: #FCE181;
+            background-color: #026670;
+            /* eh-teal */
+            border-color: #026670;
         }
 
         .progress-bar-fill {
@@ -246,6 +246,60 @@
                 <!-- Step 2: Identity -->
                 <div class="step-content hidden" id="org-step-2">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Images Section -->
+                        <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                            <!-- Org Logo -->
+                            <div class="flex items-center gap-4">
+                                <div class="relative w-24 h-24 rounded-xl bg-eh-teal/10 overflow-hidden border-2 border-eh-teal shrink-0 cursor-pointer group"
+                                    onclick="document.getElementById('org-logo-input').click()">
+                                    <img id="org-logo-preview" src="#" alt="Logo"
+                                        class="w-full h-full object-cover hidden group-hover:opacity-50 transition-opacity">
+                                    <div id="org-logo-overlay"
+                                        class="absolute inset-0 flex flex-col items-center justify-center transition-opacity group-hover:opacity-100">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-eh-teal mb-1"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                        </svg>
+                                        <span id="org-logo-text"
+                                            class="text-[10px] text-center text-eh-teal font-bold px-1">Upload
+                                            Logo</span>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-sm font-bold text-eh-teal mb-1">Organization Logo</label>
+                                    <p class="text-xs text-gray-500 mb-2">Click the box to upload.</p>
+                                    <input type="file" id="org-logo-input" accept="image/*" class="hidden">
+                                </div>
+                            </div>
+
+                            <!-- Lead Pic -->
+                            <div class="flex items-center gap-4">
+                                <div class="relative w-24 h-24 rounded-full bg-eh-teal/10 overflow-hidden border-2 border-eh-teal shrink-0 cursor-pointer group"
+                                    onclick="document.getElementById('org-lead-input').click()">
+                                    <img id="org-lead-preview" src="#" alt="Lead"
+                                        class="w-full h-full object-cover hidden group-hover:opacity-50 transition-opacity">
+                                    <div id="org-lead-overlay"
+                                        class="absolute inset-0 flex flex-col items-center justify-center transition-opacity group-hover:opacity-100">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-eh-teal mb-1"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                        </svg>
+                                        <span id="org-lead-text"
+                                            class="text-[10px] text-center text-eh-teal font-bold px-1">Upload
+                                            Photo</span>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-sm font-bold text-eh-teal mb-1">Lead Profile
+                                        Picture</label>
+                                    <p class="text-xs text-gray-500 mb-2">Click the circle to upload.</p>
+                                    <input type="file" id="org-lead-input" accept="image/*" class="hidden">
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="md:col-span-2">
                             <label class="block text-sm font-bold text-eh-teal mb-2">Organizer / Team Name</label>
                             <input type="text" name="organizer_name" required class="eh-input"
@@ -259,6 +313,40 @@
                         <div>
                             <label class="block text-sm font-bold text-eh-teal mb-2">Lead Organizer's Name</label>
                             <input type="text" name="lead_name" required class="eh-input" placeholder="Full Name">
+                        </div>
+
+                        <!-- Event Types -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-bold text-eh-teal mb-2">Event Types Conducted</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                <label class="flex items-center gap-2 bg-white/40 p-2 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="event_type" value="corporate" class="accent-eh-teal">
+                                    <span class="text-sm">Corporate</span>
+                                </label>
+                                <label class="flex items-center gap-2 bg-white/40 p-2 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="event_type" value="social" class="accent-eh-teal">
+                                    <span class="text-sm">Social</span>
+                                </label>
+                                <label class="flex items-center gap-2 bg-white/40 p-2 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="event_type" value="entertainment"
+                                        class="accent-eh-teal">
+                                    <span class="text-sm">Entertainment</span>
+                                </label>
+                                <label class="flex items-center gap-2 bg-white/40 p-2 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="event_type" value="charity" class="accent-eh-teal">
+                                    <span class="text-sm">Charity</span>
+                                </label>
+                                <label class="flex items-center gap-2 bg-white/40 p-2 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="event_type" value="academic" class="accent-eh-teal">
+                                    <span class="text-sm">Academic</span>
+                                </label>
+                                <label class="flex items-center gap-2 bg-white/40 p-2 rounded-lg cursor-pointer">
+                                    <input type="checkbox" id="org-type-other-check" class="accent-eh-teal">
+                                    <span class="text-sm">Other</span>
+                                </label>
+                            </div>
+                            <input type="text" id="org-type-other-input" class="eh-input mt-2 hidden"
+                                placeholder="Specify other type...">
                         </div>
                     </div>
                 </div>
@@ -310,30 +398,56 @@
 
                 <!-- Step 4: Details & Media -->
                 <div class="step-content hidden" id="org-step-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 gap-6">
+                        <!-- Summary -->
                         <div>
-                            <label class="block text-sm font-bold text-eh-teal mb-2">Lead Profile Picture</label>
-                            <input type="file" name="lead_pic" accept="image/*" class="eh-input file-input">
+                            <label class="block text-sm font-bold text-eh-teal mb-2">Organizational Bio /
+                                Summary</label>
+                            <textarea class="eh-input min-h-[100px]"
+                                placeholder="Tell us about your team's experience, mission, and what makes your events special..."></textarea>
                         </div>
-                        <div>
-                            <label class="block text-sm font-bold text-eh-teal mb-2">Organization Logo</label>
-                            <input type="file" name="org_logo" accept="image/*" class="eh-input file-input">
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-bold text-eh-teal mb-2">Typical Volunteers
+                                    Needed</label>
+                                <input type="number" name="volunteers_needed" min="1" class="eh-input"
+                                    placeholder="e.g. 10-50">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-eh-teal mb-2">Typical Event Size
+                                    (Scale)</label>
+                                <select class="eh-input">
+                                    <option value="" disabled selected>Select Scale</option>
+                                    <option value="micro">Micro (Under 100)</option>
+                                    <option value="small">Small (100 - 500)</option>
+                                    <option value="medium">Medium (500 - 2000)</option>
+                                    <option value="large">Large (2000 - 10000)</option>
+                                    <option value="mega">Mega (10000+)</option>
+                                </select>
+                            </div>
                         </div>
+
+                        <!-- Past Work -->
                         <div>
-                            <label class="block text-sm font-bold text-eh-teal mb-2">Event Types Conducted</label>
-                            <select name="event_type" required class="eh-input">
-                                <option value="" disabled selected>Select Primary Type</option>
-                                <option value="corporate">Corporate & Tech</option>
-                                <option value="social">Social & Weddings</option>
-                                <option value="entertainment">Concerts & Entertainment</option>
-                                <option value="charity">Non-Profit & Charity</option>
-                                <option value="other">Other</option>
-                            </select>
+                            <label class="block text-sm font-bold text-eh-teal mb-2">Portfolio / Past Events
+                                (Images)</label>
+                            <div class="border-2 border-dashed border-eh-teal/30 rounded-xl p-6 text-center bg-white/30 hover:bg-white/50 transition-colors cursor-pointer"
+                                onclick="document.getElementById('org-portfolio').click()">
+                                <p class="text-sm text-eh-teal font-medium">Click to upload images</p>
+                                <p class="text-xs text-gray-500 mt-1">Showcase your best events</p>
+                                <input type="file" id="org-portfolio" multiple accept="image/*" class="hidden">
+                            </div>
+                            <div id="org-portfolio-preview" class="flex gap-2 mt-2 overflow-x-auto pb-2">
+                                <!-- Thumbnails will go here -->
+                            </div>
                         </div>
+
+                        <!-- References -->
                         <div>
-                            <label class="block text-sm font-bold text-eh-teal mb-2">Typical Volunteers Needed</label>
-                            <input type="number" name="volunteers_needed" min="1" class="eh-input"
-                                placeholder="e.g. 10-50">
+                            <label class="block text-sm font-bold text-eh-teal mb-2">References / Past Collaborators
+                                (Optional)</label>
+                            <input type="text" class="eh-input" placeholder="e.g. Company names, previous venues...">
                         </div>
                     </div>
                 </div>
@@ -407,17 +521,78 @@
 
                 <!-- Step 2: Personal Details -->
                 <div class="client-step-content hidden" id="client-step-2">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-bold text-eh-teal mb-2">My/Company Name</label>
-                            <input type="text" name="client_name" required class="eh-input"
-                                placeholder="Who is organizing?">
+                    <!-- Top Section: Media Object Layout -->
+                    <div class="flex flex-col md:flex-row gap-8 mb-6">
+                        <!-- Left: Profile Pic -->
+                        <div class="shrink-0 flex flex-col items-center pt-2">
+                            <label class="block text-sm font-bold text-eh-teal mb-2 text-center">Profile Picture</label>
+                            <div class="relative rounded-full bg-eh-teal/10 border-2 border-eh-teal cursor-pointer group shrink-0 overflow-hidden shadow-sm hover:shadow-md transition-all"
+                                style="width: 8rem; height: 8rem;"
+                                onclick="document.getElementById('client-pic-input').click()">
+                                <img id="client-pic-preview" src="#" alt="Profile"
+                                    class="w-full h-full object-cover hidden group-hover:opacity-50 transition-opacity">
+                                <div id="client-pic-overlay"
+                                    class="absolute inset-0 flex flex-col items-center justify-center transition-opacity">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-eh-teal mb-1"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                    </svg>
+                                    <span class="text-xs text-center text-eh-teal font-bold px-1">Upload</span>
+                                </div>
+                            </div>
+                            <input type="file" id="client-pic-input" accept="image/*" class="hidden">
                         </div>
+
+                        <!-- Right: Main Details -->
+                        <div class="flex-1 space-y-4">
+                            <!-- Client Type -->
+                            <div>
+                                <label class="block text-sm font-bold text-eh-teal mb-2">I am representing...</label>
+                                <div class="flex flex-col sm:flex-row gap-4">
+                                    <label
+                                        class="flex items-center gap-3 cursor-pointer bg-white/40 px-4 py-3 rounded-xl flex-1 hover:bg-white/60 transition-colors border border-transparent hover:border-eh-teal/30">
+                                        <input type="radio" name="client_type" value="individual"
+                                            class="accent-eh-teal w-5 h-5" checked>
+                                        <span class="text-eh-teal font-medium">Myself (Individual)</span>
+                                    </label>
+                                    <label
+                                        class="flex items-center gap-3 cursor-pointer bg-white/40 px-4 py-3 rounded-xl flex-1 hover:bg-white/60 transition-colors border border-transparent hover:border-eh-teal/30">
+                                        <input type="radio" name="client_type" value="organization"
+                                            class="accent-eh-teal w-5 h-5">
+                                        <span class="text-eh-teal font-medium">Company / Organization</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- Name -->
+                            <div>
+                                <label class="block text-sm font-bold text-eh-teal mb-2">Name (or Company Name)</label>
+                                <input type="text" name="client_name" required class="eh-input"
+                                    placeholder="Who is organizing?">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Section: Grid Details -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-eh-teal mb-2">Role / Designation
+                                (Optional)</label>
+                            <input type="text" name="client_role" class="eh-input" placeholder="e.g. HR Manager">
+                        </div>
+
                         <div>
                             <label class="block text-sm font-bold text-eh-teal mb-2">Mobile Number</label>
                             <input type="tel" name="client_mobile" required class="eh-input"
                                 placeholder="+1 (555) 000-0000">
                         </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-bold text-eh-teal mb-2">Website / Social LinkedIn
+                                (Optional)</label>
+                            <input type="url" name="client_link" class="eh-input" placeholder="https://...">
+                        </div>
+
                         <div class="md:col-span-2">
                             <label class="block text-sm font-bold text-eh-teal mb-2">Location</label>
                             <div class="flex gap-2 mb-2">
@@ -522,6 +697,11 @@
                                 <input type="password" id="vol-confirm-password" required class="eh-input"
                                     placeholder="••••••••">
                             </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-bold text-eh-teal mb-2">Username</label>
+                                <input type="text" id="vol-username" required class="eh-input" placeholder="@username">
+                                <p class="text-xs text-gray-500 mt-1">Create a unique username for your profile.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -543,11 +723,6 @@
                                 <label class="block text-sm font-bold text-eh-teal mb-2">Profile Picture</label>
                                 <input type="file" id="vol-profile-pic" accept="image/*" class="eh-input file-input">
                             </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-bold text-eh-teal mb-2">Username</label>
-                            <input type="text" id="vol-username" required class="eh-input" placeholder="@username">
                         </div>
 
                         <!-- Location -->
@@ -664,17 +839,208 @@
                         <!-- Availability -->
                         <div class="md:col-span-2">
                             <h4 class="font-bold text-eh-teal mb-4 border-b border-white/30 pb-2">Availability</h4>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="text-xs font-bold text-eh-teal block mb-1">Hours per Day</label>
-                                    <input type="number" id="vol-hours" min="1" max="24" class="eh-input"
-                                        placeholder="e.g. 4">
+                            <p class="text-xs text-gray-600 mb-3">Select days and enter available hours for each.</p>
+                            <div class="space-y-4 bg-white/30 p-4 rounded-xl max-h-80 overflow-y-auto custom-scrollbar">
+                                <p class="text-[10px] text-center text-gray-600 mb-2 uppercase tracking-wide">Select
+                                    Available Time Slots (4-hour blocks)</p>
+
+                                <!-- Helper Function to generate days could be used, but hardcoding for clarity in HTML -->
+                                <!-- Mondays -->
+                                <div
+                                    class="day-container flex flex-row items-center border-b border-white/20 pb-2 last:border-0 gap-2">
+                                    <div class="text-[10px] sm:text-sm font-bold text-eh-teal w-16 sm:w-24 shrink-0">
+                                        Monday</div>
+                                    <div class="gap-1 flex-1"
+                                        style="display: grid; grid-template-columns: repeat(6, 1fr);">
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Monday" data-slot="00-04">00-04</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Monday" data-slot="04-08">04-08</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Monday" data-slot="08-12">08-12</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Monday" data-slot="12-16">12-16</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Monday" data-slot="16-20">16-20</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Monday" data-slot="20-24">20-24</button>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="text-xs font-bold text-eh-teal block mb-1">Days per Week</label>
-                                    <input type="number" id="vol-days" min="1" max="7" class="eh-input"
-                                        placeholder="e.g. 3">
+
+                                <!-- Tuesday -->
+                                <div
+                                    class="day-container flex flex-row items-center border-b border-white/20 pb-2 last:border-0 gap-2">
+                                    <div class="text-[10px] sm:text-sm font-bold text-eh-teal w-16 sm:w-24 shrink-0">
+                                        Tuesday</div>
+                                    <div class="gap-1 flex-1"
+                                        style="display: grid; grid-template-columns: repeat(6, 1fr);">
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Tuesday" data-slot="00-04">00-04</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Tuesday" data-slot="04-08">04-08</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Tuesday" data-slot="08-12">08-12</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Tuesday" data-slot="12-16">12-16</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Tuesday" data-slot="16-20">16-20</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Tuesday" data-slot="20-24">20-24</button>
+                                    </div>
                                 </div>
+
+                                <!-- Wednesday -->
+                                <div
+                                    class="day-container flex flex-row items-center border-b border-white/20 pb-2 last:border-0 gap-2">
+                                    <div class="text-[10px] sm:text-sm font-bold text-eh-teal w-16 sm:w-24 shrink-0">
+                                        Wednesday</div>
+                                    <div class="gap-1 flex-1"
+                                        style="display: grid; grid-template-columns: repeat(6, 1fr);">
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Wednesday" data-slot="00-04">00-04</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Wednesday" data-slot="04-08">04-08</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Wednesday" data-slot="08-12">08-12</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Wednesday" data-slot="12-16">12-16</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Wednesday" data-slot="16-20">16-20</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Wednesday" data-slot="20-24">20-24</button>
+                                    </div>
+                                </div>
+
+                                <!-- Thursday -->
+                                <div
+                                    class="day-container flex flex-row items-center border-b border-white/20 pb-2 last:border-0 gap-2">
+                                    <div class="text-[10px] sm:text-sm font-bold text-eh-teal w-16 sm:w-24 shrink-0">
+                                        Thursday</div>
+                                    <div class="gap-1 flex-1"
+                                        style="display: grid; grid-template-columns: repeat(6, 1fr);">
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Thursday" data-slot="00-04">00-04</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Thursday" data-slot="04-08">04-08</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Thursday" data-slot="08-12">08-12</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Thursday" data-slot="12-16">12-16</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Thursday" data-slot="16-20">16-20</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Thursday" data-slot="20-24">20-24</button>
+                                    </div>
+                                </div>
+
+                                <!-- Friday -->
+                                <div
+                                    class="day-container flex flex-row items-center border-b border-white/20 pb-2 last:border-0 gap-2">
+                                    <div class="text-[10px] sm:text-sm font-bold text-eh-teal w-16 sm:w-24 shrink-0">
+                                        Friday</div>
+                                    <div class="gap-1 flex-1"
+                                        style="display: grid; grid-template-columns: repeat(6, 1fr);">
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Friday" data-slot="00-04">00-04</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Friday" data-slot="04-08">04-08</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Friday" data-slot="08-12">08-12</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Friday" data-slot="12-16">12-16</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Friday" data-slot="16-20">16-20</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Friday" data-slot="20-24">20-24</button>
+                                    </div>
+                                </div>
+
+                                <!-- Saturday -->
+                                <div
+                                    class="day-container flex flex-row items-center border-b border-white/20 pb-2 last:border-0 gap-2">
+                                    <div class="text-[10px] sm:text-sm font-bold text-eh-teal w-16 sm:w-24 shrink-0">
+                                        Saturday</div>
+                                    <div class="gap-1 flex-1"
+                                        style="display: grid; grid-template-columns: repeat(6, 1fr);">
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Saturday" data-slot="00-04">00-04</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Saturday" data-slot="04-08">04-08</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Saturday" data-slot="08-12">08-12</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Saturday" data-slot="12-16">12-16</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Saturday" data-slot="16-20">16-20</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Saturday" data-slot="20-24">20-24</button>
+                                    </div>
+                                </div>
+
+                                <!-- Sunday -->
+                                <div
+                                    class="day-container flex flex-row items-center border-b border-white/20 pb-2 last:border-0 gap-2">
+                                    <div class="text-[10px] sm:text-sm font-bold text-eh-teal w-16 sm:w-24 shrink-0">
+                                        Sunday</div>
+                                    <div class="gap-1 flex-1"
+                                        style="display: grid; grid-template-columns: repeat(6, 1fr);">
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Sunday" data-slot="00-04">00-04</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Sunday" data-slot="04-08">04-08</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Sunday" data-slot="08-12">08-12</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Sunday" data-slot="12-16">12-16</button>
+                                        <button type="button"
+                                            class="slot-btn text-[8px] sm:text-[10px] py-1 sm:py-2 rounded px-0 bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Sunday" data-slot="16-20">16-20</button>
+                                        <button type="button"
+                                            class="slot-btn text-[10px] py-2 rounded-lg bg-white/50 text-eh-teal border border-transparent hover:border-eh-teal transition-all"
+                                            data-day="Sunday" data-slot="20-24">20-24</button>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
 
@@ -712,6 +1078,16 @@
                                         class="accent-eh-teal w-4 h-4">
                                     <span class="text-sm text-eh-teal">Creative</span>
                                 </label>
+                                <label
+                                    class="flex items-center gap-2 bg-white/40 p-3 rounded-lg cursor-pointer hover:bg-white/60 transition-colors">
+                                    <input type="checkbox" name="vol-tasks" value="others" id="vol-task-other-check"
+                                        class="accent-eh-teal w-4 h-4">
+                                    <span class="text-sm text-eh-teal">Others</span>
+                                </label>
+                            </div>
+                            <div id="vol-task-other-container" class="mt-3 hidden">
+                                <input type="text" id="vol-task-other-input" class="eh-input"
+                                    placeholder="Please specify other tasks...">
                             </div>
                         </div>
 
@@ -737,7 +1113,7 @@
                         class="px-6 py-3 rounded-xl border border-eh-teal text-eh-teal font-bold hover:bg-eh-teal/10 transition-colors hidden">Back</button>
                     <button type="button" id="vol-next-btn"
                         class="px-8 py-3 rounded-xl bg-eh-teal text-white font-bold hover:bg-eh-dark shadow-lg transition-all ml-auto">Continue</button>
-                    <button type="submit" id="vol-submit-btn"
+                    <button type="button" id="vol-submit-btn"
                         class="px-8 py-3 rounded-xl bg-eh-yellow text-eh-teal font-bold hover:bg-eh-yellow-dark shadow-lg transition-all ml-auto hidden">Finish</button>
                 </div>
             </form>

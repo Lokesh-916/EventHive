@@ -53,6 +53,45 @@ function initOrganizerFlow() {
     // Initialize Location Handler
     setupLocationHandler('org-loc-btn', 'org-manual-loc-btn', 'org-manual-loc-box', 'org-city', 'org-state', 'org-country', 'org-coords');
 
+    // --- Image Cropping Setup ---
+    setupImageCropper('org-logo-input', 'org-logo-preview', 'org-logo-overlay', 'org-logo-preview', 1);
+    setupImageCropper('org-lead-input', 'org-lead-preview', 'org-lead-overlay', 'org-lead-preview', 1);
+
+    // --- Event Types "Other" Toggle ---
+    const orgOtherCheck = document.getElementById('org-type-other-check');
+    const orgOtherInput = document.getElementById('org-type-other-input');
+    if (orgOtherCheck) {
+        orgOtherCheck.addEventListener('change', () => {
+            if (orgOtherCheck.checked) {
+                orgOtherInput.classList.remove('hidden');
+                orgOtherInput.focus();
+            } else {
+                orgOtherInput.classList.add('hidden');
+                orgOtherInput.value = '';
+            }
+        });
+    }
+
+    // --- Portfolio Preview ---
+    const portfolioInput = document.getElementById('org-portfolio');
+    const portfolioPreview = document.getElementById('org-portfolio-preview');
+    if (portfolioInput) {
+        portfolioInput.addEventListener('change', function (e) {
+            portfolioPreview.innerHTML = ''; // Clear existing
+            Array.from(e.target.files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        img.className = 'w-16 h-16 object-cover rounded-lg border border-eh-teal/30 shrink-0';
+                        portfolioPreview.appendChild(img);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    }
 
     // Initial Render
     updateUI();
@@ -70,10 +109,29 @@ function initOrganizerFlow() {
         updateUI();
     });
 
+    // Enter Key Handler for Organizer
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            const cropModal = document.getElementById('crop-modal');
+            // Ensure we are in the organizer flow and modal is closed
+            if (!document.getElementById('organizer-form').classList.contains('hidden') &&
+                cropModal.classList.contains('hidden')) {
+
+                event.preventDefault();
+                if (currentStep < totalSteps) {
+                    nextBtn.click();
+                } else {
+                    submitBtn.click();
+                }
+            }
+        }
+    });
+
     // Submit Handler
     submitBtn.addEventListener('click', (e) => {
         if (validateStep(currentStep, 'org')) {
-            // Simulate API call
+            // Collect Data (Simulation)
+            console.log("Organizer Registration Data Collected");
             alert('Organizer Registration Successful! (Simulation)');
             window.location.href = 'index.html';
         }
@@ -100,6 +158,9 @@ function initOrganizerFlow() {
         steps.forEach(step => {
             const stepNum = parseInt(step.dataset.step);
             step.classList.remove('active', 'completed');
+
+            // Logic for circles
+            const marker = step.querySelector('.step-marker');
 
             if (stepNum === currentStep) {
                 step.classList.add('active');
@@ -139,6 +200,8 @@ function initClientFlow() {
     // Initialize Location Handler
     setupLocationHandler('client-loc-btn', 'client-manual-loc-btn', 'client-manual-loc-box', 'client-city', 'client-state', 'client-country', 'client-coords');
 
+    // --- Image Cropping Setup ---
+    setupImageCropper('client-pic-input', 'client-pic-preview', 'client-pic-overlay', 'client-pic-preview', 1);
 
     // Initial Render
     updateUI();
@@ -156,9 +219,38 @@ function initClientFlow() {
         updateUI();
     });
 
+    // Enter Key Handler for Client
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            const cropModal = document.getElementById('crop-modal');
+            // Ensure we are in the Client flow and modal is closed
+            if (!document.getElementById('client-form').classList.contains('hidden') &&
+                cropModal.classList.contains('hidden')) {
+
+                event.preventDefault();
+                if (currentStep < totalSteps) {
+                    nextBtn.click();
+                } else {
+                    submitBtn.click();
+                }
+            }
+        }
+    });
+
     // Submit Handler
     submitBtn.addEventListener('click', (e) => {
         if (validateStep(currentStep, 'client')) {
+            // Collect Data
+            const formData = {
+                type: document.querySelector('input[name="client_type"]:checked').value,
+                name: document.querySelector('input[name="client_name"]').value,
+                role: document.querySelector('input[name="client_role"]').value,
+                mobile: document.querySelector('input[name="client_mobile"]').value,
+                link: document.querySelector('input[name="client_link"]').value,
+                email: document.getElementById('client-email').value
+            };
+            console.log("Client Registration Data:", formData);
+
             // Simulate API call
             alert('Client Registration Successful! Organizers will contact you soon.');
             window.location.href = 'index.html';
@@ -263,13 +355,55 @@ function initVolunteerFlow() {
             updateUI();
         });
 
+        // Add Enter Key Handler
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                const cropModal = document.getElementById('crop-modal');
+                // Ensure we are in the volunteer flow and modal is closed
+                if (!document.getElementById('volunteer-form').classList.contains('hidden') &&
+                    cropModal.classList.contains('hidden')) {
+
+                    event.preventDefault(); // Prevent default form submission or other actions
+
+                    if (currentStep < totalSteps) {
+                        nextBtn.click();
+                    } else {
+                        submitBtn.click();
+                    }
+                }
+            }
+        });
+
         submitBtn.addEventListener('click', (e) => {
             if (validateVolunteerStep(currentStep)) {
+                // Collect Availability
+                const availability = {};
+                document.querySelectorAll('.slot-btn.bg-eh-teal').forEach(btn => {
+                    const day = btn.dataset.day;
+                    const slot = btn.dataset.slot;
+                    if (!availability[day]) availability[day] = [];
+                    availability[day].push(slot);
+                });
+
+                // Collect Tasks
+                const tasks = [];
+                document.querySelectorAll('input[name="vol-tasks"]:checked').forEach(cb => {
+                    if (cb.value !== 'others') tasks.push(cb.value);
+                });
+                const otherTaskCheck = document.getElementById('vol-task-other-check');
+                const otherTaskInput = document.getElementById('vol-task-other-input');
+                if (otherTaskCheck && otherTaskCheck.checked) {
+                    tasks.push(`Other: ${otherTaskInput.value}`);
+                }
+
                 // Collect Data
+                // Note: Username moved to Step 1, ensure it's captured correctly from the DOM
                 const formData = {
                     email: document.getElementById('vol-email').value,
                     username: document.getElementById('vol-username').value,
                     skills: addedSkills,
+                    availability: availability,
+                    tasks: tasks,
                     // ... other fields
                 };
                 console.log('Volunteer Data:', formData);
@@ -280,6 +414,41 @@ function initVolunteerFlow() {
 
         // Step 2: Location
         setupLocationHandler('vol-loc-btn', 'vol-manual-loc-btn', 'vol-manual-loc-box', 'vol-city', 'vol-state', 'vol-country', 'vol-coords');
+
+        // Step 4: Availability Logic
+        const slotBtns = document.querySelectorAll('.slot-btn');
+        slotBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                // Toggle styles
+                this.classList.toggle('bg-white/50');
+                this.classList.toggle('text-eh-teal');
+                this.classList.toggle('bg-eh-teal');
+                this.classList.toggle('text-white');
+                this.classList.toggle('border-transparent');
+                this.classList.toggle('border-eh-teal'); // keep border for structure? Or just toggle color
+                // Actually, border was transparent on inactive.
+                // inactive: border-transparent
+                // active: let's toggle a border color if needed, but bg change is strong enough.
+            });
+        });
+
+        // Step 4: Other Task Logic
+        const otherTaskCheck = document.getElementById('vol-task-other-check');
+        const otherTaskContainer = document.getElementById('vol-task-other-container');
+        const otherTaskInput = document.getElementById('vol-task-other-input');
+
+        if (otherTaskCheck) {
+            otherTaskCheck.addEventListener('change', function () {
+                if (this.checked) {
+                    otherTaskContainer.classList.remove('hidden');
+                    otherTaskInput.required = true;
+                } else {
+                    otherTaskContainer.classList.add('hidden');
+                    otherTaskInput.required = false;
+                    otherTaskInput.value = '';
+                }
+            });
+        }
 
 
         // Step 2: Image Preview & Cropping
@@ -583,4 +752,147 @@ function setupLocationHandler(btnId, manualBtnId, manualBoxId, cityId, stateId, 
     manualLocBtn.addEventListener('click', () => {
         manualLocBox.classList.toggle('hidden');
     });
+}
+
+/**
+ * Image Cropper Helper
+ */
+function setupImageCropper(inputId, previewImgId, previewTextId, finalPreviewId, aspectRatio = 1) {
+    const input = document.getElementById(inputId);
+    const previewImg = document.getElementById(previewImgId); // Valid if inline preview needed? 
+    // Actually, distinct preview logic might be needed. 
+    // Based on usage: setupImageCropper('org-logo-input', 'org-logo-preview', 'org-logo-text', 'org-logo-preview', 1);
+
+    // We'll reuse the single global 'crop-modal' elements
+    const cropModal = document.getElementById('crop-modal');
+    const cropImage = document.getElementById('crop-image');
+    const cropSaveBtn = document.getElementById('crop-save-btn');
+    const cropCancelBtn = document.getElementById('crop-cancel-btn');
+    let cropper = null;
+
+    if (!input) {
+        console.warn(`Input ${inputId} not found for cropper.`);
+        return;
+    }
+
+    input.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                cropImage.src = e.target.result;
+                cropModal.classList.remove('hidden');
+
+                if (cropper) cropper.destroy();
+                cropper = new Cropper(cropImage, {
+                    aspectRatio: aspectRatio,
+                    viewMode: 1,
+                    autoCropArea: 1,
+                    background: false
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // We need to manage multiple croppers potentially interfering if we bind clean events efficiently.
+    // simpler approach: One active cropper session.
+    // We'll bind the SAVE button dynamically or use a shared handler.
+    // Given the architecture, let's use a "current wrapper" approach.
+
+    // Quick Fix: specific handlers for this instance are tricky with global modal buttons.
+    // Better: Clone the buttons or re-assign onclick.
+
+    // Let's use a simpler pattern:
+    // When input changes, set a global 'currentCropperCallback'
+
+    input.dataset.cropping = "true";
+}
+
+// Global Cropper State
+let currentCropper = null;
+let onCropSave = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const cropModal = document.getElementById('crop-modal');
+    const cropImage = document.getElementById('crop-image');
+    const cropSaveBtn = document.getElementById('crop-save-btn');
+    const cropCancelBtn = document.getElementById('crop-cancel-btn');
+
+    if (cropSaveBtn) {
+        cropSaveBtn.addEventListener('click', () => {
+            if (currentCropper && onCropSave) {
+                const canvas = currentCropper.getCroppedCanvas({ width: 300, height: 300 });
+                onCropSave(canvas.toDataURL());
+                cleanupCropper();
+            }
+        });
+    }
+
+    if (cropCancelBtn) {
+        cropCancelBtn.addEventListener('click', () => {
+            cleanupCropper();
+        });
+    }
+
+    function cleanupCropper() {
+        if (currentCropper) {
+            currentCropper.destroy();
+            currentCropper = null;
+        }
+        cropModal.classList.add('hidden');
+        onCropSave = null;
+
+        // Clear file inputs if needed logic
+    }
+});
+
+// Re-write setupImageCropper to use the global state
+function setupImageCropper(inputId, previewImgId, overlayId, finalResultImgId, aspectRatio) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+
+    input.addEventListener('change', function () {
+        if (this.files && this.files[0]) {
+            const file = this.files[0];
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const cropModal = document.getElementById('crop-modal');
+                const cropImage = document.getElementById('crop-image');
+
+                cropImage.src = e.target.result;
+                cropModal.classList.remove('hidden');
+
+                // Destroy any lingering cropper
+                if (currentCropper) currentCropper.destroy();
+
+                currentCropper = new Cropper(cropImage, {
+                    aspectRatio: aspectRatio,
+                    viewMode: 1,
+                    autoCropArea: 1,
+                    background: false
+                });
+
+                // Set callback
+                onCropSave = (dataUrl) => {
+                    const img = document.getElementById(finalResultImgId);
+                    const overlay = document.getElementById(overlayId);
+
+                    if (img) {
+                        img.src = dataUrl;
+                        img.classList.remove('hidden');
+                    }
+                    if (overlay) {
+                        // Switch from "Always Visible" to "Visible on Hover"
+                        overlay.classList.add('opacity-0', 'group-hover:opacity-100');
+                        // Optional: Change text to 'Change'
+                        const span = overlay.querySelector('span');
+                        if (span) span.innerText = 'Change';
+                    }
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
 }
