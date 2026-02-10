@@ -11,7 +11,7 @@ module.exports = {
                     yellow: '#FCE181',
                     pale: '#FEF9C7',
                     // tan: '#D6843C',
-                    tan: '#E8B86D',
+                    tan: '#93B1AA',
                     // legacy aliases
                     pink: '#9FEDD7',
                     orange: '#FCE181',
