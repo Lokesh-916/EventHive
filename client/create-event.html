@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organize Event - EventHive</title>
+    <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Satisfy&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CSS (linking for layout utilities) -->
+    <link rel="stylesheet" href="src/styles/output.css">
+
+    <style>
+        :root {
+            --eh-dark-glass: rgba(10, 15, 20, 0.85);
+            --eh-dark-glass-input: rgba(255, 255, 255, 0.05);
+            --eh-white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px 0;
+            /* Add vertical padding */
+            min-height: 100vh;
+            /* Allow growth */
+            color: var(--eh-white);
+            background: #0A0F14;
+            /* Fallback */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            /* Start from top to allow scrolling */
+            overflow-y: auto;
+            /* Enable vertical scroll */
+            color-scheme: dark;
+            /* Ensures white icons for native pickers */
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1686425374911-e0d752e09806?q=80&w=1493&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center;
+            background-size: cover;
+            z-index: -1;
+        }
+
+        .satisfy-regular {
+            font-family: "Satisfy", cursive;
+        }
+
+        /* Dark Glassmorphism Container */
+        .glass-container {
+            background: var(--eh-dark-glass);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            border-radius: 2.5rem;
+            max-width: 1100px;
+            width: 90%;
+            padding: 2.5rem 3.5rem;
+            margin: 20px 0;
+            /* Space from top/bottom when scrolling */
+        }
+
+        /* Input Styling */
+        .eh-input-dark {
+            width: 100%;
+            padding: 0.75rem 1.15rem;
+            border-radius: 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: var(--eh-dark-glass-input);
+            color: white;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .eh-input-dark:focus {
+            background-color: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+        }
+
+        .eh-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 0.02em;
+        }
+
+        /* Progress Bar */
+        .progress-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 0;
+        }
+
+        .progress-line-active {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            height: 1px;
+            background: white;
+            z-index: 1;
+            transition: width 0.5s ease-in-out;
+            width: 0%;
+        }
+
+        .step-node {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .step-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #0A0F14;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin: 0 auto 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .step-node.active .step-circle {
+            background: rgba(255, 255, 255, 1);
+            color: #0A0F14;
+            border-color: white;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .step-node.completed .step-circle {
+            background: white;
+            color: #0A0F14;
+        }
+
+        .step-text {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .step-node.active .step-text {
+            color: white;
+        }
+
+        /* Transitions */
+        .step-pane {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .step-pane.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: white;
+            font-weight: 600;
+            padding: 0.85rem 1.75rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-exit {
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-exit:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Radio Group Styling */
+        .type-card {
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        input[name="event-type"]:checked+.type-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: white;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+        }
+
+        .type-card span.block {
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .type-card span.opacity-50 {
+            font-size: 0.65rem;
+        }
+
+        /* Responsive Textarea */
+        textarea.eh-input-dark {
+            resize: none;
+        }
+
+        /* Dark Dropdown Fix */
+        select.eh-input-dark option {
+            background: #0A0F14;
+            color: white;
+        }
+
+        /* Volunteer Role Card */
+        .volunteer-role-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .volunteer-role-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-add-role {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 0.85rem;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-add-role:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-remove-role {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0.25rem;
+            transition: color 0.2s ease;
+        }
+
+        .btn-remove-role:hover {
+            color: #ff6b6b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Main Container -->
+    <div class="glass-container relative overflow-hidden">
+
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="satisfy-regular text-4xl md:text-5xl text-white">Create New Event</h1>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="progress-indicator max-w-md mx-auto">
+            <div class="progress-line"></div>
+            <div id="progress-line-fill" class="progress-line-active"></div>
+
+            <div class="step-node active" data-step="1">
+                <div class="step-circle">1</div>
+                <div class="step-text">Basics</div>
+            </div>
+            <div class="step-node" data-step="2">
+                <div class="step-circle">2</div>
+                <div class="step-text">Location</div>
+            </div>
+            <div class="step-node" data-step="3">
+                <div class="step-circle">3</div>
+                <div class="step-text">Volunteers</div>
+            </div>
+            <div class="step-node" data-step="4">
+                <div class="step-circle">4</div>
+                <div class="step-text">Media</div>
+            </div>
+        </div>
+
+        <form id="event-creation-form" onsubmit="event.preventDefault();">
+
+            <!-- Step 1: Basics -->
+            <div class="step-pane active" id="pane-1">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="eh-label" for="event-title">Event Title</label>
+                        <input type="text" id="event-title" class="eh-input-dark"
+                            placeholder="Give your event a memorable name">
+                    </div>
+
+                    <div>
+                        <label class="eh-label" for="event-category">Category</label>
+                        <select id="event-category" class="eh-input-dark appearance-none">
+                            <option value="">Select Category</option>
+                            <option value="music">Music & Concerts</option>
+                            <option value="tech">Technology & Workshops</option>
+                            <option value="social">Social Mixers</option>
+                            <option value="sports">Sports & Fitness</option>
+                            <option value="arts">Arts & Theatre</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="eh-label" for="event-tagline">Tagline</label>
+                        <input type="text" id="event-tagline" class="eh-input-dark"
+                            placeholder="A concise one-sentence hook">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="eh-label" for="event-description">Full Description</label>
+                        <textarea id="event-description" rows="3" class="eh-input-dark"
+                            placeholder="Detailed event information..."></textarea>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="eh-label" for="event-tags">Primary Tags</label>
+                        <input type="text" id="event-tags" class="eh-input-dark"
+                            placeholder="e.g. #Networking, #FreeDrinks, #TechTalk">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Date & Location -->
+            <div class="step-pane" id="pane-2">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="eh-label">Event Type</label>
+                        <div class="flex gap-4">
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="event-type" value="physical" class="hidden" checked>
+                                <div class="type-card">
+                                    <span class="block">Physical</span>
+                                    <span class="opacity-50">In-person</span>
+                                </div>
+                            </label>
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="event-type" value="virtual" class="hidden">
+                                <div class="type-card">
+                                    <span class="block">Virtual</span>
+                                    <span class="opacity-50">Online</span>
+                                </div>
+                            </label>
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="event-type" value="hybrid" class="hidden">
+                                <div class="type-card">
+                                    <span class="block">Hybrid</span>
+                                    <span class="opacity-50">Both</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="eh-label" for="event-start">Start Date & Time</label>
+                        <input type="datetime-local" id="event-start" class="eh-input-dark">
+                    </div>
+                    <div>
+                        <label class="eh-label" for="event-end">End Date & Time</label>
+                        <input type="datetime-local" id="event-end" class="eh-input-dark">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="eh-label" for="event-timezone">Timezone</label>
+                        <select id="event-timezone" class="eh-input-dark appearance-none">
+                            <option value="IST" selected>IST (GMT +05:30)</option>
+                            <option value="UTC">UTC (GMT +00:00)</option>
+                            <option value="EST">EST (GMT -05:00)</option>
+                            <option value="PST">PST (GMT -08:00)</option>
+                        </select>
+                    </div>
+
+                    <div id="venue-section" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="eh-label" for="venue-name">Venue Name</label>
+                            <input type="text" id="venue-name" class="eh-input-dark" placeholder="Venue Name">
+                        </div>
+                        <input type="text" placeholder="City" class="eh-input-dark">
+                        <input type="text" placeholder="State/Country" class="eh-input-dark">
+                    </div>
+
+                    <div id="virtual-section" class="md:col-span-2 hidden">
+                        <label class="eh-label" for="virtual-link">Meeting Link</label>
+                        <input type="url" id="virtual-link" class="eh-input-dark" placeholder="https://zoom.us/j/...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Volunteer Requirements -->
+            <div class="step-pane" id="pane-3">
+                <div class="space-y-6">
+
+                    <!-- Overall Volunteer Info -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="eh-label" for="total-volunteers">Total Volunteers Needed</label>
+                            <input type="number" id="total-volunteers" class="eh-input-dark" placeholder="e.g. 25"
+                                min="1">
+                        </div>
+                        <div>
+                            <label class="eh-label" for="volunteer-deadline">Application Deadline</label>
+                            <input type="date" id="volunteer-deadline" class="eh-input-dark">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="eh-label" for="min-age">Minimum Age Requirement</label>
+                            <input type="number" id="min-age" class="eh-input-dark" placeholder="e.g. 18" min="0">
+                        </div>
+                        <div>
+                            <label class="eh-label" for="volunteer-perks">Perks / Compensation</label>
+                            <input type="text" id="volunteer-perks" class="eh-input-dark"
+                                placeholder="e.g. Free meals, Certificate, Stipend">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="eh-label" for="skills-preferred">Preferred Skills (optional)</label>
+                        <input type="text" id="skills-preferred" class="eh-input-dark"
+                            placeholder="e.g. Communication, First Aid, Photography">
+                    </div>
+
+                    <!-- Volunteer Role Cards -->
+                    <div>
+                        <label class="eh-label">Volunteer Roles</label>
+                        <p class="text-[10px] text-white/40 mb-3">Define each type of work needed and how many
+                            volunteers per role.</p>
+
+                        <div id="volunteer-roles-container" class="space-y-4">
+                            <!-- Default Role Card -->
+                            <div class="volunteer-role-card" data-role-id="1">
+                                <div class="flex items-start justify-between gap-4 mb-3">
+                                    <span class="text-xs font-bold text-white/50 uppercase tracking-widest pt-2">Role
+                                        1</span>
+                                    <button type="button" class="btn-remove-role" onclick="removeRole(this)"
+                                        title="Remove role">&times;</button>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+                                    <div class="md:col-span-2">
+                                        <input type="text" class="eh-input-dark role-title"
+                                            placeholder="Role title (e.g. Stage Manager, Crowd Control)">
+                                    </div>
+                                    <div>
+                                        <input type="number" class="eh-input-dark role-count" placeholder="Count"
+                                            min="1">
+                                    </div>
+                                </div>
+                                <div>
+                                    <textarea rows="2" class="eh-input-dark role-note"
+                                        placeholder="Special note for applicants (e.g. Must be available all 3 days, heavy lifting required)"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add Role Button -->
+                        <button type="button" id="btn-add-role" class="btn-add-role mt-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            Add Another Role
+                        </button>
+                    </div>
+
+                    <!-- General Notes -->
+                    <div>
+                        <label class="eh-label" for="volunteer-general-note">General Instructions for All
+                            Volunteers</label>
+                        <textarea id="volunteer-general-note" rows="3" class="eh-input-dark"
+                            placeholder="Any general information all volunteers should know before applying..."></textarea>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Step 4: Media -->
+            <div class="step-pane" id="pane-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="eh-label">Event Banner</label>
+                        <div id="banner-drop-zone"
+                            class="border border-dashed border-white/10 rounded-xl p-0 min-h-[150px] text-center bg-white/5 transition-all cursor-pointer group flex flex-col items-center justify-center overflow-hidden">
+                            <div id="banner-placeholder" class="py-6">
+                                <p class="font-bold text-sm">Click to Upload Banner</p>
+                                <p class="text-[10px] opacity-50 mt-1">Recommended size 16:9</p>
+                            </div>
+                            <img id="banner-preview" class="w-full h-full object-cover hidden" alt="Banner Preview">
+                            <input type="file" id="event-banner" class="hidden" accept="image/*">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="eh-label" for="promo-video">Promo Video</label>
+                        <input type="url" id="promo-video" class="eh-input-dark" placeholder="YouTube URL">
+                    </div>
+                    <div>
+                        <label class="eh-label" for="support-contact">Support</label>
+                        <input type="text" id="support-contact" class="eh-input-dark" placeholder="Contact Info">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="eh-label">Socials</label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <input type="text" placeholder="Twitter" class="eh-input-dark text-xs">
+                            <input type="text" placeholder="Instagram" class="eh-input-dark text-xs">
+                            <input type="text" placeholder="LinkedIn" class="eh-input-dark text-xs">
+                            <input type="text" placeholder="Facebook" class="eh-input-dark text-xs">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="flex items-center justify-between mt-10 gap-4">
+                <div class="flex gap-4">
+                    <a href="index.html" class="btn-exit">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Cancel
+                    </a>
+                    <button type="button" id="btn-prev" class="btn-primary hidden">Previous</button>
+                </div>
+
+                <button type="button" id="btn-next" class="btn-primary">Next Stage &rarr;</button>
+                <button type="submit" id="btn-submit" class="btn-primary hidden">Launch Event!</button>
+            </div>
+        </form>
+
+    </div>
+
+    <script src="src/js/create-event.js"></script>
+</body>
+
+</html>
