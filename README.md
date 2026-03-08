@@ -1,5 +1,96 @@
 # EventHive
 
+Operations-First Event Platform
+
+## Project Structure
+
+```
+EventHive/
+├── client/          # Frontend files (HTML, CSS, JS, assets)
+├── server/          # Express.js backend server
+└── README.md        # This file
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v14 or higher)
+- npm
+
+### Installation
+
+1. Install server dependencies:
+```bash
+cd server
+npm install
+```
+
+2. Install client dependencies (for Tailwind CSS):
+```bash
+cd ../client
+npm install
+```
+
+### Running the Application
+
+1. Start the server (from the `server` directory):
+```bash
+cd server
+npm start
+```
+
+Or for development with auto-restart:
+```bash
+npm run dev
+```
+
+2. Open your browser and navigate to:
+```
+http://localhost:3000
+```
+
+### Building CSS (Optional)
+
+If you make changes to Tailwind CSS:
+
+```bash
+cd client
+npm run build
+```
+
+Or watch for changes:
+```bash
+npm run dev
+```
+
+## Features
+
+- Clean URLs (no .html extensions)
+- Multi-role registration (Volunteer, Organizer, Client)
+- Responsive design
+- Modern UI with glassmorphism effects
+- Support page with FAQ
+
+## Available Routes
+
+- `/` - Home page
+- `/register` - Registration (supports ?type=volunteer|organizer|client)
+- `/support` - Support and FAQ page
+- `/create-event` - Create event page
+- `/event-info` - Event information page
+- `/report-incident` - Report incident page
+
+## Technology Stack
+
+- Frontend: HTML5, Tailwind CSS, Vanilla JavaScript
+- Backend: Node.js, Express.js
+- Fonts: Google Fonts (Inter, Satisfy)
+
+## License
+
+All rights reserved © 2026 EventHive
+
 EventHive is a modern platform designed to connect event organizers, volunteers, and participants seamlessly. It provides a comprehensive suite of tools for managing events, registering volunteers, and handling incident reports.
 
 ## Features

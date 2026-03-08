@@ -122,17 +122,17 @@
 
             <!-- Left: Brand Logo -->
             <div class="relative cursor-pointer h-16 w-64 flex items-center justify-center overflow-hidden">
-                <a href="index.html"
+                <a href="/"
                     class="satisfy-regular text-4xl text-eh-teal select-none z-10 relative no-underline">EventHive</a>
             </div>
 
             <!-- Center: Navigation -->
             <nav class="hidden md:flex space-x-8 text-eh-teal font-medium absolute left-1/2 transform -translate-x-1/2">
-                <a href="index.html#home" class="nav-link hover:text-eh-yellow transition-colors">Home</a>
-                <a href="index.html#features" class="nav-link hover:text-eh-yellow transition-colors">Features</a>
-                <a href="index.html#how-it-works" class="nav-link hover:text-eh-yellow transition-colors">How It
+                <a href="/#home" class="nav-link hover:text-eh-yellow transition-colors">Home</a>
+                <a href="/#features" class="nav-link hover:text-eh-yellow transition-colors">Features</a>
+                <a href="/#how-it-works" class="nav-link hover:text-eh-yellow transition-colors">How It
                     Works</a>
-                <a href="index.html#contact" class="nav-link hover:text-eh-yellow transition-colors">Contact</a>
+                <a href="/#contact" class="nav-link hover:text-eh-yellow transition-colors">Contact</a>
             </nav>
 
             <!-- Right: Auth Buttons -->
@@ -156,9 +156,9 @@
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden bg-eh-cream border-t border-eh-pale absolute w-full">
             <div class="flex flex-col px-6 py-4 space-y-4 text-center">
-                <a href="index.html#home" class="text-eh-teal font-medium hover:text-eh-mint">Home</a>
-                <a href="index.html#features" class="text-eh-teal font-medium hover:text-eh-mint">Features</a>
-                <a href="index.html#how-it-works" class="text-eh-teal font-medium hover:text-eh-mint">How It Works</a>
+                <a href="/#home" class="text-eh-teal font-medium hover:text-eh-mint">Home</a>
+                <a href="/#features" class="text-eh-teal font-medium hover:text-eh-mint">Features</a>
+                <a href="/#how-it-works" class="text-eh-teal font-medium hover:text-eh-mint">How It Works</a>
                 <button onclick="openLoginModal()" class="text-eh-teal font-bold">Login</button>
                 <button onclick="openSignupModal()"
                     class="px-4 py-2 bg-eh-teal text-white font-bold rounded-full hover:bg-eh-mint mx-auto w-32">Sign
@@ -345,7 +345,7 @@
             <a href="#" class="hover:text-eh-teal">Privacy</a>
             <a href="#" class="hover:text-eh-teal">Terms</a>
             <a href="#" class="hover:text-eh-teal">Contact</a>
-            <a href="support.html" class="hover:text-eh-teal font-bold">Support</a>
+            <a href="/support" class="hover:text-eh-teal font-bold">Support</a>
         </div>
     </footer>
 
@@ -433,7 +433,7 @@
 
                         <div class="space-y-8">
                             <!-- Option 1: Volunteer -->
-                            <button onclick="window.location.href='register.html?type=volunteer'"
+                            <button onclick="window.location.href='/register?type=volunteer'"
                                 class="w-full flex items-center justify-between p-6 bg-white/60 rounded-2xl border border-transparent hover:border-eh-teal hover:bg-white shadow-sm hover:shadow-md transition-all duration-300 group">
                                 <div class="flex items-center gap-4">
                                     <div
@@ -452,7 +452,7 @@
                             </button>
 
                             <!-- Option 2: Client -->
-                            <button onclick="window.location.href='register.html?type=client'"
+                            <button onclick="window.location.href='/register?type=client'"
                                 class="w-full flex items-center justify-between p-6 bg-white/60 rounded-2xl border border-transparent hover:border-eh-yellow hover:bg-white shadow-sm hover:shadow-md transition-all duration-300 group">
                                 <div class="flex items-center gap-4">
                                     <div
