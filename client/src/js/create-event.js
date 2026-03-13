@@ -138,6 +138,92 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Submit Handler
+    btnSubmit.addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        const title = document.getElementById('event-title')?.value;
+        const type = document.querySelector('input[name="event-type"]:checked')?.value || 'physical';
+        
+        if (!title) {
+            alert('Please provide at least an event title');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('title', title);
+        
+        if(document.getElementById('event-tagline')) formData.append('tagline', document.getElementById('event-tagline').value);
+        if(document.getElementById('event-description')) formData.append('description', document.getElementById('event-description').value);
+        if(document.getElementById('event-category')) formData.append('category', document.getElementById('event-category').value);
+        formData.append('type', type);
+        
+        const tags = document.getElementById('event-tags')?.value.split(',').map(t => t.trim()) || [];
+        formData.append('tags', JSON.stringify(tags));
+        
+        const bannerFile = document.getElementById('event-banner')?.files[0];
+        if (bannerFile) formData.append('banner', bannerFile);
+        
+        const schedule = {
+            start: document.getElementById('event-start')?.value,
+            end: document.getElementById('event-end')?.value,
+            timezone: document.getElementById('event-timezone')?.value,
+            applicationDeadline: document.getElementById('volunteer-deadline')?.value
+        };
+        formData.append('schedule', JSON.stringify(schedule));
+        
+        const location = {
+            venueName: document.getElementById('venue-name')?.value || '',
+            city: document.getElementById('venue-city')?.value || '',
+            stateCountry: document.getElementById('venue-state-country')?.value || document.getElementById('venue-state')?.value || '',
+            virtualLink: document.getElementById('virtual-link')?.value || ''
+        };
+        formData.append('location', JSON.stringify(location));
+        
+        const requirements = {
+            totalVolunteers: document.getElementById('total-volunteers')?.value,
+            minAge: document.getElementById('min-age')?.value,
+            perks: document.getElementById('volunteer-perks')?.value,
+            generalNote: document.getElementById('volunteer-general-note')?.value
+        };
+        formData.append('volunteerRequirements', JSON.stringify(requirements));
+        
+        const roles = [];
+        document.querySelectorAll('.volunteer-role-card').forEach(card => {
+            roles.push({
+                roleId: card.dataset.roleId,
+                title: card.querySelector('.role-title')?.value,
+                count: card.querySelector('.role-count')?.value,
+                notes: card.querySelector('.role-note')?.value
+            });
+        });
+        formData.append('volunteerRoles', JSON.stringify(roles));
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Please login as organizer first');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/events', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert('Event created successfully!');
+                window.location.href = 'event-info.html?id=' + data.data._id;
+            } else {
+                alert(`Error: ${data.error}`);
+            }
+        } catch (error) {
+            console.error('Failed to submit event', error);
+            alert('Server connection error while creating event.');
+        }
+    });
+
     // Initial UI update
     updateUI();
 });

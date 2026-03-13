@@ -128,12 +128,67 @@ function initOrganizerFlow() {
     });
 
     // Submit Handler
-    submitBtn.addEventListener('click', (e) => {
+    submitBtn.addEventListener('click', async (e) => {
         if (validateStep(currentStep, 'org')) {
-            // Collect Data (Simulation)
-            console.log("Organizer Registration Data Collected");
-            alert('Organizer Registration Successful! (Simulation)');
-            window.location.href = 'index.html';
+            
+            // Build FormData
+            const formObj = new FormData(organizerForm);
+            // Some specific inputs are easier grabbed this way since form might contain different shapes:
+            const apiData = new FormData();
+            
+            apiData.append('role', 'organizer');
+            apiData.append('email', document.getElementById('org-email')?.value || '');
+            const orgName = document.getElementById('org-name')?.value || '';
+            apiData.append('orgName', orgName);
+            // Generate username
+            const username = orgName ? orgName.toLowerCase().replace(/\s+/g, '') + Math.floor(Math.random()*1000) : 'org' + new Date().getTime();
+            apiData.append('username', username);
+            
+            apiData.append('password', document.getElementById('org-password')?.value || '');
+            
+            apiData.append('leadName', document.getElementById('org-lead-name')?.value || '');
+            apiData.append('organization', document.getElementById('org-org-name')?.value || '');
+            
+            // Event Types
+            const types = Array.from(document.querySelectorAll('input[name="event_type"]:checked')).map(cb => cb.value);
+            if(document.getElementById('org-type-other-check')?.checked) types.push(document.getElementById('org-type-other-input').value);
+            apiData.append('eventTypes', JSON.stringify(types));
+            
+            apiData.append('officialEmail', document.getElementById('org-official-email')?.value || '');
+            apiData.append('mobile', document.getElementById('org-mobile')?.value || '');
+            apiData.append('website', document.getElementById('org-website')?.value || '');
+            apiData.append('bio', document.getElementById('org-bio')?.value || '');
+            
+            // Location
+            apiData.append('city', document.getElementById('org-city')?.value || '');
+            apiData.append('state', document.getElementById('org-state')?.value || '');
+            apiData.append('country', document.getElementById('org-country')?.value || '');
+            apiData.append('coordinates', document.getElementById('org-coords')?.value || '');
+            
+            const logoFile = document.getElementById('org-logo-input')?.files[0];
+            if(logoFile) apiData.append('org-logo-upload', logoFile);
+
+            try {
+                submitBtn.disabled = true;
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    body: apiData
+                });
+                const result = await response.json();
+                submitBtn.disabled = false;
+                
+                if (result.success) {
+                    localStorage.setItem('token', result.token);
+                    alert('Organizer Registration Successful!');
+                    window.location.href = 'index.html'; // Or dashboard
+                } else {
+                    alert(`Registration failed: ${result.error}`);
+                }
+            } catch (error) {
+                submitBtn.disabled = false;
+                console.error('Registration error:', error);
+                alert('Server error during registration');
+            }
         }
     });
 
@@ -238,22 +293,50 @@ function initClientFlow() {
     });
 
     // Submit Handler
-    submitBtn.addEventListener('click', (e) => {
+    submitBtn.addEventListener('click', async (e) => {
         if (validateStep(currentStep, 'client')) {
-            // Collect Data
-            const formData = {
-                type: document.querySelector('input[name="client_type"]:checked').value,
-                name: document.querySelector('input[name="client_name"]').value,
-                role: document.querySelector('input[name="client_role"]').value,
-                mobile: document.querySelector('input[name="client_mobile"]').value,
-                link: document.querySelector('input[name="client_link"]').value,
-                email: document.getElementById('client-email').value
-            };
-            console.log("Client Registration Data:", formData);
+            const apiData = new FormData();
+            
+            apiData.append('role', 'client');
+            const email = document.getElementById('client-email')?.value || '';
+            apiData.append('email', email);
+            const clientName = document.querySelector('input[name="client_name"]')?.value || '';
+            apiData.append('clientName', clientName);
+            // generate username
+            const username = email.split('@')[0] + Math.floor(Math.random()*100);
+            apiData.append('username', username);
+            
+            apiData.append('password', document.getElementById('client-password')?.value || 'Client123!');
+            
+            apiData.append('clientType', document.querySelector('input[name="client_type"]:checked')?.value || '');
+            apiData.append('clientRole', document.querySelector('input[name="client_role"]')?.value || '');
+            apiData.append('mobile', document.querySelector('input[name="client_mobile"]')?.value || '');
+            apiData.append('website', document.querySelector('input[name="client_link"]')?.value || '');
+            
+            const picFile = document.getElementById('client-pic-input')?.files[0];
+            if (picFile) apiData.append('client-pic-upload', picFile);
 
-            // Simulate API call
-            alert('Client Registration Successful! Organizers will contact you soon.');
-            window.location.href = 'index.html';
+            try {
+                submitBtn.disabled = true;
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    body: apiData
+                });
+                const result = await response.json();
+                submitBtn.disabled = false;
+                
+                if (result.success) {
+                    localStorage.setItem('token', result.token);
+                    alert('Client Registration Successful!');
+                    window.location.href = 'index.html';
+                } else {
+                    alert(`Registration failed: ${result.error}`);
+                }
+            } catch (error) {
+                submitBtn.disabled = false;
+                console.error('Registration error:', error);
+                alert('Server error during registration');
+            }
         }
     });
 
@@ -374,7 +457,7 @@ function initVolunteerFlow() {
             }
         });
 
-        submitBtn.addEventListener('click', (e) => {
+        submitBtn.addEventListener('click', async (e) => {
             if (validateVolunteerStep(currentStep)) {
                 // Collect Availability
                 const availability = {};
@@ -396,19 +479,46 @@ function initVolunteerFlow() {
                     tasks.push(`Other: ${otherTaskInput.value}`);
                 }
 
-                // Collect Data
-                // Note: Username moved to Step 1, ensure it's captured correctly from the DOM
-                const formData = {
-                    email: document.getElementById('vol-email').value,
-                    username: document.getElementById('vol-username').value,
-                    skills: addedSkills,
-                    availability: availability,
-                    tasks: tasks,
-                    // ... other fields
-                };
-                console.log('Volunteer Data:', formData);
-                alert('Volunteer Registration Successful! Welcome aboard.');
-                window.location.href = 'index.html';
+                const apiData = new FormData();
+                apiData.append('role', 'volunteer');
+                apiData.append('email', document.getElementById('vol-email')?.value || '');
+                apiData.append('username', document.getElementById('vol-username')?.value || '');
+                apiData.append('password', document.getElementById('vol-password')?.value || '');
+                
+                apiData.append('fullName', document.getElementById('vol-fullname')?.value || '');
+                apiData.append('skills', JSON.stringify(addedSkills));
+                apiData.append('availability', JSON.stringify(availability));
+                apiData.append('tasks', JSON.stringify(tasks));
+                
+                apiData.append('city', document.getElementById('vol-city')?.value || '');
+                apiData.append('state', document.getElementById('vol-state')?.value || '');
+                apiData.append('country', document.getElementById('vol-country')?.value || '');
+                apiData.append('coordinates', document.getElementById('vol-coords')?.value || '');
+                
+                const picFile = document.getElementById('vol-profile-pic')?.files[0];
+                if (picFile) apiData.append('vol-profile-pic', picFile);
+
+                try {
+                    submitBtn.disabled = true;
+                    const response = await fetch('/api/auth/register', {
+                        method: 'POST',
+                        body: apiData
+                    });
+                    const result = await response.json();
+                    submitBtn.disabled = false;
+                    
+                    if (result.success) {
+                        localStorage.setItem('token', result.token);
+                        alert('Volunteer Registration Successful! Welcome aboard.');
+                        window.location.href = 'index.html';
+                    } else {
+                        alert(`Registration failed: ${result.error}`);
+                    }
+                } catch (error) {
+                    submitBtn.disabled = false;
+                    console.error('Registration error:', error);
+                    alert('Server error during registration');
+                }
             }
         });
 

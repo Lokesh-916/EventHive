@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('change', validateForm);
 
     // 6. Submit
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
@@ -170,22 +170,61 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Checkboxes
-        data.impact = Array.from(document.querySelectorAll('input[name="impact"]:checked')).map(cb => cb.value);
+        const impact = Array.from(document.querySelectorAll('input[name="impact"]:checked')).map(cb => cb.value);
 
-        console.log('Incident Data:', data);
+        // Prep FormData for API
+        const apiData = new FormData();
+        apiData.append('category', data.category);
+        apiData.append('type', data.final_type);
+        apiData.append('description', data.description);
+        apiData.append('severity', data.severity);
+        apiData.append('timestamp', data.timestamp);
+        impact.forEach(imp => apiData.append('impact', imp));
+        
+        const fileInput = document.getElementById('evidence');
+        if (fileInput.files.length > 0) {
+            for (let i = 0; i < fileInput.files.length; i++) {
+                 apiData.append('evidence', fileInput.files[i]);
+            }
+        }
 
-        // Toast
-        const toast = document.getElementById('toast');
-        toast.classList.remove('translate-y-24', 'opacity-0');
-        setTimeout(() => toast.classList.add('translate-y-24', 'opacity-0'), 3000);
+        // Token
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Please login to report an incident');
+            return;
+        }
 
-        // Reset
-        form.reset();
-        typeSection.classList.add('opacity-50', 'pointer-events-none');
-        typeInputContainer.classList.add('hidden');
-        filePreview.classList.add('hidden');
-        filePreview.classList.remove('flex');
-        validateForm();
+        try {
+            const response = await fetch('/api/incidents', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: apiData
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                // Toast
+                const toast = document.getElementById('toast');
+                toast.classList.remove('translate-y-24', 'opacity-0');
+                setTimeout(() => toast.classList.add('translate-y-24', 'opacity-0'), 3000);
+
+                // Reset
+                form.reset();
+                typeSection.classList.add('opacity-50', 'pointer-events-none');
+                typeInputContainer.classList.add('hidden');
+                filePreview.classList.add('hidden');
+                filePreview.classList.remove('flex');
+                validateForm();
+            } else {
+                alert(`Error: ${result.error}`);
+            }
+        } catch (error) {
+            console.error('Error reporting incident:', error);
+            alert('A server error occurred while reporting the incident.');
+        }
     });
 
     // Reset Button
