@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organizer Dashboard - EventHive</title>
+<link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/styles/organiser.css">
+</head>
+<body>
+
+<!-- Scroll Progress Bar -->
+<div id="scrollProgress"></div>
+
+<!-- 🌊 Particle Background -->
+<canvas id="particleWave"></canvas>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="logo">
+    Event<span>Hive</span>
+  </div>
+
+  <ul class="nav-links">
+    <li><a href="#dashboard" class="nav-link">Dashboard</a></li>
+    <li><a href="#events" class="nav-link">Events</a></li>
+    <li><a href="#volunteers" class="nav-link">Volunteers</a></li>
+    <li><a href="#analytics" class="nav-link">Analytics</a></li>
+  </ul>
+</nav>
+
+<main class="content-wrapper">
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="section reveal">
+    <h2>Dashboard Overview</h2>
+
+    <div class="stats">
+      <div class="card float-card">
+        <h3>Active Events</h3>
+        <p>6</p>
+      </div>
+
+      <div class="card float-card">
+        <h3>Total Volunteers</h3>
+        <p>124</p>
+      </div>
+
+      <div class="card float-card">
+        <h3>Upcoming Events</h3>
+        <p>3</p>
+      </div>
+
+      <div class="card float-card">
+        <h3>Revenue</h3>
+        <p>$12,400</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- EVENTS -->
+  <section id="events" class="section reveal delay-1">
+    <h2>Manage Events</h2>
+
+    <div class="table-wrapper hover-tilt">
+      <table>
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Volunteers</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Tech Meetup</td>
+            <td>15 Feb 2026</td>
+            <td><span class="status live">Live</span></td>
+            <td>32</td>
+            <td>
+              <button class="btn ripple">Edit</button>
+              <button class="btn secondary ripple">View</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- VOLUNTEERS -->
+  <section id="volunteers" class="section reveal delay-2">
+    <h2>Volunteer Management</h2>
+    <p>Approve, assign roles and manage volunteers here.</p>
+
+    <div class="assignment-section hover-tilt">
+      <h3>Assign Work to Volunteer</h3>
+
+      <form id="assignForm">
+        <select id="selectVolunteer" required>
+          <option value="">Select Volunteer</option>
+        </select>
+
+        <input type="text" id="assignedEvent" placeholder="Event Name" required>
+
+        <select id="assignedRole" required>
+          <option value="">Select Role</option>
+          <option value="Registration Desk">Registration Desk</option>
+          <option value="Logistics">Logistics</option>
+          <option value="Stage Management">Stage Management</option>
+          <option value="Hospitality">Hospitality</option>
+        </select>
+
+        <button type="submit" class="btn ripple">Assign Work</button>
+      </form>
+    </div>
+
+    <div class="table-wrapper hover-tilt">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Assigned Event</th>
+            <th>Role</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="volunteerTable"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ANALYTICS -->
+  <section id="analytics" class="section reveal delay-3">
+    <h2>Analytics</h2>
+    <p>Advanced charts and insights coming soon.</p>
+  </section>
+
+  <!-- FUTURE UPDATES BLOCK -->
+  <section class="future-block section reveal delay-4 float-card">
+    <h2>🚀 Upcoming Dashboard Updates</h2>
+    <ul>
+      <li>📊 Advanced Event Analytics</li>
+      <li>🤖 AI Volunteer Suggestions</li>
+      <li>📅 Interactive Calendar View</li>
+      <li>💳 Expense Tracking System</li>
+      <li>🔔 Real-time Notifications</li>
+    </ul>
+  </section>
+
+</main>
+
+<script src="src/js/organiser.js"></script>
+</body>
+</html>
