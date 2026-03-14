@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EventHive</title>
+  <link rel="stylesheet" href="home.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+
+</head>
+<body>
+<canvas id="particleWave"></canvas>
+
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo">
+      Event<span>hive</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="feature1.html">feature1</a></li>
+      <li><a href="feature2.html">feature2</a></li>
+      <li><a href="feature3.html">feature3</a></li>
+      <li><a href="feature4.html">feature4</a></li>
+    </ul>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="content-wrapper">
+
+    <!-- ONGOING EVENTS -->
+    <section id="ongoing" class="feature-item">
+      <span class="badge">Live now</span>
+      <h2>Ongoing Events</h2>
+      <p>Events happening right now.</p>
+
+      <div class="events-grid">
+        <article class="event-card" data-url="event1.html">
+          <img src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=900" alt="Tech Meetup" />
+          <h3>Tech Meetup</h3>
+          <p>Live coding & networking.</p>
+        </article>
+
+        <article class="event-card" data-url="event2.html">
+          <img src="https://sxsw.com/wp-content/uploads/2020/05/sxswpitch-Beverly-Schulze.png" alt="Startup Pitch" />
+          <h3>Startup Pitch</h3>
+          <p>Innovators showcase ideas.</p>
+        </article>
+
+        <article class="event-card" data-url="event3.html">
+          <img src="https://images.unsplash.com/photo-1576595580361-90a855b84b20?w=900" alt="Design Workshop" />
+          <h3>Design Workshop</h3>
+          <p>Hands-on UI/UX session.</p>
+        </article>
+
+        <article class="event-card" data-url="event4.html">
+          <img src="https://images.unsplash.com/photo-1761223976145-a85ffe11fc57?w=900" alt="AI Conference" />
+          <h3>AI Conference</h3>
+          <p>Future of technology.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- UPCOMING EVENTS -->
+    <section id="upcoming" class="feature-item">
+      <span class="badge">Coming soon</span>
+      <h2>Upcoming Events</h2>
+      <p>Plan ahead and stay excited.</p>
+
+      <div class="events-grid">
+        <article class="event-card" data-url="event5.html">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCeEbAsmCqEWPVHbwIwmBU4lm-ZNvmpJSztA&s" alt="Blockchain Summit" />
+          <h3>Blockchain Summit</h3>
+          <p>Decentralized future.</p>
+        </article>
+
+        <article class="event-card" data-url="event6.html">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZ4R3UPDFFsmZQTdsXNe3ayc0a7M8QIDbaeA&s" alt="Cloud Expo" />
+          <h3>Cloud Expo</h3>
+          <p>Scalable solutions.</p>
+        </article>
+
+        <article class="event-card" data-url="event7.html">
+          <img src="https://images.unsplash.com/photo-1510915228340-29c85a43dcfe?w=900" alt="Cybersecurity Talk" />
+          <h3>Cybersecurity Talk</h3>
+          <p>Protecting digital assets.</p>
+        </article>
+
+        <article class="event-card" data-url="event8.html">
+          <img src="https://blog.iese.edu/mba/files/2022/03/Coding-Bootcamp-1.jpg" alt="Dev Bootcamp" />
+          <h3>Dev Bootcamp</h3>
+          <p>Level up your skills.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- PAST EVENTS -->
+    <section id="past" class="feature-item">
+      <span class="badge">Previously</span>
+      <h2>Past Events</h2>
+      <p>Events you may have missed.</p>
+
+      <div class="events-grid">
+        <article class="event-card" data-url="past1.html">
+          <img src="https://picsum.photos/id/109/400/300" alt="Hackathon" />
+          <h3>Hackathon</h3>
+          <p>24-hour coding marathon.</p>
+        </article>
+
+        <article class="event-card" data-url="past2.html">
+          <img src="https://images.unsplash.com/photo-1769798643655-e0f10f62c3fd?w=900" alt="Marketing Seminar" />
+          <h3>Marketing Seminar</h3>
+          <p>Growth strategies.</p>
+        </article>
+
+        <article class="event-card" data-url="past3.html">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_Mq101BJcTH0_Ca5F-0lbHqjZ9-6bFy6r4Q&s" alt="UI Conference" />
+          <h3>UI Conference</h3>
+          <p>Design trends & tools.</p>
+        </article>
+
+        <article class="event-card" data-url="past4.html">
+          <img src="https://picsum.photos/id/112/400/300" alt="Data Science Talk" />
+          <h3>Data Science Talk</h3>
+          <p>Insights from data.</p>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2026 EventHive. All rights reserved.</p>
+  </footer>
+
+  <script src="home.js"></script>
+</body>
+</html>

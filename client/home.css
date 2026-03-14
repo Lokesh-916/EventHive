@@ -1,0 +1,229 @@
+:root {
+  /* --nav-bg: #948979; */
+  /* --bg-main: #222831; */
+  /* --primary: #393E46;
+  --accent: #a0d2eb;
+  --secondary-bg:#948979;
+  --text-dark: #1a1b21;*/
+   --text-light: #ffffff; 
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  /* border-radius:50px; */
+}
+
+body {
+  font-family:Inter,sans-serif;
+  /* background-color:var(--bg-main); */
+  color: var(--text-light);
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  background-image:url('https://images.unsplash.com/photo-1686425374911-e0d752e09806?q=80&w=1493&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+  /* background-size:1920px 2016px; */
+  background-repeat:no-repeat;
+  background-size: cover;
+  background-attachment:fixed;
+  background-position:bottom;
+ 
+  
+}
+body::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* NAVBAR */
+
+.navbar {
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 5%;
+  position:sticky;
+  top:20px;
+  z-index: 1000;
+  background: rgba(15,15,35,0.65);
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+  backdrop-filter: blur(18px);
+  border-radius:50px;
+  width:90%;
+  margin:20px auto;
+  transition: opacity 0.4s ease, backdrop-filter 0.4s ease;
+
+}
+
+.navbar.dimmed {
+  opacity: 0.6;                 
+  backdrop-filter: blur(10px);  
+}
+
+.logo {
+  font-size:30px;
+  font-weight: 800;
+  color: #ffffff;
+  font-family: 'satisfy', cursive;
+}
+
+.logo span {
+  color: var(--text-light);
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 25px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color:#ffffff;
+  font-weight: 500;
+  transition: 0.3s;
+  font-family: Inter,sans-serif;
+  font-size:15px;
+}
+
+.nav-links a:hover {
+  color: var(--primary);
+}
+
+/* MAIN LAYOUT */
+
+.content-wrapper {
+  max-width: 1150px;
+  margin: 80px auto;
+  padding: 0 25px 60px;
+}
+
+.feature-item {
+  margin-bottom: 120px;
+}
+
+/* Section heading */
+
+.feature-item h2 {
+  font-size: 20px;
+  margin: 15px 0;
+  color:#ffffff;
+  font-family: 'Inter',sans-serif;
+}
+
+.feature-item p {
+  font-size: 1.05rem;
+  color: var(--text-light);
+  margin-bottom: 20px;
+  line-height: 1.7;
+  font-family:'Inter',sans-serif
+}
+
+/* Badge */
+
+.badge {
+  background: rgba(255, 255, 255, 0.6); /* must be semi-transparent */
+  backdrop-filter: blur(30px);
+  color:blue;
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: inline-block;
+}
+
+/* EVENT GRID */
+
+.events-grid {
+  margin-top: 25px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+}
+
+.event-card {
+  background: rgba(255, 255, 255, 0.15);/* must be semi-transparent */
+  backdrop-filter: blur(90px);
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  background: 0.25s ease;
+}
+
+.event-card img {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  display: block;
+}
+
+.event-card h3 {
+  margin: 15px 15px 8px;
+  font-size: 1.8rem;
+  color:#ffffff;
+  font-family: 'Inter', sans-serif;
+}
+
+.event-card p {
+  margin: 0 15px 18px 15px;
+  color: #ffffff;
+  font-size: 0.9rem;
+}
+
+.event-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* SCROLL ANIMATIONS */
+
+.feature-item {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+
+.feature-item.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* FOOTER */
+
+footer {
+  text-align: center;
+  padding: 15px 10px 30px;
+  font-size: 0.9rem;
+  color: #d8dbe8;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 850px) {
+  .feature-item {
+    text-align: center;
+  }
+
+  .nav-links {
+    gap: 15px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+#particleWave {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
