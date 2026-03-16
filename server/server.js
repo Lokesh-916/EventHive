@@ -77,6 +77,18 @@ app.get('/report-incident', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/report-incident.html'));
 });
 
+app.get('/home', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/home.html'));
+});
+
+app.get('/organiser-home', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/organiser-home.html'));
+});
+
+app.get('/organiser', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/organiser.html'));
+});
+
 // Generic 404 handler for API vs Front-end
 app.use((req, res, next) => {
   if (req.originalUrl.startsWith('/api')) {

@@ -180,7 +180,7 @@ function initOrganizerFlow() {
                 if (result.success) {
                     localStorage.setItem('token', result.token);
                     alert('Organizer Registration Successful!');
-                    window.location.href = 'index.html'; // Or dashboard
+                    window.location.href = '/organiser-home';
                 } else {
                     alert(`Registration failed: ${result.error}`);
                 }
@@ -328,7 +328,7 @@ function initClientFlow() {
                 if (result.success) {
                     localStorage.setItem('token', result.token);
                     alert('Client Registration Successful!');
-                    window.location.href = 'index.html';
+                    window.location.href = '/home';
                 } else {
                     alert(`Registration failed: ${result.error}`);
                 }
@@ -510,7 +510,7 @@ function initVolunteerFlow() {
                     if (result.success) {
                         localStorage.setItem('token', result.token);
                         alert('Volunteer Registration Successful! Welcome aboard.');
-                        window.location.href = 'index.html';
+                        window.location.href = '/home';
                     } else {
                         alert(`Registration failed: ${result.error}`);
                     }

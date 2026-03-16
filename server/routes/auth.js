@@ -43,7 +43,7 @@ router.post('/register', upload.any(), async (req, res) => {
       };
       // Files handled by multer req.files
       const logoFile = req.files?.find(f => f.fieldname === 'org-logo-upload');
-      if (logoFile) profile.logo = `/uploads/${logoFile.filename}`;
+      if (logoFile) profile.logo = `data:${logoFile.mimetype};base64,${logoFile.buffer.toString('base64')}`;
     } else if (role === 'volunteer') {
       profile.fullName = req.body.fullName;
       profile.skills = req.body.skills ? JSON.parse(req.body.skills) : [];
@@ -53,7 +53,7 @@ router.post('/register', upload.any(), async (req, res) => {
         coordinates: req.body.coordinates ? req.body.coordinates.split(',').map(Number) : []
       };
       const picFile = req.files?.find(f => f.fieldname === 'vol-profile-pic');
-      if (picFile) profile.profilePic = `/uploads/${picFile.filename}`;
+      if (picFile) profile.profilePic = `data:${picFile.mimetype};base64,${picFile.buffer.toString('base64')}`;
     } else if (role === 'client') {
       profile.clientName = req.body.clientName;
       profile.clientType = req.body.clientType;
@@ -61,7 +61,7 @@ router.post('/register', upload.any(), async (req, res) => {
       profile.mobile = req.body.mobile;
       profile.website = req.body.website;
       const picFile = req.files?.find(f => f.fieldname === 'client-pic-upload');
-      if (picFile) profile.profilePic = `/uploads/${picFile.filename}`;
+      if (picFile) profile.profilePic = `data:${picFile.mimetype};base64,${picFile.buffer.toString('base64')}`;
     } else {
         return res.status(400).json({ success: false, error: 'Invalid role' });
     }

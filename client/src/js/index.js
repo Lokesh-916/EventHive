@@ -423,3 +423,52 @@ if (signupModal) {
         }
     });
 }
+
+// --- Login Form Handler ---
+const loginForm = document.getElementById('login-form');
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const submitBtn = loginForm.querySelector('button[type="submit"]');
+        
+        try {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Signing in...';
+            
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                localStorage.setItem('token', result.token);
+                // Redirect logic based on role
+                if (result.user.role === 'volunteer') {
+                    window.location.href = '/home';
+                } else if (result.user.role === 'organizer') {
+                    window.location.href = '/organiser-home';
+                } else {
+                    window.location.href = '/home'; // Default fallback, client could go here too
+                }
+            } else {
+                alert(`Login failed: ${result.error}`);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Sign in';
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('Server error during login');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Sign in';
+        }
+    });
+}
+

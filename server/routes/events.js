@@ -20,7 +20,7 @@ router.post('/', protect, authorize('organizer'), upload.single('banner'), async
     if(req.body.media) eventData.media = JSON.parse(req.body.media);
     
     if (req.file) {
-      eventData.banner = `/uploads/${req.file.filename}`;
+      eventData.banner = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
     }
 
     const event = await Event.create(eventData);

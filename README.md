@@ -1,15 +1,43 @@
 # EventHive
 
-Operations-First Event Platform
+Operations-First Event Platform designed to connect event organizers, volunteers, and clients seamlessly. It provides a comprehensive suite of tools for managing events, registering volunteers, and orchestrating flawless experiences.
 
 ## Project Structure
 
 ```
 EventHive/
-├── client/          # Frontend files (HTML, CSS, JS, assets)
-├── server/          # Express.js backend server
+├── client/          # Frontend files (HTML, Tailwind CSS, JS, assets)
+├── server/          # Express.js backend server with MongoDB Atlas
 └── README.md        # This file
 ```
+
+## Features
+
+- **Modern UI**: Dark glassmorphic theme across the entire application using Tailwind CSS.
+- **Role-Based Workflows**: Tailored dashboard and flows for Volunteers, Organizers, and Clients.
+- **Smart Routing**: Multi-page application structure with clean URLs (no `.html` extensions).
+- **Authentication**: JWT-based login and registration system.
+- **Dynamic Events Management**: Track, create, and manage ongoing/upcoming/past events seamlessly.
+- **Responsive Design**: Mobile-friendly navigation and data tables.
+
+## Available Routes
+
+- `/` - Home/Landing page
+- `/home` - Volunteer Dashboard
+- `/organiser-home` - Organizer Home
+- `/organiser` - Organizer Dashboard
+- `/register` - Registration (supports `?type=volunteer|organizer|client`)
+- `/create-event` - Create event page
+- `/event-info` - Event information page
+- `/report-incident` - Report incident page
+- `/support` - Support and FAQ page
+
+## Technology Stack
+
+- **Frontend**: HTML5, Vanilla JavaScript, Tailwind CSS
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB Atlas
+- **Fonts**: Google Fonts (Inter, Satisfy)
 
 ## Getting Started
 
@@ -17,153 +45,64 @@ EventHive/
 
 - Node.js (v14 or higher)
 - npm
+- MongoDB Atlas Cluster URI
+
+### Environment Variables
+
+Before running the backend, create a `.env` file in the `server` directory and add your MongoDB Atlas URI:
+
+1. Create the `.env` file:
+   ```bash
+   cd server
+   touch .env
+   ```
+2. Add your MongoDB URI (example):
+   ```env
+   MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/eventhive?retryWrites=true&w=majority
+   JWT_SECRET=your_jwt_secret_key
+   PORT=3000
+   ```
+
+*(Note: The `.env` file is included in `.gitignore` and should never be committed.)*
 
 ### Installation
 
 1. Install server dependencies:
-```bash
-cd server
-npm install
-```
+   ```bash
+   cd server
+   npm install
+   ```
 
 2. Install client dependencies (for Tailwind CSS):
-```bash
-cd ../client
-npm install
-```
+   ```bash
+   cd ../client
+   npm install
+   ```
 
 ### Running the Application
 
-1. Start the server (from the `server` directory):
-```bash
-cd server
-npm start
-```
+1. **Start the Express Server:**
+   From the `server` directory, run:
+   ```bash
+   cd server
+   npm run dev
+   ```
+   *(This starts the node server typically on port 3000)*
 
-Or for development with auto-restart:
-```bash
-npm run dev
-```
+2. **Start the Tailwind CSS Compiler:**
+   Open a new terminal window/tab, navigate to the `client` directory, and run:
+   ```bash
+   cd client
+   npm run dev
+   ```
+   *(This watches for class changes in your HTML/JS and updates `output.css`)*
 
-2. Open your browser and navigate to:
-```
-http://localhost:3000
-```
-
-### Building CSS (Optional)
-
-If you make changes to Tailwind CSS:
-
-```bash
-cd client
-npm run build
-```
-
-Or watch for changes:
-```bash
-npm run dev
-```
-
-## Features
-
-- Clean URLs (no .html extensions)
-- Multi-role registration (Volunteer, Organizer, Client)
-- Responsive design
-- Modern UI with glassmorphism effects
-- Support page with FAQ
-
-## Available Routes
-
-- `/` - Home page
-- `/register` - Registration (supports ?type=volunteer|organizer|client)
-- `/support` - Support and FAQ page
-- `/create-event` - Create event page
-- `/event-info` - Event information page
-- `/report-incident` - Report incident page
-
-## Technology Stack
-
-- Frontend: HTML5, Tailwind CSS, Vanilla JavaScript
-- Backend: Node.js, Express.js
-- Fonts: Google Fonts (Inter, Satisfy)
+3. **View the App:**
+   Open your browser and navigate to:
+   ```
+   http://localhost:3000
+   ```
 
 ## License
 
 All rights reserved © 2026 EventHive
-
-EventHive is a modern platform designed to connect event organizers, volunteers, and participants seamlessly. It provides a comprehensive suite of tools for managing events, registering volunteers, and handling incident reports.
-
-## Features
-
-- **Dynamic Landing Page**: A visually appealing landing page showcasing the platform's value proposition.
-- **User Registration**:
-  - **Organizers**: 4-step registration process (Account, Identity, Contact, Details).
-  - **Clients**: 2-step registration process (Account, Personal Details) with profile picture upload.
-  - **Volunteers**: Dedicated registration flow.
-- **Incident Reporting**: A streamlined interface for reporting issues or incidents.
-- **Support System**: Access to help and support resources.
-- **Location Services**: Automatic location fetching for easier form filling.
-
-## Tech Stack
-
-- **Frontend**: HTML5, JavaScript (Vanilla)
-- **Styling**: Tailwind CSS
-- **Design**: Responsive and modern UI with glassmorphism effects and animations.
-
-## Directory Structure
-
-```plaintext
-EventHive/
-├── client/                 # Frontend Application
-│   ├── public/             # Static Assets
-│   │   ├── assets/         # Images, videos, and icons
-│   ├── src/                # Source Code
-│   │   ├── js/             # JavaScript logic (index.js, register.js)
-│   │   ├── styles/         # CSS source files (Tailwind input)
-│   ├── index.html          # Landing Page
-│   ├── register.html       # Registration Pages (Organizer/Volunteer/Client)
-│   ├── report-incident.html # Incident Reporting Page
-│   ├── support.html        # Support & FAQ Page
-│   ├── tailwind.config.js  # Tailwind CSS Configuration
-│   └── package.json        # Frontend Dependencies
-└── server/                 # Backend Application (In Development)
-```
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js installed on your machine.
-
-### Installation
-
-1.  **Clone the repository:**
-    ```bash
-    git clone <repository-url>
-    cd EventHive
-    ```
-
-2.  **Navigate to the client directory:**
-    ```bash
-    cd client
-    ```
-
-3.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
-
-### Running the Project
-
-1.  **Start the Tailwind CSS build process (watch mode):**
-    ```bash
-    npx tailwindcss -i ./src/styles/input.css -o ./src/styles/output.css --watch
-    ```
-
-2.  **Launch the application:**
-    - Open `index.html` in your preferred web browser.
-    - Alternatively, use a live server extension (e.g., Live Server in VS Code) for a better development experience.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.

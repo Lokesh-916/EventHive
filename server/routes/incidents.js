@@ -9,7 +9,7 @@ const upload = require('../middleware/upload');
 // @access  Private (Any authenticated user)
 router.post('/', protect, upload.array('evidence', 5), async (req, res) => {
   try {
-    const evidencePaths = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+    const evidencePaths = req.files ? req.files.map(file => `data:${file.mimetype};base64,${file.buffer.toString('base64')}`) : [];
     
     // Determine issue type logic dynamically
     let issueType = req.body.type;
