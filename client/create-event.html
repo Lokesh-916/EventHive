@@ -50,9 +50,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('https://images.unsplash.com/photo-1686425374911-e0d752e09806?q=80&w=1493&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center;
+            background: url('public/images/light.jpeg') no-repeat center center;
             background-size: cover;
             z-index: -1;
+            filter: brightness(0.25) saturate(0.5);
         }
 
         .satisfy-regular {
@@ -456,8 +457,8 @@
                             <label class="eh-label" for="venue-name">Venue Name</label>
                             <input type="text" id="venue-name" class="eh-input-dark" placeholder="Venue Name">
                         </div>
-                        <input type="text" placeholder="City" class="eh-input-dark">
-                        <input type="text" placeholder="State/Country" class="eh-input-dark">
+                        <input type="text" id="venue-city" placeholder="City" class="eh-input-dark">
+                        <input type="text" id="venue-state-country" placeholder="State/Country" class="eh-input-dark">
                     </div>
 
                     <div id="virtual-section" class="md:col-span-2 hidden">
@@ -584,10 +585,10 @@
                     <div class="md:col-span-2">
                         <label class="eh-label">Socials</label>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <input type="text" placeholder="Twitter" class="eh-input-dark text-xs">
-                            <input type="text" placeholder="Instagram" class="eh-input-dark text-xs">
-                            <input type="text" placeholder="LinkedIn" class="eh-input-dark text-xs">
-                            <input type="text" placeholder="Facebook" class="eh-input-dark text-xs">
+                            <input type="text" data-social="twitter" placeholder="Twitter" class="eh-input-dark text-xs">
+                            <input type="text" data-social="instagram" placeholder="Instagram" class="eh-input-dark text-xs">
+                            <input type="text" data-social="linkedin" placeholder="LinkedIn" class="eh-input-dark text-xs">
+                            <input type="text" data-social="facebook" placeholder="Facebook" class="eh-input-dark text-xs">
                         </div>
                     </div>
                 </div>

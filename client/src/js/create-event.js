@@ -184,6 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
             totalVolunteers: document.getElementById('total-volunteers')?.value,
             minAge: document.getElementById('min-age')?.value,
             perks: document.getElementById('volunteer-perks')?.value,
+            preferredSkills: (document.getElementById('skills-preferred')?.value || '').split(',').map(s => s.trim()).filter(Boolean),
             generalNote: document.getElementById('volunteer-general-note')?.value
         };
         formData.append('volunteerRequirements', JSON.stringify(requirements));
@@ -198,6 +199,16 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         formData.append('volunteerRoles', JSON.stringify(roles));
+        const mediaInputs = document.querySelectorAll('input[data-social]');
+        const socials = {};
+        mediaInputs.forEach(inp => { if(inp.value) socials[inp.dataset.social] = inp.value; });
+        const media = {
+            promoVideo: document.getElementById('promo-video')?.value || '',
+            supportContact: document.getElementById('support-contact')?.value || '',
+            socials
+        };
+        formData.append('media', JSON.stringify(media));
+        formData.append('status', 'published');
 
         const token = localStorage.getItem('token');
         if (!token) {
@@ -214,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             if (data.success) {
                 alert('Event created successfully!');
-                window.location.href = 'event-info.html?id=' + data.data._id;
+                window.location.href = '/event-info?id=' + data.data._id;
             } else {
                 alert(`Error: ${data.error}`);
             }

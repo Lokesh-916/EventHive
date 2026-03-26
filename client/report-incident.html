@@ -1,77 +1,283 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Report Incident - EventHive</title>
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Satisfy&display=swap"
+    <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Satisfy&display=swap"
         rel="stylesheet">
     <!-- Tailwind CSS -->
     <link rel="stylesheet" href="src/styles/output.css">
 
     <style>
-        /* Minimal Custom Styling for things Tailwind utilities miss */
+        :root {
+            --eh-dark-glass: rgba(255, 255, 255, 0.65);
+            --eh-dark-glass-light: rgba(255, 255, 255, 0.4);
+            --eh-dark-glass-input: rgba(0, 0, 0, 0.05);
+            --eh-white: #1a1a2e;
+            --bg-overlay: rgba(255, 255, 255, 0.72);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --border-hover: rgba(0, 0, 0, 0.2);
+            --btn-bg: rgba(0, 0, 0, 0.05);
+            --btn-bg-hover: rgba(0, 0, 0, 0.1);
+            --input-bg: rgba(255, 255, 255, 0.5);
+        }
+
+        [data-theme="dark"] {
+            --eh-dark-glass: rgba(10, 15, 20, 0.85);
+            --eh-dark-glass-light: rgba(10, 15, 20, 0.6);
+            --eh-dark-glass-input: rgba(255, 255, 255, 0.05);
+            --eh-white: #FFFFFF;
+            --bg-overlay: rgba(10, 15, 20, 0.80);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.25);
+            --btn-bg: rgba(255, 255, 255, 0.1);
+            --btn-bg-hover: rgba(255, 255, 255, 0.2);
+            --input-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            color: var(--eh-white);
+            background: transparent;
+        }
+
+        /* Dynamically overriding Tailwind white variables based on theme */
+        .text-white { color: var(--eh-white) !important; }
+        .text-white\/30 { color: color-mix(in srgb, var(--eh-white) 30%, transparent) !important; }
+        .text-white\/40 { color: color-mix(in srgb, var(--eh-white) 40%, transparent) !important; }
+        .text-white\/50 { color: color-mix(in srgb, var(--eh-white) 50%, transparent) !important; }
+        .text-white\/70 { color: color-mix(in srgb, var(--eh-white) 70%, transparent) !important; }
+        .bg-white\/5 { background-color: color-mix(in srgb, var(--eh-white) 5%, transparent) !important; }
+        .border-white\/10 { border-color: color-mix(in srgb, var(--eh-white) 10%, transparent) !important; }
+
+        /* Background */
+        .bg-layer {
+          position: fixed;
+          inset: 0;
+          z-index: -2;
+          overflow: hidden;
+        }
+        .bg-layer img {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center center;
+          display: block;
+        }
+        .bg-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: -1;
+          background: var(--bg-overlay);
+          transition: background 0.4s ease;
+        }
+
+        .satisfy-regular {
+            font-family: "Satisfy", cursive;
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--eh-dark-glass);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border: 1px solid var(--border-color);
+            border-radius: 1.5rem;
+        }
+
+        .glass-card-light {
+            background: var(--eh-dark-glass-light);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+        }
+
+        /* Forms */
+        .glass-input {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--eh-white);
+            transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+            outline: none;
+            border-color: var(--border-hover);
+            background: var(--eh-dark-glass-input);
+        }
+        .glass-input::placeholder {
+            color: color-mix(in srgb, var(--eh-white) 40%, transparent);
+        }
+
+        select.glass-input option {
+            background: var(--eh-dark-glass);
+            color: var(--eh-white);
+        }
+
+        /* Buttons */
+        .btn-glass {
+            background: var(--btn-bg);
+            backdrop-filter: blur(8px);
+            color: var(--eh-white);
+            font-weight: 700;
+            padding: 1rem 3rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .btn-glass:hover:not(:disabled) {
+            background: var(--btn-bg-hover);
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+        .btn-glass:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Radio Blocks */
+        .radio-block {
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .peer:checked + .radio-block {
+            border-color: var(--eh-white);
+            background: var(--btn-bg-hover);
+            box-shadow: 0 0 20px color-mix(in srgb, var(--eh-white) 10%, transparent);
+        }
+
         .incident-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 1rem;
         }
+        
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-backdrop.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .modal-content {
+            background: var(--eh-dark-glass);
+            backdrop-filter: blur(40px);
+            border: 1px solid var(--border-color);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            max-width: 600px;
+            width: 90%;
+            transform: translateY(20px) scale(0.97);
+            transition: transform 0.3s ease;
+        }
+        .modal-backdrop.active .modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        /* Smooth Scroll */
+        html { scroll-behavior: smooth; }
+        
+        /* Back button */
+        .btn-back {
+            background: var(--btn-bg);
+            border: 1px solid var(--border-color);
+            color: var(--eh-white);
+            padding: 0.6rem 1.2rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-back:hover {
+            background: var(--btn-bg-hover);
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 
-<body class="bg-incident-green font-sans text-gray-800 min-h-screen flex flex-col">
+<body>
 
-    <!-- Header -->
-    <header class="bg-incident-teal sticky top-0 z-50 shadow-md">
-        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="bg-white/20 p-2 rounded-full backdrop-blur-sm">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                        </path>
-                    </svg>
-                </div>
-                <div>
-                    <h1 class="text-3xl font-brand text-white font-bold drop-shadow-sm">Report an Issue</h1>
-                </div>
-            </div>
-            <a href="/" class="text-white hover:text-white/80 transition-colors bg-white/10 p-2 rounded-full">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
+    <!-- Background -->
+    <div class="bg-layer">
+        <img id="bgImage" src="public/images/dark.avif" alt="Background">
+    </div>
+    <div class="bg-overlay"></div>
+
+    <!-- Back Button & Header -->
+    <div class="max-w-4xl mx-auto px-6 pt-10 pb-4 animate-fade-in flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <a href="/home" class="btn-back rounded-full p-2" title="Back to Home">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
                 </svg>
             </a>
+            <h1 class="satisfy-regular text-4xl">Report an Issue</h1>
         </div>
-    </header>
+        
+        <!-- Theme Toggle (Visual Consistency) -->
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" id="themeToggle" class="sr-only peer">
+          <div class="w-11 h-6 bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.2)] rounded-full peer peer-focus:outline-none peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[rgba(255,255,255,0.2)]"></div>
+          <span class="ml-3 text-sm font-medium text-white/50" id="themeLabel">Dark</span>
+        </label>
+    </div>
 
     <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4 md:px-8 py-8 max-w-5xl">
+    <main class="flex-grow container mx-auto px-4 md:px-8 py-4 max-w-4xl pb-20">
 
-        <form id="incident-form"
-            class="bg-white rounded-3xl shadow-xl overflow-hidden animate-fade-in border border-incident-teal/20">
-            <!-- Decorative Header Bar -->
-            <div class="h-2 w-full bg-incident-teal"></div>
-
+        <form id="incident-form" class="glass-card overflow-hidden animate-fade-in">
             <div class="p-6 md:p-10 space-y-8">
 
                 <!-- Section 1: Classification -->
                 <section>
-                    <h2 class="text-xl font-bold border-b border-gray-100 pb-2 mb-6 font-sans">
-                        1. Classification</h2>
+                    <h2 class="text-xl font-bold border-b border-white/10 pb-2 mb-6 flex items-center gap-2">
+                        <span class="text-white/40 opacity-70">1.</span> Category
+                    </h2>
 
                     <div class="grid md:grid-cols-2 gap-8">
-
                         <!-- Category -->
                         <div class="space-y-2">
-                            <label for="category"
-                                class="block text-sm font-bold text-gray-700 uppercase tracking-wide">Category <span
-                                    class="text-incident-red">*</span></label>
+                            <label for="category" class="block text-xs font-bold text-white/50 uppercase tracking-widest">Type <span class="text-red-400">*</span></label>
                             <div class="relative">
-                                <select id="category" name="category" required
-                                    class="block w-full rounded-2xl border-gray-200 bg-gray-50 py-3 px-4 text-gray-700 outline-none focus:ring-2 focus:ring-incident-teal transition-all appearance-none cursor-pointer">
+                                <select id="category" name="category" required class="glass-input block w-full rounded-2xl py-3 px-4 outline-none appearance-none cursor-pointer">
                                     <option value="" disabled selected>Select Category...</option>
                                     <option value="volunteer">Volunteer Issue</option>
                                     <option value="resource">Resource Shortage</option>
@@ -79,89 +285,70 @@
                                     <option value="safety">Safety Hazard</option>
                                     <option value="other">Other</option>
                                 </select>
-                                <div
-                                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7"></path>
-                                    </svg>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-white/40">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Specific Issue (Dynamic) -->
-                        <div id="type-section"
-                            class="space-y-2 opacity-50 pointer-events-none transition-all duration-300">
-                            <label for="type"
-                                class="block text-sm font-bold text-gray-700 uppercase tracking-wide">Specific Issue
-                                <span class="text-incident-red">*</span></label>
+                        <div id="type-section" class="space-y-2 opacity-50 pointer-events-none transition-all duration-300">
+                            <label for="type" class="block text-xs font-bold text-white/50 uppercase tracking-widest">Specific <span class="text-red-400">*</span></label>
                             <div class="relative">
-                                <select id="type" name="type" required disabled
-                                    class="block w-full rounded-2xl border-gray-200 bg-gray-50 py-3 px-4 text-gray-700 outline-none focus:ring-2 focus:ring-incident-teal transition-all appearance-none cursor-pointer">
+                                <select id="type" name="type" required disabled class="glass-input block w-full rounded-2xl py-3 px-4 outline-none appearance-none cursor-pointer">
                                     <option value="" disabled selected>Select Category First...</option>
                                 </select>
-                                <div
-                                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7"></path>
-                                    </svg>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-white/40">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Hidden Input for Custom Type -->
-                    <div id="type-input-container" class="hidden mt-4 animate-fade-in-up">
-                        <label for="custom_type"
-                            class="block text-sm font-bold text-gray-700 uppercase tracking-wide mb-2">Specify Issue
-                            <span class="text-incident-red">*</span></label>
-                        <input type="text" id="type-input" name="custom_type"
-                            placeholder="Describe the issue briefly..."
-                            class="block w-full rounded-2xl border-gray-200 bg-gray-50 py-3 px-4 outline-none focus:ring-2 focus:ring-incident-teal transition-all">
+                    <div id="type-input-container" class="hidden mt-4 animate-fade-in">
+                        <label for="custom_type" class="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">Specify details <span class="text-red-400">*</span></label>
+                        <input type="text" id="type-input" name="custom_type" placeholder="Describe the issue briefly..." class="glass-input block w-full rounded-2xl py-3 px-4 outline-none">
                     </div>
                 </section>
 
                 <!-- Section 2: Urgency -->
                 <section>
-                    <h2 class="text-xl font-bold text-incident-black border-b border-gray-100 pb-2 mb-6 font-sans">2.
-                        Urgency</h2>
+                    <h2 class="text-xl font-bold border-b border-white/10 pb-2 mb-6 flex items-center gap-2">
+                        <span class="text-white/40 opacity-70">2.</span> Priority
+                    </h2>
 
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <!-- Low -->
                         <label class="cursor-pointer relative group">
                             <input type="radio" name="severity" value="low" class="peer sr-only" required>
-                            <div
-                                class="p-4 rounded-2xl border-2 border-gray-100 text-center hover:bg-incident-green/20 peer-checked:bg-incident-green peer-checked:border-incident-green transition-all">
-                                <span class="block font-bold text-gray-800">Low</span>
-                                <span class="text-xs text-gray-500">Can wait</span>
+                            <div class="radio-block p-4 rounded-xl text-center">
+                                <span class="block font-bold">Low</span>
+                                <span class="text-[10px] text-white/40 uppercase tracking-wider">Can wait</span>
                             </div>
                         </label>
                         <!-- Medium -->
                         <label class="cursor-pointer relative group">
                             <input type="radio" name="severity" value="medium" class="peer sr-only">
-                            <div
-                                class="p-4 rounded-2xl border-2 border-gray-100 text-center hover:bg-incident-yellow/20 peer-checked:bg-incident-yellow peer-checked:border-incident-yellow transition-all">
-                                <span class="block font-bold text-gray-800">Medium</span>
-                                <span class="text-xs text-gray-500">Needs attention</span>
+                            <div class="radio-block p-4 rounded-xl text-center">
+                                <span class="block font-bold">Medium</span>
+                                <span class="text-[10px] text-white/40 uppercase tracking-wider">Note</span>
                             </div>
                         </label>
                         <!-- High -->
                         <label class="cursor-pointer relative group">
                             <input type="radio" name="severity" value="high" class="peer sr-only">
-                            <div
-                                class="p-4 rounded-2xl border-2 border-gray-100 text-center hover:bg-incident-red/20 peer-checked:bg-incident-red peer-checked:border-incident-red peer-checked:text-white transition-all">
-                                <span class="block font-bold">High</span>
-                                <span class="text-xs opacity-90">Urgent</span>
+                            <div class="radio-block p-4 rounded-xl text-center">
+                                <span class="block font-bold text-orange-400">High</span>
+                                <span class="text-[10px] text-white/40 uppercase tracking-wider">Urgent</span>
                             </div>
                         </label>
                         <!-- Critical -->
                         <label class="cursor-pointer relative group">
                             <input type="radio" name="severity" value="critical" class="peer sr-only">
-                            <div
-                                class="p-4 rounded-2xl border-2 border-gray-100 text-center hover:bg-red-600/10 peer-checked:bg-red-600 peer-checked:border-red-600 peer-checked:text-white transition-all">
-                                <span class="block font-bold">Critical</span>
-                                <span class="text-xs opacity-90">Immediate</span>
+                            <div class="radio-block p-4 rounded-xl text-center">
+                                <span class="block font-bold text-red-500">Critical</span>
+                                <span class="text-[10px] text-white/40 uppercase tracking-wider">Immediate</span>
                             </div>
                         </label>
                     </div>
@@ -169,178 +356,140 @@
 
                 <!-- Section 3: Details -->
                 <section>
-                    <h2 class="text-xl font-bold text-incident-black border-b border-gray-100 pb-2 mb-6 font-sans">3.
-                        Details</h2>
+                    <h2 class="text-xl font-bold border-b border-white/10 pb-2 mb-6 flex items-center gap-2">
+                        <span class="text-white/40 opacity-70">3.</span> Details
+                    </h2>
 
                     <div class="grid md:grid-cols-2 gap-8 mb-6">
                         <!-- Location -->
                         <div class="space-y-2">
-                            <label for="location"
-                                class="block text-sm font-bold text-gray-700 uppercase tracking-wide">Location <span
-                                    class="text-incident-red">*</span></label>
-                            <input type="text" id="location" name="location" placeholder="e.g. Stage Left, Food Court"
-                                required
-                                class="block w-full rounded-2xl border-gray-200 bg-gray-50 py-3 px-4 outline-none focus:ring-2 focus:ring-incident-teal transition-all">
+                            <label for="location" class="block text-xs font-bold text-white/50 uppercase tracking-widest">Location/Area <span class="text-red-400">*</span></label>
+                            <input type="text" id="location" name="location" placeholder="e.g. Stage Left, Food Court" required class="glass-input block w-full rounded-2xl py-3 px-4 outline-none">
                         </div>
                         <!-- Time -->
                         <div class="space-y-2">
-                            <label for="timestamp"
-                                class="block text-sm font-bold text-gray-700 uppercase tracking-wide">Time</label>
-                            <input type="text" id="timestamp" name="timestamp" readonly
-                                class="block w-full rounded-2xl border-gray-200 bg-gray-100 py-3 px-4 text-gray-500 cursor-not-allowed">
+                            <label for="timestamp" class="block text-xs font-bold text-white/50 uppercase tracking-widest">Time</label>
+                            <input type="text" id="timestamp" name="timestamp" readonly class="block w-full rounded-2xl py-3 px-4 text-white/40 bg-white/5 border border-white/5 cursor-not-allowed outline-none">
                         </div>
                     </div>
 
                     <div class="space-y-2 mb-6">
-                        <label for="description"
-                            class="block text-sm font-bold text-gray-700 uppercase tracking-wide">Description <span
-                                class="text-incident-red">*</span></label>
-                        <textarea id="description" name="description" rows="4" placeholder="Describe what happened..."
-                            required
-                            class="block w-full rounded-2xl border-gray-200 bg-gray-50 py-3 px-4 outline-none focus:ring-2 focus:ring-incident-teal transition-all resize-y"></textarea>
+                        <label for="description" class="block text-xs font-bold text-white/50 uppercase tracking-widest">Description <span class="text-red-400">*</span></label>
+                        <textarea id="description" name="description" rows="4" placeholder="Describe the situation..." required class="glass-input block w-full rounded-2xl py-3 px-4 outline-none resize-y"></textarea>
                     </div>
 
-                    <!-- Compact File Upload -->
+                    <!-- File Upload -->
                     <div class="space-y-2">
-                        <label class="block text-sm font-bold text-gray-700 uppercase tracking-wide">Evidence
-                            (Optional)</label>
+                        <label class="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">Evidence (Optional)</label>
                         <div class="flex items-center gap-4">
-                            <label
-                                class="cursor-pointer bg-gray-50 hover:bg-incident-green/30 border-2 border-dashed border-gray-300 hover:border-incident-teal rounded-2xl px-6 py-4 flex items-center gap-3 transition-colors group">
-                                <div
-                                    class="bg-white p-2 rounded-full shadow-sm group-hover:scale-110 transition-transform">
-                                    <svg class="w-5 h-5 text-incident-teal" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
-                                        </path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    </svg>
+                            <label class="glass-input cursor-pointer rounded-2xl px-6 py-4 flex items-center gap-3 w-max group border-dashed">
+                                <div class="bg-white/10 p-2 rounded-full shadow-sm group-hover:bg-white/20 transition-colors">
+                                    <svg class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                                 </div>
-                                <span class="text-sm font-medium text-gray-600 group-hover:text-gray-800">Add
-                                    Photo</span>
+                                <span class="text-sm font-medium text-white/70">Attach Photo</span>
                                 <input type="file" id="evidence" accept="image/*" capture="environment" class="hidden">
                             </label>
 
                             <!-- Preview -->
-                            <div id="file-preview"
-                                class="hidden items-center gap-2 bg-incident-teal/10 px-4 py-2 rounded-xl text-incident-teal">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                    </path>
-                                </svg>
-                                <span id="filename" class="text-xs font-bold truncate max-w-[100px]">file.jpg</span>
-                                <button type="button" id="remove-file" class="ml-2 hover:text-incident-red"><svg
-                                        class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg></button>
+                            <div id="file-preview" class="hidden items-center gap-2 bg-white/10 px-4 py-3 rounded-xl">
+                                <svg class="w-4 h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <span id="filename" class="text-xs font-bold truncate max-w-[100px] text-white">file.jpg</span>
+                                <button type="button" id="remove-file" class="ml-2 text-white/40 hover:text-red-400 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <hr class="border-gray-100">
+                <hr class="border-white/10 my-4">
 
                 <!-- Impact Assessment -->
                 <section class="space-y-4">
-                    <span class="block text-sm font-bold text-gray-700 uppercase tracking-wide">Impact</span>
+                    <span class="block text-xs font-bold text-white/50 uppercase tracking-widest">Impact</span>
                     <div class="incident-grid">
-                        <label
-                            class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border-2 border-transparent hover:border-incident-teal cursor-pointer transition-all">
-                            <input type="checkbox" name="impact" value="schedule"
-                                class="form-checkbox h-5 w-5 text-incident-teal rounded focus:ring-incident-teal border-gray-300">
-                            <span class="text-sm font-medium text-gray-700">Schedule</span>
+                        <label class="glass-input flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-white/5">
+                            <input type="checkbox" name="impact" value="schedule" class="form-checkbox h-4 w-4 rounded bg-black/20 border-white/20 text-indigo-500">
+                            <span class="text-sm font-medium">Schedule</span>
                         </label>
-                        <label
-                            class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border-2 border-transparent hover:border-incident-teal cursor-pointer transition-all">
-                            <input type="checkbox" name="impact" value="attendees"
-                                class="form-checkbox h-5 w-5 text-incident-teal rounded focus:ring-incident-teal border-gray-300">
-                            <span class="text-sm font-medium text-gray-700">Attendees</span>
+                        <label class="glass-input flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-white/5">
+                            <input type="checkbox" name="impact" value="attendees" class="form-checkbox h-4 w-4 rounded bg-black/20 border-white/20 text-indigo-500">
+                            <span class="text-sm font-medium">Attendees</span>
                         </label>
-                        <label
-                            class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border-2 border-transparent hover:border-incident-teal cursor-pointer transition-all">
-                            <input type="checkbox" name="impact" value="safety"
-                                class="form-checkbox h-5 w-5 text-incident-teal rounded focus:ring-incident-teal border-gray-300">
-                            <span class="text-sm font-medium text-gray-700">Safety</span>
+                        <label class="glass-input flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-white/5">
+                            <input type="checkbox" name="impact" value="safety" class="form-checkbox h-4 w-4 rounded bg-black/20 border-white/20 text-indigo-500">
+                            <span class="text-sm font-medium">Safety</span>
                         </label>
-                        <label
-                            class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border-2 border-transparent hover:border-incident-teal cursor-pointer transition-all">
-                            <input type="checkbox" name="impact" value="resources"
-                                class="form-checkbox h-5 w-5 text-incident-teal rounded focus:ring-incident-teal border-gray-300">
-                            <span class="text-sm font-medium text-gray-700">Resources</span>
+                        <label class="glass-input flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-white/5">
+                            <input type="checkbox" name="impact" value="resources" class="form-checkbox h-4 w-4 rounded bg-black/20 border-white/20 text-indigo-500">
+                            <span class="text-sm font-medium">Resources</span>
                         </label>
                     </div>
                 </section>
 
                 <!-- Actions -->
-                <div class="flex flex-col-reverse md:flex-row items-center justify-end gap-4 pt-4">
-                    <button type="button" id="reset-btn"
-                        class="px-8 py-3 rounded-full text-gray-400 font-bold hover:bg-gray-50 hover:text-gray-600 transition-colors w-full md:w-auto">Clear</button>
-                    <button type="submit" id="submit-btn" disabled
-                        class="px-10 py-3 rounded-full bg-incident-teal text-white font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all w-full md:w-auto flex justify-center items-center gap-2">
+                <div class="flex flex-col md:flex-row items-center justify-end gap-4 pt-4">
+                    <button type="button" id="reset-btn" class="px-6 py-2 rounded-full text-white/40 font-bold hover:bg-white/10 transition-colors w-full md:w-auto">Clear</button>
+                    <button type="submit" id="submit-btn" disabled class="btn-glass w-full md:w-auto flex justify-center items-center gap-2">
                         <span>Submit Report</span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                        </svg>
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                     </button>
                 </div>
             </div>
         </form>
 
-        <div class="text-center mt-8 cursor-pointer">
-            <button id="report-system-issue-btn"
-                class="text-xs text-gray-400 font-sans hover:text-incident-teal hover:underline transition-colors focus:outline-none">
-                Report System Issue (App Bug)
+        <div class="text-center mt-6">
+            <button id="report-system-issue-btn" class="text-[11px] text-white/30 uppercase tracking-widest hover:text-white transition-colors">
+                Report System Issue / App Bug
             </button>
         </div>
     </main>
 
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300">
-        <div class="bg-white border-l-4 border-incident-teal shadow-2xl rounded-lg p-4 flex items-center pr-8">
-            <div class="bg-incident-teal rounded-full p-1 mr-3 text-white">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
+        <div class="glass-card shadow-2xl p-4 flex items-center pr-8 border-l-4 border-l-indigo-500">
+            <div class="bg-indigo-500/20 rounded-full p-2 mr-4 text-indigo-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
             </div>
             <div>
-                <h4 class="font-bold text-gray-800">Submitted</h4>
-                <p class="text-xs text-gray-500">Incident logged successfully.</p>
+                <h4 class="font-bold text-white">Submitted</h4>
+                <p class="text-xs text-white/50">Incident logged successfully.</p>
             </div>
         </div>
     </div>
 
     <!-- System Issue Modal -->
-    <div id="system-issue-modal" class="fixed inset-0 z-[60] hidden" aria-modal="true">
-        <!-- Backdrop -->
-        <div class="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity opacity-0" id="system-modal-backdrop">
-        </div>
-
-        <!-- Modal Panel -->
-        <div class="fixed inset-0 flex items-center justify-center p-4">
-            <div id="system-modal-panel"
-                class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all scale-95 opacity-0 relative">
-                <h3 class="text-lg font-bold text-gray-800 mb-4 font-sans">Report System Issue</h3>
-
-                <textarea id="system-issue-text" rows="4"
-                    class="block w-full rounded-xl border-gray-200 bg-gray-50 p-4 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-incident-teal transition-all resize-none"
-                    placeholder="Describe the bug or technical issue..."></textarea>
-
-                <div class="flex justify-end gap-3 mt-6">
-                    <button id="cancel-system-issue"
-                        class="px-4 py-2 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
-                    <button id="submit-system-issue"
-                        class="px-6 py-2 text-sm font-bold text-white bg-incident-teal hover:bg-teal-600 rounded-lg shadow-md transition-all">Submit</button>
-                </div>
+    <div id="system-issue-modal" class="modal-backdrop">
+        <div class="modal-content">
+            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg> 
+               Report System Issue
+            </h3>
+            <textarea id="system-issue-text" rows="4" class="glass-input block w-full rounded-2xl py-3 px-4 outline-none resize-none" placeholder="Describe the bug or technical issue..."></textarea>
+            <div class="flex justify-end gap-3 mt-6">
+                <button id="cancel-system-issue" class="px-6 py-2 text-sm font-bold text-white/50 hover:bg-white/10 rounded-xl transition-colors">Cancel</button>
+                <button id="submit-system-issue" class="px-8 py-2 text-sm font-bold text-white bg-white/10 border border-white/20 hover:bg-white/20 rounded-xl transition-all">Submit</button>
             </div>
         </div>
     </div>
 
     <script src="src/js/report-incident.js"></script>
-</body>
+    <script>
+      // Apply theme
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      function applyTheme(isDark) {
+          document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+          document.getElementById('bgImage').src = isDark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
+          if(document.getElementById('themeToggle')) {
+            document.getElementById('themeToggle').checked = isDark;
+            document.getElementById('themeLabel').textContent = isDark ? "Dark" : "Light";
+          }
+          localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      }
+      applyTheme(savedTheme === 'dark');
 
+      const themeToggle = document.getElementById('themeToggle');
+      if(themeToggle) {
+        themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
+      }
+    </script>
+</body>
 </html>

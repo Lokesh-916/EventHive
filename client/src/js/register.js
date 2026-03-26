@@ -138,7 +138,7 @@ function initOrganizerFlow() {
             
             apiData.append('role', 'organizer');
             apiData.append('email', document.getElementById('org-email')?.value || '');
-            const orgName = document.getElementById('org-name')?.value || '';
+            const orgName = formObj.get('organizer_name') || '';
             apiData.append('orgName', orgName);
             // Generate username
             const username = orgName ? orgName.toLowerCase().replace(/\s+/g, '') + Math.floor(Math.random()*1000) : 'org' + new Date().getTime();
@@ -146,18 +146,18 @@ function initOrganizerFlow() {
             
             apiData.append('password', document.getElementById('org-password')?.value || '');
             
-            apiData.append('leadName', document.getElementById('org-lead-name')?.value || '');
-            apiData.append('organization', document.getElementById('org-org-name')?.value || '');
+            apiData.append('leadName', formObj.get('lead_name') || '');
+            apiData.append('organization', formObj.get('organization') || '');
             
             // Event Types
             const types = Array.from(document.querySelectorAll('input[name="event_type"]:checked')).map(cb => cb.value);
             if(document.getElementById('org-type-other-check')?.checked) types.push(document.getElementById('org-type-other-input').value);
             apiData.append('eventTypes', JSON.stringify(types));
             
-            apiData.append('officialEmail', document.getElementById('org-official-email')?.value || '');
-            apiData.append('mobile', document.getElementById('org-mobile')?.value || '');
-            apiData.append('website', document.getElementById('org-website')?.value || '');
-            apiData.append('bio', document.getElementById('org-bio')?.value || '');
+            apiData.append('officialEmail', formObj.get('official_email') || '');
+            apiData.append('mobile', formObj.get('mobile') || '');
+            apiData.append('website', formObj.get('website') || '');
+            apiData.append('bio', document.querySelector('#org-step-4 textarea')?.value || '');
             
             // Location
             apiData.append('city', document.getElementById('org-city')?.value || '');
@@ -485,7 +485,8 @@ function initVolunteerFlow() {
                 apiData.append('username', document.getElementById('vol-username')?.value || '');
                 apiData.append('password', document.getElementById('vol-password')?.value || '');
                 
-                apiData.append('fullName', document.getElementById('vol-fullname')?.value || '');
+                const volFormObj = new FormData(document.getElementById('vol-reg-form'));
+                apiData.append('fullName', document.getElementById('vol-fullname')?.value || volFormObj.get('full_name') || document.getElementById('vol-username')?.value || '');
                 apiData.append('skills', JSON.stringify(addedSkills));
                 apiData.append('availability', JSON.stringify(availability));
                 apiData.append('tasks', JSON.stringify(tasks));

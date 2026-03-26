@@ -450,6 +450,7 @@ if (loginForm) {
             
             if (result.success) {
                 localStorage.setItem('token', result.token);
+                localStorage.setItem('user', JSON.stringify(result.user));
                 // Redirect logic based on role
                 if (result.user.role === 'volunteer') {
                     window.location.href = '/home';

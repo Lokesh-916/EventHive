@@ -247,23 +247,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function toggleSystemModal(show) {
         if (show) {
-            systemModal.classList.remove('hidden');
-            setTimeout(() => {
-                systemModal.querySelector('div[id="system-modal-backdrop"]').classList.remove('opacity-0');
-                if (systemModalPanel) {
-                    systemModalPanel.classList.remove('scale-95', 'opacity-0');
-                    systemModalPanel.classList.add('scale-100');
-                }
-            }, 10);
+            systemModal.classList.add('active');
         } else {
-            systemModal.querySelector('div[id="system-modal-backdrop"]').classList.add('opacity-0');
-            if (systemModalPanel) {
-                systemModalPanel.classList.add('scale-95', 'opacity-0');
-                systemModalPanel.classList.remove('scale-100');
-            }
-            setTimeout(() => {
-                systemModal.classList.add('hidden');
-            }, 300);
+            systemModal.classList.remove('active');
         }
     }
 
