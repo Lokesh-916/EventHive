@@ -228,6 +228,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Feature 2 Play/Pause Logic
+    const f2Btn = document.getElementById('feature-btn-2');
+    const f2Video = document.getElementById('feature-video-2');
+    const iconPause2 = document.getElementById('icon-pause-2');
+    const iconPlay2 = document.getElementById('icon-play-2');
+
+    if (f2Btn && f2Video) {
+        f2Btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (f2Video.paused) {
+                f2Video.play();
+                iconPause2.classList.remove('hidden');
+                iconPlay2.classList.add('hidden');
+            } else {
+                f2Video.pause();
+                iconPause2.classList.add('hidden');
+                iconPlay2.classList.remove('hidden');
+            }
+        });
+    }
+
     // Testimonials Carousel Logic
     const testimonials = [
         { text: "Managing 50 volunteers was a breeze. The dashboard saved my life.", name: "Sarah Jenkins", role: "Event Organizer", type: "organizer", rating: 5 },
