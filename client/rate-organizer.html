@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rate Organizer - EventHive</title>
+  <meta name="description" content="Rate your event organizer on EventHive after your event.">
+  <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
+  <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/styles/output.css">
+  <style>
+    /* Star Rating */
+    .stars { display: flex; gap: 8px; justify-content: center; }
+    .star-btn {
+      font-size: 2.8rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: rgba(255,255,255,0.2);
+      transition: color 0.15s, transform 0.15s;
+      line-height: 1;
+    }
+    .star-btn:hover, .star-btn.active { color: #f59e0b; transform: scale(1.15); }
+    .star-btn.hovered { color: #fbbf24; }
+
+    /* Confetti */
+    .confetti-piece {
+      position: fixed;
+      width: 10px; height: 10px;
+      top: -20px;
+      animation: confettiFall 2.5s ease-in forwards;
+      border-radius: 2px;
+    }
+    @keyframes confettiFall {
+      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* Textarea */
+    textarea:focus { outline: none; border-color: rgba(59,130,246,0.5); background: rgba(255,255,255,0.08); }
+  </style>
+</head>
+<body class="bg-[#0A0F14] text-white font-['Inter'] min-h-screen relative overflow-x-hidden">
+
+  <!-- Background -->
+  <div class="fixed inset-0 z-[-1]">
+    <img src="https://images.unsplash.com/photo-1686425374911-e0d752e09806?q=80&w=1493&auto=format&fit=crop&ixlib=rb-4.1.0" alt="Background" class="w-full h-full object-cover">
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center bg-[#0f0f23]/65 border border-white/15 shadow-[0_18px_40px_rgba(0,0,0,0.5)] backdrop-blur-[18px] rounded-[50px] z-50">
+    <div class="font-bold text-2xl font-['Satisfy'] tracking-widest text-white cursor-pointer" onclick="window.location.href='/client-home'">
+      Event<span>Hive</span>
+    </div>
+    <button onclick="window.location.href='/client-home'" class="px-5 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all">
+      ← Back
+    </button>
+  </nav>
+
+  <main class="w-[90%] max-w-2xl mx-auto my-20 relative z-10 pb-20">
+
+    <!-- Loading state -->
+    <div id="loadingState" class="text-center py-20 text-white/50 italic">Loading organizer info...</div>
+
+    <!-- Rating Card -->
+    <div id="ratingCard" class="hidden bg-[#0A0F14]/85 backdrop-blur-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2.5rem] p-10">
+
+      <!-- Organizer info header -->
+      <div id="organizerHeader" class="flex items-center gap-5 mb-8 pb-8 border-b border-white/10">
+        <div id="orgAvatar" class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-2xl flex-shrink-0">?</div>
+        <div>
+          <h2 id="orgName" class="text-xl font-bold text-white">—</h2>
+          <p id="orgEmail" class="text-white/50 text-sm mt-0.5">—</p>
+          <div class="flex gap-3 mt-2">
+            <span id="orgCurrentRating" class="text-yellow-400 text-sm font-bold">—</span>
+            <span id="orgEventsCount" class="text-white/40 text-sm">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event / Offer being rated -->
+      <div id="offerInfo" class="bg-white/5 border border-white/10 rounded-[1rem] px-5 py-4 mb-8">
+        <p class="text-xs uppercase tracking-widest text-white/40 font-bold mb-1">Rating for booking</p>
+        <p id="offerTitle" class="text-white font-semibold">—</p>
+        <p id="offerDate" class="text-white/50 text-xs mt-0.5">—</p>
+      </div>
+
+      <!-- Already Rated State -->
+      <div id="alreadyRatedMsg" class="hidden text-center py-6">
+        <p class="text-2xl mb-2">✅</p>
+        <p class="text-white font-bold text-lg">You've already rated this booking</p>
+        <p class="text-white/50 text-sm mt-1">Thank you for your feedback!</p>
+        <button onclick="window.location.href='/client-home'" class="mt-6 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-all">
+          Back to Home
+        </button>
+      </div>
+
+      <!-- Rating Form -->
+      <form id="ratingForm">
+        <h3 class="text-center text-sm uppercase tracking-widest text-white/50 font-bold mb-6">How was your experience?</h3>
+
+        <!-- Stars -->
+        <div class="stars mb-3" id="starContainer">
+          <button type="button" class="star-btn" data-star="1">★</button>
+          <button type="button" class="star-btn" data-star="2">★</button>
+          <button type="button" class="star-btn" data-star="3">★</button>
+          <button type="button" class="star-btn" data-star="4">★</button>
+          <button type="button" class="star-btn" data-star="5">★</button>
+        </div>
+        <p id="starLabel" class="text-center text-white/40 text-sm mb-8 h-5 transition-all">Click to select a rating</p>
+
+        <!-- Review -->
+        <div class="mb-8">
+          <label class="block text-xs uppercase tracking-widest text-white/50 font-bold mb-3">Your Review <span class="normal-case text-white/30">(optional)</span></label>
+          <textarea id="reviewText" rows="4" placeholder="Tell others about your experience with this organizer..."
+            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 resize-none transition-all"></textarea>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" id="submitBtn" disabled
+          class="w-full py-4 font-bold uppercase tracking-wider text-sm bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl hover:opacity-90 transition-all shadow-lg disabled:opacity-30 disabled:cursor-not-allowed">
+          Submit Rating
+        </button>
+        <p id="errorMsg" class="text-red-400 text-sm text-center mt-4 hidden"></p>
+      </form>
+
+      <!-- Success State (hidden initially) -->
+      <div id="successState" class="hidden text-center py-4">
+        <p class="text-5xl mb-4">🎉</p>
+        <h3 class="text-2xl font-bold font-['Satisfy'] text-white mb-2">Thank you!</h3>
+        <p class="text-white/60 text-sm mb-6">Your rating has been submitted and will help other clients find great organizers.</p>
+        <div id="newRatingDisplay" class="bg-white/5 border border-white/10 rounded-[1rem] px-6 py-4 mb-6 inline-block">
+          <p class="text-xs uppercase tracking-widest text-white/40 font-bold mb-1">New organizer rating</p>
+          <p id="newRatingValue" class="text-3xl font-bold text-yellow-400">—</p>
+        </div>
+        <br>
+        <button onclick="window.location.href='/client-home'" class="px-8 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-all shadow-lg">
+          Back to Home
+        </button>
+      </div>
+    </div>
+
+    <!-- Error state (no valid offer) -->
+    <div id="errorState" class="hidden text-center py-20 bg-[#0A0F14]/85 backdrop-blur-[32px] border border-white/10 rounded-[2.5rem] p-10">
+      <p class="text-5xl mb-4">⚠️</p>
+      <h3 class="text-xl font-bold text-white mb-2">Cannot rate this organizer</h3>
+      <p class="text-white/50 text-sm mb-6" id="errorStateMsg">You don't have a completed booking with this organizer.</p>
+      <button onclick="window.location.href='/client-home'" class="px-6 py-3 bg-white/10 border border-white/20 rounded-xl text-sm font-bold uppercase tracking-wider hover:bg-white/20 transition-all">
+        Back to Home
+      </button>
+    </div>
+
+  </main>
+
+  <footer class="mt-auto py-8 text-center text-white/40 text-sm">
+    <p>&copy; 2026 EventHive. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const STAR_LABELS = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+    let selectedScore = 0;
+    let organizerId = null;
+    let offerId = null;
+
+    // Parse URL params
+    const params = new URLSearchParams(window.location.search);
+    organizerId = params.get('organizerId');
+    offerId = params.get('offerId');
+
+    const token = localStorage.getItem('token');
+
+    async function init() {
+      if (!organizerId || !offerId || !token) {
+        showError('Missing organizer or booking information. Please navigate from your bookings.');
+        return;
+      }
+
+      // Load organizer info
+      try {
+        const [orgRes, offerRes] = await Promise.all([
+          fetch(`/api/organizers/${organizerId}`),
+          fetch(`/api/offers/my-offers`, { headers: { Authorization: `Bearer ${token}` } })
+        ]);
+
+        if (!orgRes.ok) { showError('Organizer not found.'); return; }
+
+        const org = await orgRes.json();
+        const offersData = await offerRes.json();
+
+        // Find the specific offer
+        const offer = (offersData.data || []).find(o => o._id === offerId);
+
+        if (!offer) { showError('Booking not found.'); return; }
+        if (offer.status !== 'completed') { showError('You can only rate after the event is completed by the organizer.'); return; }
+
+        // Populate organizer header
+        const initials = (org.username || org.profile?.orgName || 'O')[0].toUpperCase();
+        document.getElementById('orgAvatar').textContent = initials;
+        document.getElementById('orgName').textContent = org.profile?.orgName || org.username || 'Organizer';
+        document.getElementById('orgEmail').textContent = org.email || '';
+        document.getElementById('orgCurrentRating').textContent = `⭐ ${org.ratingAvg > 0 ? org.ratingAvg.toFixed(1) : 'No ratings yet'}`;
+        document.getElementById('orgEventsCount').textContent = `${org.eventsHosted || 0} events hosted`;
+
+        // Populate offer info
+        document.getElementById('offerTitle').textContent = offer.title || 'Untitled Event';
+        document.getElementById('offerDate').textContent = offer.eventDate
+          ? new Date(offer.eventDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+          : 'Date not specified';
+
+        // Update page title
+        document.title = `Rate ${org.profile?.orgName || org.username} - EventHive`;
+
+        // Show card
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('ratingCard').classList.remove('hidden');
+
+        // If already rated, show message
+        if (offer.isRated) {
+          document.getElementById('ratingForm').classList.add('hidden');
+          document.getElementById('alreadyRatedMsg').classList.remove('hidden');
+        }
+
+      } catch (err) {
+        console.error(err);
+        showError('Something went wrong. Please try again.');
+      }
+    }
+
+    function showError(msg) {
+      document.getElementById('loadingState').classList.add('hidden');
+      document.getElementById('errorState').classList.remove('hidden');
+      document.getElementById('errorStateMsg').textContent = msg;
+    }
+
+    // --- Star interaction ---
+    const starBtns = document.querySelectorAll('.star-btn');
+    const starLabel = document.getElementById('starLabel');
+    const submitBtn = document.getElementById('submitBtn');
+
+    starBtns.forEach(btn => {
+      btn.addEventListener('mouseenter', () => {
+        const hoverScore = parseInt(btn.dataset.star);
+        starBtns.forEach(b => {
+          b.classList.toggle('hovered', parseInt(b.dataset.star) <= hoverScore);
+          b.classList.remove('active');
+        });
+        starLabel.textContent = STAR_LABELS[hoverScore];
+      });
+
+      btn.addEventListener('mouseleave', () => {
+        starBtns.forEach(b => {
+          b.classList.remove('hovered');
+          b.classList.toggle('active', parseInt(b.dataset.star) <= selectedScore);
+        });
+        starLabel.textContent = selectedScore ? STAR_LABELS[selectedScore] : 'Click to select a rating';
+      });
+
+      btn.addEventListener('click', () => {
+        selectedScore = parseInt(btn.dataset.star);
+        starBtns.forEach(b => {
+          b.classList.toggle('active', parseInt(b.dataset.star) <= selectedScore);
+        });
+        starLabel.textContent = STAR_LABELS[selectedScore];
+        submitBtn.disabled = false;
+      });
+    });
+
+    // --- Form submission ---
+    document.getElementById('ratingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const review = document.getElementById('reviewText').value.trim();
+      const errMsg = document.getElementById('errorMsg');
+      errMsg.classList.add('hidden');
+
+      if (!selectedScore) { errMsg.textContent = 'Please select a star rating.'; errMsg.classList.remove('hidden'); return; }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+
+      try {
+        const res = await fetch(`/api/organizers/${organizerId}/rate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ offerId, score: selectedScore, review })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          // Show success
+          document.getElementById('ratingForm').classList.add('hidden');
+          document.getElementById('successState').classList.remove('hidden');
+          document.getElementById('newRatingValue').textContent = `${data.ratingAvg} ★`;
+          launchConfetti();
+        } else {
+          errMsg.textContent = data.error || 'Submission failed. Please try again.';
+          errMsg.classList.remove('hidden');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Rating';
+        }
+      } catch (err) {
+        errMsg.textContent = 'Network error. Please try again.';
+        errMsg.classList.remove('hidden');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Rating';
+      }
+    });
+
+    // --- Confetti ---
+    function launchConfetti() {
+      const colors = ['#3b82f6', '#06b6d4', '#f59e0b', '#10b981', '#8b5cf6', '#ec4899'];
+      for (let i = 0; i < 60; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + 'vw';
+        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = Math.random() * 1.5 + 's';
+        piece.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+        piece.style.width = (6 + Math.random() * 8) + 'px';
+        piece.style.height = (6 + Math.random() * 8) + 'px';
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), 3500);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

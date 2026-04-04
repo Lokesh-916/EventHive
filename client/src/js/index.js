@@ -491,7 +491,11 @@ if (loginForm) {
                 // Redirect logic based on role
                 if (result.user.role === 'volunteer') {
                     window.location.href = '/home';
-                } else if (result.user.role === 'organizer') {
+                }
+                 if (result.user.role === 'client') {
+                    window.location.href = '/client-home';
+                 }
+                 else if (result.user.role === 'organizer') {
                     window.location.href = '/organiser-home';
                 } else {
                     window.location.href = '/home'; // Default fallback, client could go here too

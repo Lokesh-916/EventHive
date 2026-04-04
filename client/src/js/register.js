@@ -328,7 +328,7 @@ function initClientFlow() {
                 if (result.success) {
                     localStorage.setItem('token', result.token);
                     alert('Client Registration Successful!');
-                    window.location.href = '/home';
+                    window.location.href = '/client-home';
                 } else {
                     alert(`Registration failed: ${result.error}`);
                 }

@@ -42,11 +42,15 @@ const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
 const applicationRoutes = require('./routes/applications');
 const incidentRoutes = require('./routes/incidents');
+const organizerRoutes = require('./routes/organizer');
+const offerRoutes = require('./routes/offers');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/incidents', incidentRoutes);
+app.use('/api', organizerRoutes);
+app.use('/api/offers', offerRoutes);
 
 // Static file setup for uploads and client
 app.use('/uploads', express.static(path.join(__dirname, '../client/public/uploads')));
@@ -87,6 +91,14 @@ app.get('/organiser-home', (req, res) => {
 
 app.get('/organiser', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/organiser.html'));
+});
+
+app.get('/client-home', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/client-home.html'));
+});
+
+app.get('/rate-organizer', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/rate-organizer.html'));
 });
 
 // Generic 404 handler for API vs Front-end

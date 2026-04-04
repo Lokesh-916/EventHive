@@ -67,22 +67,22 @@
           <li class="flex items-center gap-4">
             <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">📅</div>
             <div>
-              <p class="text-sm font-bold text-white">Next event</p>
-              <p class="text-xs text-white/60">Tech Summit 2026 - in 5 days</p>
+              <p class="text-sm font-bold text-white">Pending offers</p>
+              <p id="snap-offers" class="text-xs text-white/60">Loading…</p>
             </div>
           </li>
           <li class="flex items-center gap-4">
             <div class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center font-bold">💼</div>
             <div>
-              <p class="text-sm font-bold text-white">New client offers</p>
-              <p class="text-xs text-white/60">3 waiting</p>
+              <p class="text-sm font-bold text-white">Events hosted</p>
+              <p id="snap-hosted" class="text-xs text-white/60">Loading…</p>
             </div>
           </li>
           <li class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center font-bold">✅</div>
+            <div class="w-10 h-10 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center font-bold">⭐</div>
             <div>
-              <p class="text-sm font-bold text-white">Pending tasks</p>
-              <p class="text-xs text-white/60">7 remaining</p>
+              <p class="text-sm font-bold text-white">Your rating</p>
+              <p id="snap-rating" class="text-xs text-white/60">Loading…</p>
             </div>
           </li>
         </ul>
@@ -93,13 +93,12 @@
     <section id="offers" class="bg-[#0A0F14]/85 backdrop-blur-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2.5rem] p-10">
       <div class="mb-10 text-center">
         <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy'] text-white">Client Offers for You</h2>
-        <p class="text-white/60 text-sm mt-2">Clients looking for organizers like you. Review details and accept.</p>
+        <p class="text-white/60 text-sm mt-2">Clients looking for organizers like you. Accept, reject, or mark as completed once the event is done.</p>
       </div>
 
-      <div id="offersList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-center italic text-white/40 pb-10">
-        <!-- JS dynamically populates this, we'll put empty state for now -->
-        No offers available currently.
-      </div>
+      <div id="offersList" class="flex flex-col gap-4"></div>
+      <div id="offers-loading" class="text-center py-8 text-white/30 italic text-sm">Loading offers…</div>
+      <div id="offers-empty" class="hidden text-center py-10 text-white/40 italic">No pending offers right now. Check back later.</div>
     </section>
 
     <!-- MY EVENTS SECTION -->
@@ -162,11 +161,120 @@
   </footer>
 
   <script>
+    const token = localStorage.getItem('token');
+
+    // ── Load organizer profile for snapshot ────────────────────
+    async function loadSnapshot() {
+      if (!token) return;
+      try {
+        const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok) return;
+        const data = await res.json();
+        const user = data.data;
+        document.getElementById('snap-hosted').textContent = `${user.eventsHosted || 0} completed`;
+        document.getElementById('snap-rating').textContent = user.ratingAvg > 0 ? `${user.ratingAvg.toFixed(1)} ★ (${user.ratings?.length || 0} reviews)` : 'No ratings yet';
+      } catch (e) { console.error(e); }
+    }
+
+    // ── Load Incoming Offers ───────────────────────────────────
+    async function loadOffers() {
+      const list = document.getElementById('offersList');
+      const loading = document.getElementById('offers-loading');
+      const empty = document.getElementById('offers-empty');
+
+      if (!token) { loading.classList.add('hidden'); empty.classList.remove('hidden'); return; }
+      try {
+        const res = await fetch('/api/offers/incoming', { headers: { Authorization: `Bearer ${token}` } });
+        loading.classList.add('hidden');
+        if (!res.ok) { empty.classList.remove('hidden'); return; }
+        const data = await res.json();
+        const offers = data.data || [];
+
+        document.getElementById('snap-offers').textContent = offers.length > 0 ? `${offers.length} waiting` : 'None right now';
+
+        if (!offers.length) { empty.classList.remove('hidden'); return; }
+
+        list.innerHTML = offers.map(offer => {
+          const clientName = offer.clientId?.profile?.clientName || offer.clientId?.username || 'Client';
+          const date = offer.eventDate ? new Date(offer.eventDate).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }) : 'No date';
+          return `
+            <div class="bg-white/5 border border-white/10 rounded-[1.5rem] p-6 flex flex-col sm:flex-row sm:items-center gap-5 hover:bg-white/8 transition-colors" id="offer-${offer._id}">
+              <div class="flex-1 min-w-0">
+                <h3 class="text-white font-bold text-base mb-1">${offer.title}</h3>
+                <p class="text-white/50 text-sm">From: <span class="text-white/80">${clientName}</span></p>
+                <div class="flex flex-wrap gap-4 mt-2 text-xs text-white/40">
+                  ${offer.budget ? `<span>💰 ${offer.budget}</span>` : ''}
+                  <span>📅 ${date}</span>
+                  ${offer.city ? `<span>📍 ${offer.city}</span>` : ''}
+                </div>
+                ${offer.description ? `<p class="text-white/40 text-xs mt-2 line-clamp-2">${offer.description}</p>` : ''}
+              </div>
+              <div class="flex gap-2 flex-shrink-0 flex-col">
+                <button onclick="acceptOffer('${offer._id}')" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-gradient-to-r from-blue-500 to-cyan-500 hover:opacity-90 rounded-xl transition-all shadow-lg">Accept</button>
+                <button onclick="rejectOffer('${offer._id}')" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-all">Reject</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        loading.classList.add('hidden');
+        empty.classList.remove('hidden');
+      }
+    }
+
+    async function patchOffer(id, action) {
+      try {
+        const res = await fetch(`/api/offers/${id}/${action}`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        return await res.json();
+      } catch (e) { return { success: false }; }
+    }
+
+    async function acceptOffer(id) {
+      const data = await patchOffer(id, 'accept');
+      if (data.success) {
+        const el = document.getElementById(`offer-${id}`);
+        if (el) {
+          el.innerHTML = `
+            <div class="flex-1">
+              <p class="text-green-400 font-bold">✓ Offer Accepted</p>
+              <p class="text-white/50 text-sm mt-1">Once the event is done, mark it as completed so the client can rate you.</p>
+            </div>
+            <button onclick="completeOffer('${id}')" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-green-500/20 hover:bg-green-500/30 text-green-400 border border-green-500/30 rounded-xl transition-all">Mark Completed</button>
+          `;
+        }
+        loadSnapshot();
+      } else { alert(data.error || 'Failed to accept offer'); }
+    }
+
+    async function rejectOffer(id) {
+      const data = await patchOffer(id, 'reject');
+      if (data.success) {
+        document.getElementById(`offer-${id}`)?.remove();
+      } else { alert(data.error || 'Failed to reject offer'); }
+    }
+
+    async function completeOffer(id) {
+      const data = await patchOffer(id, 'complete');
+      if (data.success) {
+        const el = document.getElementById(`offer-${id}`);
+        if (el) {
+          el.innerHTML = `<p class="text-green-400 font-bold w-full text-center py-2">✅ Marked as Completed — client can now rate you!</p>`;
+        }
+        loadSnapshot();
+      } else { alert(data.error || 'Failed to mark complete'); }
+    }
+
     document.getElementById('logoutBtn').addEventListener('click', (e) => {
       e.preventDefault();
       localStorage.removeItem('token');
       window.location.href = '/';
     });
+
+    loadSnapshot();
+    loadOffers();
   </script>
 </body>
 </html>

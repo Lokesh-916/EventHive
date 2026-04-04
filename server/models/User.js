@@ -32,7 +32,17 @@ const userSchema = new mongoose.Schema({
     location: {
       city: String, state: String, country: String, coordinates: [Number]
     }
-  }
+  },
+  // Organizer rating data
+  ratings: [{
+    clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    offerId:  { type: mongoose.Schema.Types.ObjectId, ref: 'ClientOffer' },
+    score:    { type: Number, min: 1, max: 5 },
+    review:   { type: String },
+    createdAt: { type: Date, default: Date.now }
+  }],
+  ratingAvg:    { type: Number, default: 0 },
+  eventsHosted: { type: Number, default: 0 }
 }, { timestamps: true });
 
 userSchema.pre('save', async function() {

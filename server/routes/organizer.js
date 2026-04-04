@@ -1,0 +1,118 @@
+const express = require("express");
+const router = express.Router();
+const User = require("../models/User");
+const ClientOffer = require("../models/ClientOffer");
+const { protect, authorize } = require("../middleware/auth");
+
+// @route   GET /api/organizers
+// @desc    Get all organizers (public)
+router.get("/organizers", async (req, res) => {
+  try {
+    const organizers = await User.find({ role: "organizer" })
+      .select("-password_hash -ratings");
+    res.json(organizers);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// @route   GET /api/organizers/:id
+// @desc    Get single organizer (public)
+router.get("/organizers/:id", async (req, res) => {
+  try {
+    const organizer = await User.findOne({ _id: req.params.id, role: "organizer" })
+      .select("-password_hash");
+    if (!organizer) return res.status(404).json({ error: "Organizer not found" });
+    res.json(organizer);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// @route   GET /api/organizers/:id/ratings
+// @desc    Get all reviews for an organizer (public)
+router.get("/organizers/:id/ratings", async (req, res) => {
+  try {
+    const organizer = await User.findOne({ _id: req.params.id, role: "organizer" })
+      .select("ratings ratingAvg eventsHosted username profile.orgName profile.leadName")
+      .populate("ratings.clientId", "username profile.clientName");
+    if (!organizer) return res.status(404).json({ error: "Organizer not found" });
+    res.json({
+      ratingAvg: organizer.ratingAvg,
+      eventsHosted: organizer.eventsHosted,
+      count: organizer.ratings.length,
+      ratings: organizer.ratings
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// @route   POST /api/organizers/:id/rate
+// @desc    Client rates an organizer after a completed offer
+// @access  Private (Client)
+router.post("/organizers/:id/rate", protect, authorize("client"), async (req, res) => {
+  try {
+    const { offerId, score, review } = req.body;
+
+    if (!offerId || !score) {
+      return res.status(400).json({ success: false, error: "offerId and score are required" });
+    }
+    if (score < 1 || score > 5) {
+      return res.status(400).json({ success: false, error: "Score must be between 1 and 5" });
+    }
+
+    // Validate the offer: must be completed, belong to this client, and target this organizer
+    const offer = await ClientOffer.findOne({
+      _id: offerId,
+      clientId: req.user.id,
+      organizerId: req.params.id,
+      status: "completed"
+    });
+
+    if (!offer) {
+      return res.status(403).json({
+        success: false,
+        error: "No completed booking found for this organizer with your account"
+      });
+    }
+
+    // Prevent double-rating the same offer
+    if (offer.isRated) {
+      return res.status(400).json({ success: false, error: "You have already rated this booking" });
+    }
+
+    // Add rating to organizer
+    const organizer = await User.findById(req.params.id);
+    if (!organizer || organizer.role !== "organizer") {
+      return res.status(404).json({ success: false, error: "Organizer not found" });
+    }
+
+    organizer.ratings.push({
+      clientId: req.user.id,
+      offerId,
+      score: Number(score),
+      review: review || ""
+    });
+
+    // Recompute average
+    const total = organizer.ratings.reduce((sum, r) => sum + r.score, 0);
+    organizer.ratingAvg = Math.round((total / organizer.ratings.length) * 10) / 10;
+
+    await organizer.save();
+
+    // Mark offer as rated
+    offer.isRated = true;
+    await offer.save();
+
+    res.json({
+      success: true,
+      ratingAvg: organizer.ratingAvg,
+      totalRatings: organizer.ratings.length
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+module.exports = router;
