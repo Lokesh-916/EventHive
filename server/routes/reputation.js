@@ -24,12 +24,13 @@ router.get('/:volunteerId', protect, async (req, res) => {
       return res.status(404).json({ message: 'Volunteer not found' });
     }
 
-    const { xp, rank, eventsCompleted, badges } = user.reputation;
+    const rep = user.reputation || {};
+    const { xp = 0, rank = 'Newcomer', eventsCompleted = 0, badges = [] } = rep;
     const response = {
       xp, rank, eventsCompleted, badges,
-      fullName: user.profile.fullName,
-      profilePic: user.profile.profilePic,
-      skills: user.profile.skills,
+      fullName: user.profile?.fullName,
+      profilePic: user.profile?.profilePic,
+      skills: user.profile?.skills,
     };
 
     res.status(200).json(response);

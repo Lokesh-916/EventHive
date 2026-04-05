@@ -42,7 +42,19 @@ const userSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
   }],
   ratingAvg:    { type: Number, default: 0 },
-  eventsHosted: { type: Number, default: 0 }
+  eventsHosted: { type: Number, default: 0 },
+
+  // Volunteer reputation & badges
+  reputation: {
+    xp:              { type: Number, default: 0 },
+    rank:            { type: String, default: 'Newcomer' },
+    eventsCompleted: { type: Number, default: 0 },
+    badges: [{
+      badgeId:   { type: String },
+      awardedAt: { type: Date, default: Date.now },
+      eventId:   { type: mongoose.Schema.Types.ObjectId, ref: 'Event', default: null }
+    }]
+  }
 }, { timestamps: true });
 
 userSchema.pre('save', async function() {
