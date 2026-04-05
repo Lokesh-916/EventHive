@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics – EventHive</title>
+  <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
+  <link href="https://fonts.googleapis.com/css2?family=Satisfy&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/styles/output.css">
+  <script>(function(){const t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <style>
+    :root{--bg-overlay:rgba(255,255,255,0.72);--section-bg:rgba(255,255,255,0.6);--card-bg:rgba(255,255,255,0.5);--card-border:rgba(0,0,0,0.08);--text-primary:#1a1a2e;--text-secondary:rgba(20,20,40,0.6);--text-muted:rgba(20,20,40,0.4);--nav-bg:rgba(255,255,255,0.65);--nav-border:rgba(0,0,0,0.08);--article-bg:rgba(255,255,255,0.5);--article-border:rgba(0,0,0,0.06);--input-bg:rgba(255,255,255,0.5);--dropdown-bg:rgba(255,255,255,0.92);--dropdown-border:rgba(0,0,0,0.1);--dropdown-hover:rgba(0,0,0,0.05);--shadow:0 8px 32px rgba(0,0,0,0.1);--footer-text:rgba(20,20,40,0.4);}
+    [data-theme="dark"]{--bg-overlay:rgba(10,15,20,0.82);--section-bg:rgba(10,15,20,0.85);--card-bg:rgba(255,255,255,0.04);--card-border:rgba(255,255,255,0.08);--text-primary:#ffffff;--text-secondary:rgba(255,255,255,0.6);--text-muted:rgba(255,255,255,0.35);--nav-bg:rgba(15,15,35,0.65);--nav-border:rgba(255,255,255,0.12);--article-bg:rgba(255,255,255,0.05);--article-border:rgba(255,255,255,0.08);--input-bg:rgba(255,255,255,0.06);--dropdown-bg:rgba(20,25,35,0.96);--dropdown-border:rgba(255,255,255,0.12);--dropdown-hover:rgba(255,255,255,0.08);--shadow:0 20px 50px rgba(0,0,0,0.6);--footer-text:rgba(255,255,255,0.4);}
+    *{box-sizing:border-box;}
+    body{font-family:'Inter',sans-serif;margin:0;min-height:100vh;color:var(--text-primary);background:#0a0f14;}
+    .glass{background:var(--section-bg);backdrop-filter:blur(32px);-webkit-backdrop-filter:blur(32px);border:1px solid var(--card-border);border-radius:1.5rem;}
+    .glass-sm{background:var(--card-bg);backdrop-filter:blur(16px);border:1px solid var(--card-border);border-radius:1rem;}
+    .profile-wrapper{position:relative;}
+    .profile-avatar{width:40px;height:40px;border-radius:50%;border:2px solid var(--card-border);cursor:pointer;background:var(--card-bg);display:flex;align-items:center;justify-content:center;overflow:hidden;transition:border-color .3s,box-shadow .3s;}
+    .profile-avatar:hover{border-color:var(--text-primary);box-shadow:0 0 0 3px rgba(0,0,0,.08);}
+    .profile-avatar svg,.profile-avatar img{width:100%;height:100%;object-fit:cover;}
+    .profile-dropdown{position:absolute;top:calc(100% + 12px);right:0;min-width:200px;background:var(--dropdown-bg);border:1px solid var(--dropdown-border);border-radius:1rem;box-shadow:0 12px 40px rgba(0,0,0,.15);backdrop-filter:blur(20px);padding:.5rem;opacity:0;pointer-events:none;transform:translateY(-8px);transition:opacity .2s,transform .2s;z-index:100;}
+    .profile-dropdown.open{opacity:1;pointer-events:all;transform:translateY(0);}
+    .dropdown-header{padding:.6rem .85rem;border-bottom:1px solid var(--dropdown-border);margin-bottom:.4rem;}
+    .dropdown-header p{margin:0;font-size:.75rem;font-weight:700;color:var(--text-primary);}
+    .dropdown-header span{font-size:.65rem;color:var(--text-muted);}
+    .dropdown-item{display:flex;align-items:center;gap:.65rem;padding:.6rem .85rem;border-radius:.6rem;font-size:.8rem;color:var(--text-primary);cursor:pointer;transition:background .2s;text-decoration:none;user-select:none;}
+    .dropdown-item:hover{background:var(--dropdown-hover);}
+    .dropdown-item.danger{color:#e53e3e;}
+    .kpi-card{padding:1.5rem;border-radius:1.25rem;border:1px solid var(--card-border);background:var(--card-bg);transition:transform .25s,box-shadow .25s;cursor:default;}
+    .kpi-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.25);}
+    .kpi-value{font-size:2.2rem;font-weight:800;line-height:1;}
+    .kpi-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-top:.4rem;color:var(--text-muted);}
+    .event-tab{padding:.5rem 1.1rem;border-radius:9999px;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-secondary);transition:all .2s;white-space:nowrap;display:inline-flex;align-items:center;gap:.4rem;}
+    .event-tab:hover{background:rgba(255,255,255,.1);color:var(--text-primary);}
+    .event-tab.active{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3);color:var(--text-primary);}
+    .dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0;}
+    .dot-completed{background:#34d399;}.dot-ongoing{background:#60a5fa;}.dot-published{background:#a78bfa;}.dot-draft{background:#94a3b8;}
+    .bar-track{height:8px;border-radius:9999px;background:rgba(255,255,255,.08);overflow:hidden;}
+    .bar-fill{height:100%;border-radius:9999px;transition:width 1s cubic-bezier(.4,0,.2,1);}
+    .fade-in{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease;}
+    .fade-in.visible{opacity:1;transform:translateY(0);}
+    .badge-completed{background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.25);padding:.2rem .65rem;border-radius:9999px;font-size:.65rem;font-weight:700;text-transform:uppercase;}
+    .badge-ongoing{background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.25);padding:.2rem .65rem;border-radius:9999px;font-size:.65rem;font-weight:700;text-transform:uppercase;}
+    .badge-published{background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.25);padding:.2rem .65rem;border-radius:9999px;font-size:.65rem;font-weight:700;text-transform:uppercase;}
+    .cluster-title{font-family:'Satisfy',cursive;font-size:1.6rem;color:var(--text-primary);margin-bottom:.25rem;}
+    .cluster-sub{font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;}
+    canvas{display:block;max-width:100%;}
+    ::-webkit-scrollbar{width:4px;height:4px;}
+    ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:9999px;}
+  </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden">
+  <div class="fixed inset-0 z-[-2]"><img id="bgImage" src="public/images/dark.avif" alt="" class="w-full h-full object-cover"></div>
+  <div class="fixed inset-0 z-[-1]" style="background:var(--bg-overlay);transition:background .4s;"></div>
+
+  <!-- NAVBAR -->
+  <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center backdrop-blur-[18px] rounded-[50px] z-50 border shadow-[0_18px_40px_rgba(0,0,0,.5)]" style="background:var(--nav-bg);border-color:var(--nav-border);">
+    <div class="font-bold text-2xl font-['Satisfy'] cursor-pointer" style="color:var(--text-primary);" onclick="window.location.href='/organiser-home'">Event<span>Hive</span></div>
+    <ul class="flex gap-6 list-none m-0 p-0">
+      <li><a href="/organiser-home" class="text-sm uppercase tracking-widest opacity-70 hover:opacity-100 transition-opacity" style="color:var(--text-primary);">Home</a></li>
+      <li><a href="/organiser" class="text-sm uppercase tracking-widest opacity-70 hover:opacity-100 transition-opacity" style="color:var(--text-primary);">Dashboard</a></li>
+      <li><a href="/analytics" class="text-sm uppercase tracking-widest font-bold opacity-100" style="color:var(--text-primary);">Analytics</a></li>
+    </ul>
+    <div class="profile-wrapper">
+      <div class="profile-avatar" id="profileAvatarBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/></svg>
+      </div>
+      <div class="profile-dropdown" id="profileDropdown">
+        <div class="dropdown-header"><p id="dropdownName">Organizer</p><span>Organizer</span></div>
+        <a class="dropdown-item" href="/organiser-home"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</a>
+        <a class="dropdown-item" href="/organiser"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>Dashboard</a>
+        <a class="dropdown-item" href="/profile"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Profile</a>
+        <div class="dropdown-item danger" id="logoutBtn"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="w-[90%] max-w-6xl mx-auto pt-12 pb-24 flex flex-col gap-16">
+
+    <!-- Header -->
+    <div class="fade-in">
+      <p class="cluster-sub mb-1">Organizer Intelligence</p>
+      <h1 class="font-['Satisfy'] text-5xl md:text-6xl" style="color:var(--text-primary);">Analytics</h1>
+      <p class="mt-2 text-sm" style="color:var(--text-secondary);">Real-time insights across all your events.</p>
+    </div>
+
+    <!-- CLUSTER 1: KPIs -->
+    <section class="fade-in">
+      <div class="flex items-end justify-between mb-6">
+        <div><p class="cluster-sub">Portfolio Overview</p><h2 class="cluster-title">At a Glance</h2></div>
+        <span id="lastUpdated" class="text-xs" style="color:var(--text-muted);"></span>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="kpiGrid"></div>
+    </section>
+
+    <!-- CLUSTER 2: Event Deep Dive -->
+    <section class="fade-in">
+      <div class="mb-6"><p class="cluster-sub">Per-Event Breakdown</p><h2 class="cluster-title">Event Deep Dive</h2></div>
+      <div class="flex gap-2 overflow-x-auto pb-3 mb-8" id="eventTabs" style="scrollbar-width:none;-ms-overflow-style:none;"></div>
+      <div id="deepDivePanel" class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div class="lg:col-span-1 flex flex-col gap-5">
+          <div class="glass p-6" id="ddEventCard"></div>
+          <div class="glass p-6" id="ddAttendance"></div>
+        </div>
+        <div class="lg:col-span-1 flex flex-col gap-5">
+          <div class="glass p-6" id="ddVolunteerDonut"></div>
+          <div class="glass p-6" id="ddRoleBars"></div>
+        </div>
+        <div class="lg:col-span-1 flex flex-col gap-5">
+          <div class="glass p-6" id="ddAppStatus"></div>
+          <div class="glass p-6" id="ddSatisfaction"></div>
+          <div class="glass p-6" id="ddReach"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLUSTER 3: Volunteer Trends -->
+    <section class="fade-in">
+      <div class="mb-6"><p class="cluster-sub">Volunteer Intelligence</p><h2 class="cluster-title">Volunteer Trends</h2></div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div class="glass p-6"><p class="text-xs uppercase tracking-widest font-bold mb-4" style="color:var(--text-muted);">Applications Over Time (last 60 days)</p><canvas id="timelineCanvas" height="180"></canvas></div>
+        <div class="glass p-6"><p class="text-xs uppercase tracking-widest font-bold mb-4" style="color:var(--text-muted);">Role Popularity</p><canvas id="roleCanvas" height="180"></canvas></div>
+      </div>
+    </section>
+
+    <!-- CLUSTER 4: Event Mix -->
+    <section class="fade-in">
+      <div class="mb-6"><p class="cluster-sub">Portfolio Composition</p><h2 class="cluster-title">Event Mix</h2></div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="glass p-6"><p class="text-xs uppercase tracking-widest font-bold mb-4" style="color:var(--text-muted);">By Category</p><canvas id="categoryCanvas" height="200"></canvas></div>
+        <div class="glass p-6"><p class="text-xs uppercase tracking-widest font-bold mb-4" style="color:var(--text-muted);">By Status</p><div id="statusBars" class="flex flex-col gap-3 mt-2"></div></div>
+        <div class="glass p-6"><p class="text-xs uppercase tracking-widest font-bold mb-4" style="color:var(--text-muted);">Top Cities</p><div id="cityBars" class="flex flex-col gap-3 mt-2"></div></div>
+      </div>
+    </section>
+
+  </main>
+  <footer class="py-8 text-center text-xs" style="color:var(--footer-text);">&copy; 2026 EventHive. All rights reserved.</footer>
+  <script src="src/js/analytics.js"></script>
+</body>
+</html>
