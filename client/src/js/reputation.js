@@ -357,11 +357,12 @@ function loadReputationSection(volunteerId) {
       '<div class="badge-scroll" id="badge-grid"></div>',
     ].join('');
 
-    // Insert as the very first child of profileMain (above all sections)
+    // Insert as 2nd child of profileMain (after hero, before all sections)
     var main = document.getElementById('profileMain');
     if (main) {
-      if (main.firstChild) {
-        main.insertBefore(section, main.firstChild);
+      var secondChild = main.children[1];
+      if (secondChild) {
+        main.insertBefore(section, secondChild);
       } else {
         main.appendChild(section);
       }
