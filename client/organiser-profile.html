@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organizer Profile - EventHive</title>
+  <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
+  <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/styles/output.css">
+  <style>
+    /* Modal backdrop */
+    .modal-backdrop { backdrop-filter: blur(12px); background: rgba(0,0,0,0.7); }
+    /* Input focus */
+    input:focus, select:focus, textarea:focus { outline: none; border-color: rgba(59,130,246,0.5); }
+  </style>
+</head>
+<body class="bg-[#0A0F14] text-white font-['Inter'] min-h-screen relative overflow-x-hidden">
+
+  <!-- Background -->
+  <div class="fixed inset-0 z-[-1]">
+    <img src="https://images.unsplash.com/photo-1686425374911-e0d752e09806?q=80&w=1493&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Background" class="w-full h-full object-cover">
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center bg-[#0f0f23]/65 border border-white/15 shadow-[0_18px_40px_rgba(0,0,0,0.5)] backdrop-blur-[18px] rounded-[50px] z-50">
+    <div id="navLogo" class="font-bold text-2xl font-['Satisfy'] tracking-widest text-[#ffffff] cursor-pointer" onclick="window.location.href='/client-home'">
+      Event<span>Hive</span>
+    </div>
+    <div class="flex gap-4 ml-auto">
+      <button id="homeBtn" class="px-5 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all" onclick="window.location.href='/client-home'">← Back to Organizers</button>
+    </div>
+  </nav>
+
+  <main class="w-[90%] max-w-6xl mx-auto my-10 relative z-10 flex flex-col gap-10 pb-20">
+
+    <!-- PROFILE HERO -->
+    <section id="profile-hero" class="bg-[#0A0F14]/85 backdrop-blur-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2.5rem] p-10 flex flex-col md:flex-row items-center md:items-start gap-8">
+      <div id="org-initials" class="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-5xl flex-shrink-0 shadow-[0_0_30px_rgba(0,198,255,0.4)] overflow-hidden">
+        O
+      </div>
+      <div class="flex-1 text-center md:text-left">
+        <h1 id="org-name" class="text-4xl md:text-5xl font-['Satisfy'] text-white mb-2">Loading...</h1>
+        <p id="org-email" class="text-white/60 mb-4"></p>
+        <p id="org-bio" class="text-white/80 max-w-2xl mb-6 leading-relaxed">Loading bio details...</p>
+        
+        <div class="flex flex-wrap items-center justify-center md:justify-start gap-6 text-sm mb-6">
+          <div class="flex items-center gap-2">
+            <span class="text-yellow-400 text-xl">⭐</span>
+            <span id="org-rating-avg" class="font-bold text-xl text-white">0.0</span>
+            <span id="org-rating-count" class="text-white/50">(0 reviews)</span>
+          </div>
+          <div class="h-6 w-px bg-white/20 hidden md:block"></div>
+          <div class="flex items-center gap-2">
+            <span class="text-blue-400 text-xl">🎉</span>
+            <span id="org-events-count" class="font-bold text-xl text-white">0</span>
+            <span class="text-white/50">Events Hosted</span>
+          </div>
+        </div>
+
+        <button onclick="openOfferModal()" class="px-8 py-3 font-bold uppercase tracking-wider text-sm bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl hover:shadow-[0_0_20px_rgba(0,198,255,0.4)] transition-all transform hover:-translate-y-1">
+          Send Offer
+        </button>
+      </div>
+    </section>
+
+    <!-- HOSTED EVENTS -->
+    <section class="bg-[#0A0F14]/85 backdrop-blur-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2.5rem] p-10">
+      <div class="mb-8 border-b border-white/10 pb-4">
+        <h2 class="text-3xl font-bold font-['Satisfy'] text-white">Recent Events</h2>
+      </div>
+      <div id="events-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      <div id="events-empty" class="hidden text-center py-8 text-white/40 italic">No events found.</div>
+      <div id="events-loading" class="text-center py-8 text-white/30 italic text-sm">Loading events…</div>
+    </section>
+
+    <!-- REVIEWS SECTION -->
+    <section id="reviews-section" class="bg-[#0A0F14]/85 backdrop-blur-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2.5rem] p-10">
+      <div class="mb-8 text-center flex flex-col items-center">
+        <h2 class="text-3xl font-bold font-['Satisfy'] text-white">Client Reviews</h2>
+        <div class="flex items-center justify-center gap-4 mt-3">
+          <span id="review-avg-big" class="text-4xl font-bold text-yellow-400">—</span>
+          <div class="text-left">
+            <div id="review-stars-big" class="text-yellow-400 text-xl"></div>
+            <p id="review-count-big" class="text-white/50 text-xs mt-0.5"></p>
+          </div>
+        </div>
+      </div>
+
+      <div id="rate-btn-container" class="hidden text-center mb-8">
+        <a id="rate-btn" href="#"
+          class="inline-block px-8 py-3 font-bold uppercase tracking-wider text-sm bg-gradient-to-r from-yellow-500 to-amber-400 hover:opacity-90 rounded-xl transition-all shadow-lg">
+          ⭐ Rate This Organizer
+        </a>
+        <p class="text-white/30 text-xs mt-2">You have a completed booking with this organizer</p>
+      </div>
+
+      <div id="reviews-list" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+      <div id="reviews-empty" class="hidden text-center py-8 text-white/40 italic">No reviews yet. Be the first to rate!</div>
+      <div id="reviews-loading" class="text-center py-8 text-white/30 italic text-sm">Loading reviews…</div>
+    </section>
+
+  </main>
+
+  <footer class="mt-auto py-8 text-center text-white/40 text-sm">
+    <p>&copy; 2026 EventHive. All rights reserved.</p>
+  </footer>
+
+  <!-- ============================================================ -->
+  <!-- SEND OFFER MODAL -->
+  <!-- ============================================================ -->
+  <div id="offer-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+    <div class="modal-backdrop absolute inset-0" id="offer-backdrop"></div>
+    <div class="relative bg-[#0d1117] border border-white/10 rounded-[2rem] p-8 w-full max-w-lg shadow-[0_30px_80px_rgba(0,0,0,0.8)] z-10 transition-all">
+      <button id="close-offer-modal" class="absolute top-5 right-6 text-white/40 hover:text-white text-2xl leading-none transition-colors">&times;</button>
+
+      <h3 class="text-xl font-bold font-['Satisfy'] text-white mb-1">Send an Offer</h3>
+      <p id="offer-modal-org-name" class="text-white/50 text-sm mb-6">to —</p>
+
+      <form id="offer-form" class="flex flex-col gap-4">
+        <div>
+          <label class="block text-xs uppercase tracking-widest text-white/40 font-bold mb-2">Event Title *</label>
+          <input id="offer-title" type="text" required placeholder="e.g. Annual Corporate Gala"
+            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 transition-all">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-white/40 font-bold mb-2">Budget</label>
+            <input id="offer-budget" type="text" placeholder="e.g. ₹2,00,000"
+              class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 transition-all">
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-white/40 font-bold mb-2">Event Date</label>
+            <input id="offer-date" type="date"
+              class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm transition-all [color-scheme:dark]">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs uppercase tracking-widest text-white/40 font-bold mb-2">City</label>
+          <input id="offer-city" type="text" placeholder="e.g. Hyderabad"
+            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 transition-all">
+        </div>
+        <div>
+          <label class="block text-xs uppercase tracking-widest text-white/40 font-bold mb-2">Description</label>
+          <textarea id="offer-description" rows="3" placeholder="Describe your event needs..."
+            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 resize-none transition-all"></textarea>
+        </div>
+        <p id="offer-error" class="text-red-400 text-xs hidden"></p>
+        <button type="submit" id="offer-submit-btn"
+          class="mt-2 w-full py-3 font-bold uppercase tracking-wider text-sm bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl hover:opacity-90 transition-all shadow-lg">
+          Send Offer
+        </button>
+      </form>
+
+      <!-- Success state -->
+      <div id="offer-success" class="hidden text-center py-6">
+        <p class="text-4xl mb-3">✅</p>
+        <h4 class="text-lg font-bold text-white mb-1">Offer Sent!</h4>
+        <p class="text-white/50 text-sm mb-5">The organizer will review your offer and respond soon.</p>
+        <button onclick="closeOfferModal()" class="px-6 py-2 bg-white/10 border border-white/20 rounded-xl text-sm font-bold hover:bg-white/20 transition-all">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const organizerId = params.get('id');
+    const token = localStorage.getItem('token');
+    
+    let organizerName = 'Organizer';
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (!organizerId) {
+        window.location.href = '/client-home';
+        return;
+      }
+
+      loadOrganizerDetails();
+      loadOrganizerEvents();
+    });
+
+    async function loadOrganizerDetails() {
+      try {
+        const [orgRes, ratingsRes] = await Promise.all([
+          fetch(`/api/organizers/${organizerId}`),
+          fetch(`/api/organizers/${organizerId}/ratings`)
+        ]);
+
+        if (orgRes.ok) {
+          const org = await orgRes.json();
+          organizerName = org.profile?.orgName || org.username || 'Organizer';
+          document.title = `${organizerName} - Profile`;
+          
+          const logoSrc = org.profile?.logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(organizerName)}&background=3b82f6&color=fff&size=150`;
+          document.getElementById('org-initials').innerHTML = `<img src="${logoSrc}" alt="${organizerName}" class="w-full h-full object-cover">`;
+          document.getElementById('org-name').textContent = organizerName;
+          document.getElementById('org-email').textContent = org.profile?.officialEmail || org.email || '';
+          document.getElementById('org-bio').textContent = org.profile?.bio || 'No bio available.';
+          document.getElementById('org-events-count').textContent = org.eventsHosted || 0;
+          
+          document.getElementById('offer-modal-org-name').textContent = `to ${organizerName}`;
+        }
+
+        if (ratingsRes.ok) {
+          const rData = await ratingsRes.json();
+          const avg = rData.ratingAvg || 0;
+          const count = rData.count || 0;
+          const ratings = rData.ratings || [];
+
+          document.getElementById('org-rating-avg').textContent = avg > 0 ? avg.toFixed(1) : 'New';
+          document.getElementById('org-rating-count').textContent = `(${count} review${count !== 1 ? 's' : ''})`;
+
+          document.getElementById('review-avg-big').textContent = avg > 0 ? avg.toFixed(1) : 'N/A';
+          document.getElementById('review-stars-big').textContent = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
+          document.getElementById('review-count-big').textContent = `${count} review${count !== 1 ? 's' : ''}`;
+          document.getElementById('reviews-loading').classList.add('hidden');
+
+          if (!ratings.length) {
+            document.getElementById('reviews-empty').classList.remove('hidden');
+          } else {
+            document.getElementById('reviews-list').innerHTML = ratings.map(r => {
+              const reviewer = r.clientId?.profile?.clientName || r.clientId?.username || 'Client';
+              const stars = '★'.repeat(r.score) + '☆'.repeat(5 - r.score);
+              const date = new Date(r.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+              return `
+                <div class="bg-white/5 border border-white/10 rounded-[1.5rem] p-6 hover:bg-white/10 transition-colors">
+                  <div class="flex justify-between items-start mb-4">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm">
+                        ${reviewer[0].toUpperCase()}
+                      </div>
+                      <div>
+                        <p class="text-sm font-bold text-white">${reviewer}</p>
+                        <p class="text-xs text-white/40">${date}</p>
+                      </div>
+                    </div>
+                    <span class="text-yellow-400 text-sm font-bold">${stars}</span>
+                  </div>
+                  ${r.review ? `<p class="text-white/70 text-sm leading-relaxed">&ldquo;${r.review}&rdquo;</p>` : ''}
+                </div>
+              `;
+            }).join('');
+          }
+
+          // Check if this client can rate (has completed booking)
+          if (token) {
+            try {
+              const myOffersRes = await fetch('/api/offers/my-offers', { headers: { Authorization: `Bearer ${token}` } });
+              if (myOffersRes.ok) {
+                const myOffers = await myOffersRes.json();
+                const rateableOffer = (myOffers.data || []).find(o =>
+                  o.organizerId?._id === organizerId && o.status === 'completed' && !o.isRated
+                );
+                if (rateableOffer) {
+                  const rateBtn = document.getElementById('rate-btn');
+                  rateBtn.href = `/rate-organizer?organizerId=${organizerId}&offerId=${rateableOffer._id}`;
+                  document.getElementById('rate-btn-container').classList.remove('hidden');
+                }
+              }
+            } catch(e) { console.error(e); }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load details:', err);
+      }
+    }
+
+    async function loadOrganizerEvents() {
+      try {
+        const res = await fetch(`/api/organizers/${organizerId}/events`);
+        document.getElementById('events-loading').classList.add('hidden');
+        if (!res.ok) {
+          document.getElementById('events-empty').classList.remove('hidden');
+          return;
+        }
+        const eventsData = await res.json();
+        const events = eventsData.data || [];
+        
+        if (!events.length) {
+          document.getElementById('events-empty').classList.remove('hidden');
+          return;
+        }
+
+        document.getElementById('events-list').innerHTML = events.map(ev => {
+          const date = ev.date ? new Date(ev.date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : 'TBA';
+          const img = ev.banner || 'https://via.placeholder.com/400x200?text=Event+Banner';
+          return `
+            <div class="bg-white/5 border border-white/10 rounded-[1.5rem] overflow-hidden hover:bg-white/10 hover:-translate-y-1 transition-all shadow-[0_8px_24px_rgba(0,0,0,0.4)] flex flex-col">
+              <div class="h-40 w-full overflow-hidden flex-shrink-0">
+                <img src="${img}" alt="${ev.title}" class="w-full h-full object-cover">
+              </div>
+              <div class="p-6 flex flex-col flex-1">
+                <div class="flex justify-between items-start mb-2">
+                  <h3 class="text-white font-bold text-lg truncate flex-1 pr-2">${ev.title}</h3>
+                </div>
+                <div class="flex flex-col gap-1 text-xs text-white/50 mb-4 flex-1">
+                  <span>📅 ${date}</span>
+                  ${ev.location?.city ? `<span>📍 ${ev.location.city}</span>` : ''}
+                </div>
+                <button onclick="window.location.href='/event-info?id=${ev._id}'" class="mt-auto w-full py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all">
+                  Event Details
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        document.getElementById('events-loading').classList.add('hidden');
+        document.getElementById('events-empty').classList.remove('hidden');
+        console.error('Failed to load events:', err);
+      }
+    }
+
+    // ── Offer Modal ──────────────────────────────────────────────
+    function openOfferModal() {
+      if (!token) { alert('Please log in to send an offer.'); window.location.href = '/'; return; }
+      document.getElementById('offer-form').classList.remove('hidden');
+      document.getElementById('offer-success').classList.add('hidden');
+      document.getElementById('offer-form').reset();
+      document.getElementById('offer-error').classList.add('hidden');
+      document.getElementById('offer-modal').classList.remove('hidden');
+    }
+
+    function closeOfferModal() {
+      document.getElementById('offer-modal').classList.add('hidden');
+    }
+
+    document.getElementById('close-offer-modal').addEventListener('click', closeOfferModal);
+    document.getElementById('offer-backdrop').addEventListener('click', closeOfferModal);
+
+    document.getElementById('offer-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('offer-submit-btn');
+      const errEl = document.getElementById('offer-error');
+      errEl.classList.add('hidden');
+      btn.disabled = true; btn.textContent = 'Sending…';
+
+      try {
+        const res = await fetch('/api/offers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            organizerId: organizerId,
+            title:       document.getElementById('offer-title').value,
+            budget:      document.getElementById('offer-budget').value,
+            eventDate:   document.getElementById('offer-date').value || undefined,
+            city:        document.getElementById('offer-city').value,
+            description: document.getElementById('offer-description').value
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('offer-form').classList.add('hidden');
+          document.getElementById('offer-success').classList.remove('hidden');
+        } else {
+          errEl.textContent = data.error || 'Failed to send offer.';
+          errEl.classList.remove('hidden');
+          btn.disabled = false; btn.textContent = 'Send Offer';
+        }
+      } catch (err) {
+        errEl.textContent = 'Network error. Please try again.';
+        errEl.classList.remove('hidden');
+        btn.disabled = false; btn.textContent = 'Send Offer';
+      }
+    });
+  </script>
+</body>
+</html>

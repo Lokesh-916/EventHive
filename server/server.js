@@ -101,6 +101,10 @@ app.get('/rate-organizer', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/rate-organizer.html'));
 });
 
+app.get('/organiser-profile', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/organiser-profile.html'));
+});
+
 // Generic 404 handler for API vs Front-end
 app.use((req, res, next) => {
   if (req.originalUrl.startsWith('/api')) {

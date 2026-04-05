@@ -40,7 +40,8 @@
       <li><a href="/support" class="relative text-white text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity">Support<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
     </ul>
     <div class="flex gap-4">
-      <button id="logout-btn" class="px-5 py-2 text-xs uppercase tracking-widest font-bold bg-gradient-to-r from-blue-500 to-cyan-500 hover:opacity-90 rounded-full transition-all shadow-lg">Logout</button>
+      <button onclick="window.location.href='/home'" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all text-white">Events Home</button>
+      <button id="logout-btn" class="px-5 py-2 text-xs uppercase tracking-widest font-bold bg-gradient-to-r from-blue-500 to-cyan-500 hover:opacity-90 rounded-full transition-all shadow-lg text-white">Logout</button>
     </div>
   </nav>
 
@@ -57,20 +58,7 @@
           <button onclick="document.getElementById('my-bookings').scrollIntoView({behavior: 'smooth'})" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 transition-all transform hover:-translate-y-1">My Bookings</button>
         </div>
 
-        <div class="flex gap-8">
-          <div>
-            <span id="stat-organizers" class="block text-3xl font-bold text-white mb-1">—</span>
-            <span class="text-xs uppercase tracking-wider text-white/50 font-bold">Active Organizers</span>
-          </div>
-          <div>
-            <span id="stat-events" class="block text-3xl font-bold text-white mb-1">—</span>
-            <span class="text-xs uppercase tracking-wider text-white/50 font-bold">Events Hosted</span>
-          </div>
-          <div>
-            <span id="stat-rating" class="block text-3xl font-bold text-white mb-1">—</span>
-            <span class="text-xs uppercase tracking-wider text-white/50 font-bold">Avg Rating</span>
-          </div>
-        </div>
+
       </div>
 
       <div class="bg-[#0A0F14]/85 backdrop-blur-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2rem] p-8 md:w-[350px]">
@@ -232,21 +220,12 @@
         const res = await fetch('/api/organizers');
         organizers = await res.json();
         renderOrganizers(organizers);
-        computeStats(organizers);
       } catch (err) {
         console.error(err);
         showEmpty(true);
       }
     }
 
-    function computeStats(data) {
-      document.getElementById('stat-organizers').textContent = data.length;
-      const totalEvents = data.reduce((s, o) => s + (o.eventsHosted || 0), 0);
-      document.getElementById('stat-events').textContent = totalEvents + '+';
-      const rated = data.filter(o => o.ratingAvg > 0);
-      const avg = rated.length ? (rated.reduce((s, o) => s + o.ratingAvg, 0) / rated.length).toFixed(1) : 'N/A';
-      document.getElementById('stat-rating').textContent = avg !== 'N/A' ? avg + '★' : avg;
-    }
 
     function showEmpty(show) {
       document.getElementById('empty-state').classList.toggle('hidden', !show);
@@ -275,7 +254,7 @@
               <span class="text-white/60">${events} event${events === 1 ? '' : 's'} hosted</span>
             </div>
             <div class="flex gap-2">
-              <button onclick="window.location.href='/organiser?id=${org._id}'"
+              <button onclick="window.location.href='/organiser-profile?id=${org._id}'"
                 class="flex-1 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-all">
                 View Profile
               </button>
@@ -371,7 +350,7 @@
               </div>
             </div>
             <div class="flex gap-2 flex-shrink-0 sm:flex-col items-end">
-              <button onclick="window.location.href='/organiser?id=${offer.organizerId?._id}'"
+              <button onclick="window.location.href='/organiser-profile?id=${offer.organizerId?._id}'"
                 class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-all">
                 View Profile
               </button>

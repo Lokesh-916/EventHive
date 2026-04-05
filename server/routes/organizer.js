@@ -115,4 +115,19 @@ router.post("/organizers/:id/rate", protect, authorize("client"), async (req, re
   }
 });
 
+// @route   GET /api/organizers/:id/events
+// @desc    Get recent events hosted by an organizer (public)
+router.get("/organizers/:id/events", async (req, res) => {
+  try {
+    const Event = require("../models/Event");
+    const events = await Event.find({ organizerId: req.params.id })
+      .sort({ createdAt: -1 })
+      .limit(6)
+      .select("title date location tags banner status");
+    res.json({ success: true, data: events });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
