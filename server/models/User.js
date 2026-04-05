@@ -21,10 +21,14 @@ const userSchema = new mongoose.Schema({
     // Client
     clientName: String,
     clientType: String,
-    clientRole: String, // mapped to role in frontend form logic
+    clientRole: String,
     profilePic: String,
     // Volunteer
     fullName: String,
+    dob: Date,
+    gender: String,
+    languages: [String],
+    experience: String,
     skills: [{ name: String, rating: Number }],
     availability: {
       mon: [String], tue: [String], wed: [String], thu: [String], fri: [String], sat: [String], sun: [String]
