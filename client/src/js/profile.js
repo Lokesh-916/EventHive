@@ -932,6 +932,10 @@ window.handleAvatarUpload = function(input) {
 
 // ====== INIT ======
 (async function init() {
+  // Check if viewing another user's profile via ?id= param
+  const urlParams = new URLSearchParams(window.location.search);
+  const viewId = urlParams.get('id');
+
   // Quick navbar from cache
   const cached = JSON.parse(localStorage.getItem('user') || '{}');
   if (cached.username) {
@@ -944,7 +948,9 @@ window.handleAvatarUpload = function(input) {
   if (!token) { renderError('You are not logged in. Please sign in to view your profile.'); return; }
 
   try {
-    const res = await fetch('/api/auth/profile', { headers: { 'Authorization': `Bearer ${token}` } });
+    // If viewing another user, fetch their public profile
+    const apiUrl = viewId ? `/api/auth/profile/${viewId}` : '/api/auth/profile';
+    const res = await fetch(apiUrl, { headers: { 'Authorization': `Bearer ${token}` } });
 
     if (res.status === 401) {
       localStorage.removeItem('token');
@@ -957,6 +963,10 @@ window.handleAvatarUpload = function(input) {
     if (!data.success) { renderError(data.error || 'Failed to load profile.'); return; }
 
     CURRENT_USER = data.data;
+    // If viewing another user, mark as read-only
+    if (viewId && CURRENT_USER._id !== cached.id) {
+      window._viewingOther = true;
+    }
 
     localStorage.setItem('user', JSON.stringify({
       id: CURRENT_USER._id, username: CURRENT_USER.username,
@@ -966,6 +976,20 @@ window.handleAvatarUpload = function(input) {
 
     updateNavbar(CURRENT_USER);
     renderProfile(CURRENT_USER);
+
+    // If viewing another user, hide all edit buttons and show read-only banner
+    if (window._viewingOther) {
+      setTimeout(() => {
+        document.querySelectorAll('.edit-btn, [onclick*="openEdit"], [onclick*="saveHero"]').forEach(el => el.style.display = 'none');
+        const main = document.getElementById('profileMain');
+        if (main) {
+          const banner = document.createElement('div');
+          banner.style.cssText = 'background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.25);border-radius:0.75rem;padding:0.6rem 1rem;font-size:0.75rem;color:#60a5fa;margin-bottom:1rem;text-align:center;';
+          banner.textContent = 'Viewing ' + (CURRENT_USER.profile?.fullName || CURRENT_USER.username) + "'s profile (read-only)";
+          main.insertBefore(banner, main.firstChild);
+        }
+      }, 100);
+    }
 
     // Load reputation badge section for volunteers
     if (CURRENT_USER.role === 'volunteer' && typeof loadReputationSection === 'function') {

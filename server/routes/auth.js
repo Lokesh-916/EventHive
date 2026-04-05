@@ -118,6 +118,19 @@ router.get('/profile', protect, async (req, res) => {
   }
 });
 
+// @route   GET /api/auth/profile/:id
+// @desc    Get any user's profile by ID (read-only, for organizers viewing volunteers)
+// @access  Private
+router.get('/profile/:id', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password_hash');
+    if (!user) return res.status(404).json({ success: false, error: 'User not found' });
+    res.status(200).json({ success: true, data: user });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // @route   PUT /api/auth/profile
 // @desc    Update user profile
 // @access  Private

@@ -660,7 +660,7 @@
     }
 
     function buildRepCell(rep) {
-      if (!rep) return '<span class="opacity-40 text-xs">???</span>';
+      if (!rep) return '<span class="opacity-40 text-xs">—</span>';
       const rank   = rep.rank   || rep.tier   || '—';
       const badges = rep.badges || [];
       const badgeHtml = badges.slice(0, 3).map(b =>
@@ -718,7 +718,7 @@
             <td class="px-4 py-4" style="color:var(--text-secondary);">${email}</td>
             <td class="px-4 py-4" style="color:var(--text-secondary);">${app._eventTitle}</td>
             <td class="px-4 py-4" style="color:var(--text-secondary);">${roleTitle}</td>
-            <td class="px-4 py-4" id="rep-${app._id}"><span class="opacity-40 text-xs">??????</span></td>
+            <td class="px-4 py-4" id="rep-${app._id}"><span class="opacity-40 text-xs">…</span></td>
             <td class="px-4 py-4 font-bold ${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</td>
             <td class="px-4 py-4">${actionBtn}${profileLink}</td>
           `;
