@@ -1,107 +1,157 @@
 # EventHive
 
-Operations-First Event Platform designed to connect event organizers, volunteers, and clients seamlessly. It provides a comprehensive suite of tools for managing events, registering volunteers, and orchestrating flawless experiences.
+Operations-First Event Platform connecting event organizers, volunteers, and clients. Comprehensive tools for managing events, registering volunteers, tracking applications, and orchestrating flawless experiences.
 
 ## Project Structure
 
 ```
 EventHive/
-├── client/          # Frontend files (HTML, Tailwind CSS, JS, assets)
-├── server/          # Express.js backend server with MongoDB Atlas
-└── README.md        # This file
+├── client/                  # Frontend (HTML, Tailwind CSS, Vanilla JS)
+│   ├── src/js/              # JavaScript modules per page
+│   ├── src/styles/          # Tailwind input/output CSS
+│   └── public/              # Static assets (images, videos)
+├── server/                  # Express.js backend
+│   ├── models/              # Mongoose schemas
+│   ├── routes/              # API route handlers
+│   ├── middleware/          # Auth, upload middleware
+│   ├── services/            # Reputation, badge logic
+│   ├── seed.js              # Seed events & organizer
+│   └── seed-analytics.js    # Seed analytics data
+└── README.md
 ```
 
 ## Features
 
-- **Modern UI**: Dark glassmorphic theme across the entire application using Tailwind CSS.
-- **Role-Based Workflows**: Tailored dashboard and flows for Volunteers, Organizers, and Clients.
-- **Smart Routing**: Multi-page application structure with clean URLs (no `.html` extensions).
-- **Authentication**: JWT-based login and registration system.
-- **Dynamic Events Management**: Track, create, and manage ongoing/upcoming/past events seamlessly.
-- **Responsive Design**: Mobile-friendly navigation and data tables.
+### Volunteer
+- Browse ongoing, upcoming, and past events
+- Enroll for specific roles in events (duplicate prevention)
+- View application status (pending / approved / rejected)
+- Reputation & badge system — earn XP and ranks by completing events
+- Full profile page with edit support, skills, availability, and badges
 
-## Available Routes
+### Organizer
+- Create and manage events with full scheduling, location, and volunteer role setup
+- Organizer Home — client offers, created events, volunteer management
+- Organizer Dashboard — event stats, manage events table, analytics link
+- Volunteer Management — approve applications, view volunteer profiles
+- Analytics page — KPI cards, per-event deep dive, volunteer trends, event mix charts
+- Expense tracking per accepted offer
+- Rate and complete volunteer applications (awards XP)
 
-- `/` - Home/Landing page
-- `/home` - Volunteer Dashboard
-- `/organiser-home` - Organizer Home
-- `/organiser` - Organizer Dashboard
-- `/register` - Registration (supports `?type=volunteer|organizer|client`)
-- `/create-event` - Create event page
-- `/event-info` - Event information page
-- `/report-incident` - Report incident page
-- `/support` - Support and FAQ page
+### Client
+- Browse and filter verified organizers
+- Send offers with budget, date, city, and description
+- Track bookings and rate organizers after event completion
+
+### General
+- JWT-based authentication with role-specific auth guards
+- Theme toggle (dark/light) consistent across all pages
+- Access restricted page with back navigation for wrong-role access
+- Report incident from event info page
+- Bird's Eye View (event overview) for each event
+
+## Pages & Routes
+
+| Route | Description | Access |
+|---|---|---|
+| `/` | Landing page | Public |
+| `/register` | Registration (`?type=volunteer\|organizer\|client`) | Public |
+| `/home` | Volunteer event browser | Volunteer |
+| `/event-info` | Event details + enroll | Volunteer |
+| `/event-overview` | Bird's Eye View of event | All |
+| `/profile` | User profile (view/edit, supports `?id=` for read-only) | Authenticated |
+| `/organiser-home` | Organizer home — offers, events, volunteers | Organizer |
+| `/organiser` | Organizer dashboard — stats, events table | Organizer |
+| `/analytics` | Analytics — KPIs, charts, event deep dive | Organizer |
+| `/create-event` | Create/edit event | Organizer |
+| `/client-home` | Client home — browse organizers, bookings | Client |
+| `/organiser-profile` | Public organizer profile | All |
+| `/rate-organizer` | Rate an organizer after event | Client |
+| `/report-incident` | Report an incident | Authenticated |
+| `/all-events` | All events listing | Public |
+| `/support` | Support & FAQ | Public |
+
+## API Endpoints
+
+| Method | Route | Description |
+|---|---|---|
+| POST | `/api/auth/register` | Register user |
+| POST | `/api/auth/login` | Login |
+| GET | `/api/auth/profile` | Get own profile |
+| PUT | `/api/auth/profile` | Update profile |
+| GET | `/api/auth/profile/:id` | Get any user profile (read-only) |
+| GET | `/api/events` | All events |
+| GET | `/api/events/my` | Organizer's events |
+| POST | `/api/events` | Create event |
+| GET | `/api/events/:id` | Single event |
+| POST | `/api/applications` | Apply for event role |
+| GET | `/api/applications/my-applications` | Volunteer's applications |
+| GET | `/api/applications/event/:eventId` | Applications for an event |
+| POST | `/api/applications/:id/approve` | Approve application |
+| POST | `/api/applications/:id/complete` | Complete + award XP |
+| GET | `/api/reputation/:volunteerId` | Volunteer reputation |
+| GET | `/api/reputation/catalog` | Badge catalog |
+| GET | `/api/analytics/overview` | Portfolio KPIs |
+| GET | `/api/analytics/events` | Per-event analytics |
+| GET | `/api/offers` | Offers (organizer/client) |
+| POST | `/api/offers` | Send offer |
+| GET | `/api/organizers` | All organizers |
 
 ## Technology Stack
 
 - **Frontend**: HTML5, Vanilla JavaScript, Tailwind CSS
 - **Backend**: Node.js, Express.js
-- **Database**: MongoDB Atlas
+- **Database**: MongoDB Atlas (Mongoose)
+- **Auth**: JWT (jsonwebtoken, bcryptjs)
 - **Fonts**: Google Fonts (Inter, Satisfy)
 
 ## Getting Started
 
 ### Prerequisites
-
-- Node.js (v14 or higher)
+- Node.js v14+
 - npm
-- MongoDB Atlas Cluster URI
+- MongoDB Atlas cluster URI
 
-### Environment Variables
+### Environment Setup
 
-Before running the backend, create a `.env` file in the `server` directory and add your MongoDB Atlas URI:
-
-1. Create the `.env` file:
-   ```bash
-   cd server
-   touch .env
-   ```
-2. Add your MongoDB URI (example):
-   ```env
-   MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/eventhive?retryWrites=true&w=majority
-   JWT_SECRET=your_jwt_secret_key
-   PORT=3000
-   ```
-
-*(Note: The `.env` file is included in `.gitignore` and should never be committed.)*
+Create `server/.env`:
+```env
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/eventhive?retryWrites=true&w=majority
+JWT_SECRET=your_jwt_secret_key
+PORT=5000
+```
 
 ### Installation
 
-1. Install server dependencies:
-   ```bash
-   cd server
-   npm install
-   ```
+```bash
+# Install server dependencies
+cd server && npm install
 
-2. Install client dependencies (for Tailwind CSS):
-   ```bash
-   cd ../client
-   npm install
-   ```
+# Install client dependencies (Tailwind)
+cd ../client && npm install
+```
 
-### Running the Application
+### Running
 
-1. **Start the Express Server:**
-   From the `server` directory, run:
-   ```bash
-   cd server
-   npm run dev
-   ```
-   *(This starts the node server typically on port 3000)*
+```bash
+# Terminal 1 — Start server (from root)
+node server/server.js
 
-2. **Start the Tailwind CSS Compiler:**
-   Open a new terminal window/tab, navigate to the `client` directory, and run:
-   ```bash
-   cd client
-   npm run dev
-   ```
-   *(This watches for class changes in your HTML/JS and updates `output.css`)*
+# Terminal 2 — Watch Tailwind (from client/)
+cd client && npm run dev
+```
 
-3. **View the App:**
-   Open your browser and navigate to:
-   ```
-   http://localhost:3000
-   ```
+Open `http://localhost:5000`
+
+### Seeding Data
+
+```bash
+# Seed events and system organizer
+node server/seed.js
+
+# Seed analytics data (run after seed.js)
+node server/seed-analytics.js
+```
 
 ## License
 
