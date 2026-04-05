@@ -1,518 +1,1564 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Organizer Dashboard - EventHive</title>
-  <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
-  <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="src/styles/output.css">
-  <style>
-    /* ====== THEME VARIABLES ====== */
-    :root {
-      --bg-overlay: rgba(255,255,255,0.72);
-      --section-bg: rgba(255,255,255,0.6);
-      --card-border: rgba(0,0,0,0.08);
-      --text-primary: #1a1a2e;
-      --text-secondary: rgba(20,20,40,0.6);
-      --text-muted: rgba(20,20,40,0.4);
-      --nav-bg: rgba(255,255,255,0.65);
-      --nav-border: rgba(0,0,0,0.08);
-      --article-bg: rgba(255,255,255,0.5);
-      --article-border: rgba(0,0,0,0.06);
-      --shadow: 0 8px 32px rgba(0,0,0,0.1);
-      --dropdown-bg: rgba(255,255,255,0.92);
-      --dropdown-border: rgba(0,0,0,0.1);
-      --dropdown-hover: rgba(0,0,0,0.05);
-      --footer-text: rgba(20,20,40,0.4);
-      --input-bg: rgba(255,255,255,0.5);
-    }
-    [data-theme="dark"] {
-      --bg-overlay: rgba(10,15,20,0.80);
-      --section-bg: rgba(10,15,20,0.85);
-      --card-border: rgba(255,255,255,0.08);
-      --text-primary: #ffffff;
-      --text-secondary: rgba(255,255,255,0.6);
-      --text-muted: rgba(255,255,255,0.4);
-      --nav-bg: rgba(15,15,35,0.65);
-      --nav-border: rgba(255,255,255,0.12);
-      --article-bg: rgba(255,255,255,0.05);
-      --article-border: rgba(255,255,255,0.08);
-      --shadow: 0 20px 50px rgba(0,0,0,0.6);
-      --dropdown-bg: rgba(20,25,35,0.96);
-      --dropdown-border: rgba(255,255,255,0.12);
-      --dropdown-hover: rgba(255,255,255,0.08);
-      --footer-text: rgba(255,255,255,0.4);
-      --input-bg: rgba(255,255,255,0.06);
-    }
-
-    /* -- Profile Avatar & Dropdown -- */
-    .profile-wrapper { position: relative; }
-
-    .profile-avatar {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      border: 2px solid var(--card-border);
-      object-fit: cover;
-      cursor: pointer;
-      background: var(--article-bg);
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    .profile-avatar:hover {
-      border-color: var(--text-primary);
-      box-shadow: 0 0 0 3px rgba(0,0,0,0.08);
-    }
-    .profile-avatar svg, .profile-avatar img {
-      width: 100%; height: 100%; object-fit: cover;
-    }
-
-    .profile-dropdown {
-      position: absolute;
-      top: calc(100% + 12px);
-      right: 0;
-      min-width: 200px;
-      background: var(--dropdown-bg);
-      border: 1px solid var(--dropdown-border);
-      border-radius: 1rem;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-      backdrop-filter: blur(20px);
-      padding: 0.5rem;
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(-8px);
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      z-index: 100;
-    }
-    .profile-dropdown.open {
-      opacity: 1; pointer-events: all; transform: translateY(0);
-    }
-
-    .dropdown-header {
-      padding: 0.6rem 0.85rem;
-      border-bottom: 1px solid var(--dropdown-border);
-      margin-bottom: 0.4rem;
-    }
-    .dropdown-header p {
-      margin: 0; font-size: 0.75rem; font-weight: 700; color: var(--text-primary);
-    }
-    .dropdown-header span {
-      font-size: 0.65rem; color: var(--text-muted);
-    }
-
-    .dropdown-item {
-      display: flex; align-items: center; gap: 0.65rem;
-      padding: 0.6rem 0.85rem;
-      border-radius: 0.6rem;
-      font-size: 0.8rem; color: var(--text-primary);
-      cursor: pointer;
-      transition: background 0.2s;
-      text-decoration: none;
-      user-select: none;
-    }
-    .dropdown-item:hover { background: var(--dropdown-hover); }
-    .dropdown-item svg { flex-shrink: 0; opacity: 0.6; }
-    .dropdown-item.danger { color: #e53e3e; }
-    .dropdown-item.danger svg { opacity: 0.8; }
-
-    .theme-toggle-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.5rem 0.85rem;
-      border-radius: 0.6rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .theme-toggle-row:hover { background: var(--dropdown-hover); }
-    .theme-toggle-label {
-      display: flex; align-items: center; gap: 0.65rem;
-      font-size: 0.8rem; color: var(--text-primary);
-    }
-    .theme-toggle-label svg { opacity: 0.6; }
-
-    .toggle-switch { position: relative; width: 36px; height: 20px; }
-    .toggle-switch input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider {
-      position: absolute; inset: 0;
-      border-radius: 20px;
-      background: rgba(0,0,0,0.15);
-      transition: background 0.3s;
-      cursor: pointer;
-    }
-    .toggle-slider:before {
-      content: '';
-      position: absolute;
-      width: 14px; height: 14px;
-      border-radius: 50%;
-      background: var(--text-primary);
-      top: 3px; left: 3px;
-      transition: transform 0.3s;
-    }
-    input:checked + .toggle-slider { background: rgba(0,0,0,0.35); }
-    input:checked + .toggle-slider:before { transform: translateX(16px); }
-  </style>
-</head>
-<body class="font-['Inter'] min-h-screen relative overflow-x-hidden" style="color:var(--text-primary);">
-
-  <!-- Consistent Background Image -->
-  <div class="fixed inset-0 z-[-2]">
-    <img id="bgImage" src="public/images/dark.avif" alt="Background" class="w-full h-full object-cover">
-  </div>
-  <div class="bg-overlay" style="position:fixed;inset:0;z-index:-1;background:var(--bg-overlay);transition:background 0.4s ease;"></div>
-
-  <!-- NAVBAR -->
-  <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center backdrop-blur-[18px] rounded-[50px] z-50 border shadow-[0_18px_40px_rgba(0,0,0,0.5)]" style="background:var(--nav-bg);border-color:var(--nav-border);">
-    <div id="navLogo" class="font-bold text-2xl font-['Satisfy'] cursor-pointer" style="color:var(--text-primary);">
-      Event<span>Hive</span>
-    </div>
-    <ul id="navLinks" class="flex gap-6 list-none m-0 p-0 hidden md:flex">
-      <li><a href="/organiser-home" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Home<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-      <li><a href="#events" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Events<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-      <li><a href="#analytics" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Analytics<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-    </ul>
-    <li class="profile-wrapper" style="list-style:none;">
-      <div class="profile-avatar" id="profileAvatarBtn" title="Account options">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);">
-          <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/>
-        </svg>
-      </div>
-
-      <div class="profile-dropdown" id="profileDropdown">
-        <div class="dropdown-header">
-          <p id="dropdownName">Organizer</p>
-          <span id="dropdownRole">Organizer</span>
-        </div>
-
-        <!-- Theme toggle (stored in localStorage; background stays dark) -->
-        <div class="theme-toggle-row" id="themeToggleRow">
-          <div class="theme-toggle-label">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-              <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-            </svg>
-            Dark Mode
-          </div>
-          <label class="toggle-switch">
-            <input type="checkbox" id="themeToggle">
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-
-        <a class="dropdown-item" href="/organiser-home">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-          </svg>
-          Home
-        </a>
-
-        <a class="dropdown-item" href="/profile">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
-          </svg>
-          My Profile
-        </a>
-
-        <div class="dropdown-item danger" id="dropdownLogoutBtn">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-          Logout
-        </div>
-      </div>
-    </li>
-  </nav>
-
-  <main class="w-[90%] max-w-6xl mx-auto my-20 relative z-10 flex flex-col gap-20 pb-20">
-
-    <!-- DASHBOARD -->
-    <section id="dashboard" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 mt-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-      <h2 class="text-3xl font-bold font-['Satisfy'] mb-8 border-b pb-4" style="color:var(--text-primary);border-color:var(--card-border);">Dashboard Overview</h2>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="rounded-[1.5rem] p-6 hover:-translate-y-1 transition-transform border" style="background:var(--article-bg);border-color:var(--article-border);">
-          <h3 class="text-sm uppercase tracking-widest mb-2" style="color:var(--text-muted);">Active Events</h3>
-          <p id="stat-active" class="text-4xl font-bold" style="color:var(--text-primary);">∩┐╜</p>
-        </div>
-        <div class="rounded-[1.5rem] p-6 hover:-translate-y-1 transition-transform border" style="background:var(--article-bg);border-color:var(--article-border);">
-          <h3 class="text-sm uppercase tracking-widest mb-2" style="color:var(--text-muted);">Total Volunteers</h3>
-          <p id="stat-volunteers" class="text-4xl font-bold" style="color:var(--text-primary);">∩┐╜</p>
-        </div>
-        <div class="rounded-[1.5rem] p-6 hover:-translate-y-1 transition-transform border" style="background:var(--article-bg);border-color:var(--article-border);">
-          <h3 class="text-sm uppercase tracking-widest mb-2" style="color:var(--text-muted);">Upcoming Events</h3>
-          <p id="stat-upcoming" class="text-4xl font-bold" style="color:var(--text-primary);">∩┐╜</p>
-        </div>
-        <div class="rounded-[1.5rem] p-6 hover:-translate-y-1 transition-transform border" style="background:var(--article-bg);border-color:var(--article-border);">
-          <h3 class="text-sm uppercase tracking-widest mb-2" style="color:var(--text-muted);">Volunteer Requests</h3>
-          <p id="stat-requests" class="text-4xl font-bold text-yellow-400">∩┐╜</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- EVENTS -->
-    <section id="events" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-      <h2 class="text-3xl font-bold font-['Satisfy'] mb-8 border-b pb-4" style="color:var(--text-primary);border-color:var(--card-border);">Manage Events</h2>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm whitespace-nowrap">
-          <thead class="uppercase tracking-wider text-xs font-bold border-b" style="color:var(--text-muted);border-color:var(--card-border);">
-            <tr>
-              <th class="px-4 py-4">Event</th>
-              <th class="px-4 py-4">Date</th>
-              <th class="px-4 py-4">Status</th>
-              <th class="px-4 py-4">Volunteers</th>
-              <th class="px-4 py-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="eventsTableBody" style="color:var(--text-secondary);">
-            <!-- Populated via JS -->
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ANALYTICS -->
-    <section id="analytics" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 text-center border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-      <h2 class="text-3xl font-bold font-['Satisfy'] mb-4" style="color:var(--text-primary);">Analytics</h2>
-      <p class="italic" style="color:var(--text-secondary);">Advanced charts and insights coming soon.</p>
-    </section>
-
-    <!-- FUTURE UPDATES BLOCK -->
-    <section class="bg-gradient-to-r from-blue-900/40 to-[#0A0F14]/80 backdrop-blur-[32px] border border-blue-500/20 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2.5rem] p-10">
-      <h2 class="text-xl font-bold mb-6 flex items-center gap-2" style="color:var(--text-primary);"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Upcoming Dashboard Updates</h2>
-      <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm" style="color:var(--text-secondary);">
-        <li class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div> Advanced Event Analytics</li>
-        <li class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 9h.01M15 9h.01M9 15h6"/></svg></div> AI Volunteer Suggestions</li>
-        <li class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div> Interactive Calendar View</li>
-        <li class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M2 10h20"/></svg></div> Expense Tracking System</li>
-        <li class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg></div> Real-time Notifications</li>
-      </ul>
-    </section>
-
-
-
-  </main>
-
-  <footer class="mt-auto py-8 text-center text-sm" style="color:var(--footer-text);">
-    <p>&copy; 2026 EventHive. All rights reserved.</p>
-  </footer>
-
-  <script>
-    // -- Auth guard --
-    (async function checkAuth() {
-      const token = localStorage.getItem('token');
-      if (!token) return showUnauthorized('not-logged-in');
-      try {
-        const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
-        if (!res.ok) return showUnauthorized('not-logged-in');
-        const data = await res.json();
-        if (data.data?.role !== 'organizer') return showUnauthorized(data.data?.role || 'unknown');
-      } catch { showUnauthorized('not-logged-in'); }
-    })();
-
-    function showUnauthorized(role) {
-      const isLoggedIn = role !== 'not-logged-in';
-      const roleLabels = { volunteer: 'Volunteer', client: 'Client' };
-      document.body.innerHTML = `
-        <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0f14;font-family:'Inter',sans-serif;padding:2rem;">
-          <div style="max-width:480px;width:100%;text-align:center;">
-            <div style="width:72px;height:72px;border-radius:50%;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
-              <svg xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;color:#f87171;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
-              </svg>
-            </div>
-            <h1 style="font-family:'Satisfy',cursive;font-size:2rem;color:#fff;margin-bottom:0.75rem;">Access Restricted</h1>
-            <p style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:0.5rem;">
-              ${isLoggedIn
-                ? `You're logged in as a <strong style="color:rgba(255,255,255,0.8);">${roleLabels[role] || role}</strong>, but this page is for <strong style="color:rgba(255,255,255,0.8);">Organizers</strong> only.`
-                : `You need to be logged in as an <strong style="color:rgba(255,255,255,0.8);">Organizer</strong> to access this page.`}
-            </p>
-            <p style="color:rgba(255,255,255,0.3);font-size:0.75rem;margin-bottom:2rem;">
-              ${isLoggedIn ? 'Please log out and sign in with your organizer account.' : 'Please log in with your organizer account to continue.'}
-            </p>
-            <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;">
-              ${isLoggedIn ? `
-              <button onclick="localStorage.removeItem('token');window.location.href='/register';"
-                style="padding:0.75rem 1.5rem;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
-                Log Out
-              </button>` : ''}
-              <button onclick="window.location.href='/register';"
-                style="padding:0.75rem 1.5rem;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
-                ${isLoggedIn ? 'Switch Account' : 'Log In'}
-              </button>
-              <button onclick="history.back();"
-                style="padding:0.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
-                ΓåÉ Back
-              </button>
-              <button onclick="window.location.href='/';"
-                style="padding:0.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
-                Home
-              </button>
-            </div>
-          </div>
-        </div>`;
-    }
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      const navLogo = document.getElementById('navLogo');
-      if (navLogo) navLogo.onclick = () => window.location.href = '/organiser-home';
-
-      // -- Theme toggle --
-      const bgImage = document.getElementById('bgImage');
-      const themeToggle = document.getElementById('themeToggle');
-      function applyTheme(dark) {
-        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-        bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
-        themeToggle.checked = dark;
-        localStorage.setItem('theme', dark ? 'dark' : 'light');
-      }
-      applyTheme(localStorage.getItem('theme') !== 'light');
-      themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
-
-      // -- Profile Avatar Dropdown --
-      const avatarBtn   = document.getElementById('profileAvatarBtn');
-      const dropdown    = document.getElementById('profileDropdown');
-
-      avatarBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdown.classList.toggle('open');
-      });
-      document.addEventListener('click', (e) => {
-        if (!dropdown.contains(e.target) && e.target !== avatarBtn) {
-          dropdown.classList.remove('open');
-        }
-      });
-
-      // -- Dropdown Logout --
-      document.getElementById('dropdownLogoutBtn').addEventListener('click', () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/';
-      });
-
-      // -- Load organizer profile into dropdown --
-      (async function loadProfile() {
-        try {
-          const cached = JSON.parse(localStorage.getItem('user') || '{}');
-          const dName = cached.profile?.name || cached.profile?.orgName || cached.username;
-          if (dName) document.getElementById('dropdownName').textContent = dName;
-
-          const token = localStorage.getItem('token');
-          if (!token) return;
-          const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
-          if (!res.ok) return;
-          const data = await res.json();
-          if (!data.success) return;
-          const u = data.data;
-          const displayName = u.profile?.name || u.profile?.orgName || u.username;
-          if (displayName) document.getElementById('dropdownName').textContent = displayName;
-          const roleLabel = u.role ? u.role.charAt(0).toUpperCase() + u.role.slice(1) : 'Organizer';
-          document.getElementById('dropdownRole').textContent = roleLabel;
-
-          const pic = u.profile?.profilePic;
-          if (pic) {
-            const img = document.createElement('img');
-            img.src = pic;
-            img.alt = 'Profile';
-            img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
-            img.onerror = () => {
-              avatarBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/></svg>`;
-            };
-            avatarBtn.innerHTML = '';
-            avatarBtn.appendChild(img);
-          }
-        } catch(e) { /* silently fail */ }
-      })();
-
-      loadDashboardStats();
-      async function loadDashboardStats() {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-
-        try {
-          const res = await fetch('/api/events/my', { headers: { Authorization: `Bearer ${token}` } });
-          if (!res.ok) return;
-          const data = await res.json();
-          const events = data.data || [];
-          const now = new Date();
-
-          let activeCount = 0;
-          let upcomingCount = 0;
-          events.forEach(ev => {
-            const start = ev.schedule?.start ? new Date(ev.schedule.start) : null;
-            const end = ev.schedule?.end ? new Date(ev.schedule.end) : null;
-            if (ev.status === 'ongoing' || (start && start <= now && (!end || end >= now))) {
-              activeCount++;
-            } else if (start && start > now) {
-              upcomingCount++;
-            }
-          });
-
-          document.getElementById('stat-active').textContent = activeCount;
-          document.getElementById('stat-upcoming').textContent = upcomingCount;
-
-          const totalVolunteers = events.reduce((sum, ev) => {
-            return sum + (ev.volunteerRequirements?.totalVolunteers || 0);
-          }, 0);
-          document.getElementById('stat-volunteers').textContent = totalVolunteers;
-
-          let pendingCount = 0;
-          const fetchPromises = events.map(ev =>
-            fetch(`/api/applications/event/${ev._id}`, { headers: { Authorization: `Bearer ${token}` } })
-              .then(r => r.ok ? r.json() : { data: [] })
-              .then(d => {
-                const apps = d.data || [];
-                pendingCount += apps.filter(a => a.status === 'pending').length;
-              })
-              .catch(() => {})
-          );
-          await Promise.all(fetchPromises);
-          document.getElementById('stat-requests').textContent = pendingCount;
-
-          const tbody = document.getElementById('eventsTableBody');
-          if (!tbody) return;
-          if (!events.length) {
-            tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center italic" style="color:var(--text-muted);">No events yet.</td></tr>`;
-            return;
-          }
-          tbody.innerHTML = events.map(ev => {
-            const start = ev.schedule?.start
-              ? new Date(ev.schedule.start).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-              : '∩┐╜';
-            const isLive = ev.status === 'ongoing';
-            const isUpcoming = ev.status === 'upcoming' || (ev.schedule?.start && new Date(ev.schedule.start) > now);
-            const statusLabel = isLive ? 'Live' : isUpcoming ? 'Upcoming' : (ev.status || 'Published');
-            const statusClass = isLive
-              ? 'bg-green-500/20 text-green-400 border-green-500/30'
-              : isUpcoming
-                ? 'bg-blue-500/20 text-blue-400 border-blue-500/30'
-                : 'bg-white/10 text-white/50 border-white/20';
-            const volunteers = ev.volunteerRequirements?.totalVolunteers || 0;
-            const isPast = ev.schedule?.end && new Date(ev.schedule.end) < now;
-            const overviewBtn = isPast ? '' : `<a href="/event-overview?id=${ev._id}" class="px-3 py-1 bg-purple-500/20 hover:bg-purple-500/40 text-purple-400 border border-purple-500/30 rounded text-xs">Overview</a>`;
-
-            return `
-              <tr class="border-b hover:opacity-90 transition-colors" style="border-color:var(--card-border);">
-                <td class="px-4 py-4 font-bold" style="color:var(--text-primary);">${ev.title || 'Untitled'}</td>
-                <td class="px-4 py-4" style="color:var(--text-secondary);">${start}</td>
-                <td class="px-4 py-4"><span class="px-3 py-1 border rounded-full text-xs font-bold ${statusClass}">${statusLabel}</span></td>
-                <td class="px-4 py-4" style="color:var(--text-secondary);">${volunteers}</td>
-                <td class="px-4 py-4 space-x-2">
-                  <a href="/create-event?id=${ev._id}" class="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 border border-blue-500/30 rounded text-xs">Edit</a>
-                  <a href="/event-info?id=${ev._id}" class="px-3 py-1 bg-white/10 hover:bg-white/20 border border-white/20 rounded text-xs" style="color:var(--text-primary);">View</a>
-                  ${overviewBtn}
-                </td>
-              </tr>`;
-          }).join('');
-        } catch (err) {
-          console.error('Failed to load dashboard stats:', err);
-        }
-      }
-
-      loadDashboardStats();
-    });
-  </script>
-</body>
-</html>
+<!DOCTYPE html>
+
+
+<html lang="en" data-theme="dark">
+
+
+<head>
+
+
+  <meta charset="UTF-8">
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+  <title>Organizer Dashboard - EventHive</title>
+
+
+  <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
+
+
+  <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+
+  <link rel="stylesheet" href="src/styles/output.css">
+
+
+  <style>
+
+
+    /* ====== THEME VARIABLES ====== */
+
+
+    :root {
+
+
+      --bg-overlay: rgba(255,255,255,0.72);
+
+
+      --section-bg: rgba(255,255,255,0.6);
+
+
+      --card-border: rgba(0,0,0,0.08);
+
+
+      --text-primary: #1a1a2e;
+
+
+      --text-secondary: rgba(20,20,40,0.6);
+
+
+      --text-muted: rgba(20,20,40,0.4);
+
+
+      --nav-bg: rgba(255,255,255,0.65);
+
+
+      --nav-border: rgba(0,0,0,0.08);
+
+
+      --article-bg: rgba(255,255,255,0.5);
+
+
+      --article-border: rgba(0,0,0,0.06);
+
+
+      --shadow: 0 8px 32px rgba(0,0,0,0.1);
+
+
+      --dropdown-bg: rgba(255,255,255,0.92);
+
+
+      --dropdown-border: rgba(0,0,0,0.1);
+
+
+      --dropdown-hover: rgba(0,0,0,0.05);
+
+
+      --footer-text: rgba(20,20,40,0.4);
+
+
+      --input-bg: rgba(255,255,255,0.5);
+
+
+    }
+
+
+    [data-theme="dark"] {
+
+
+      --bg-overlay: rgba(10,15,20,0.80);
+
+
+      --section-bg: rgba(10,15,20,0.85);
+
+
+      --card-border: rgba(255,255,255,0.08);
+
+
+      --text-primary: #ffffff;
+
+
+      --text-secondary: rgba(255,255,255,0.6);
+
+
+      --text-muted: rgba(255,255,255,0.4);
+
+
+      --nav-bg: rgba(15,15,35,0.65);
+
+
+      --nav-border: rgba(255,255,255,0.12);
+
+
+      --article-bg: rgba(255,255,255,0.05);
+
+
+      --article-border: rgba(255,255,255,0.08);
+
+
+      --shadow: 0 20px 50px rgba(0,0,0,0.6);
+
+
+      --dropdown-bg: rgba(20,25,35,0.96);
+
+
+      --dropdown-border: rgba(255,255,255,0.12);
+
+
+      --dropdown-hover: rgba(255,255,255,0.08);
+
+
+      --footer-text: rgba(255,255,255,0.4);
+
+
+      --input-bg: rgba(255,255,255,0.06);
+
+
+    }
+
+
+
+
+
+    /* -- Profile Avatar & Dropdown -- */
+
+
+    .profile-wrapper { position: relative; }
+
+
+
+
+
+    .profile-avatar {
+
+
+      width: 40px; height: 40px;
+
+
+      border-radius: 50%;
+
+
+      border: 2px solid var(--card-border);
+
+
+      object-fit: cover;
+
+
+      cursor: pointer;
+
+
+      background: var(--article-bg);
+
+
+      display: flex; align-items: center; justify-content: center;
+
+
+      overflow: hidden;
+
+
+      transition: border-color 0.3s, box-shadow 0.3s;
+
+
+    }
+
+
+    .profile-avatar:hover {
+
+
+      border-color: var(--text-primary);
+
+
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.08);
+
+
+    }
+
+
+    .profile-avatar svg, .profile-avatar img {
+
+
+      width: 100%; height: 100%; object-fit: cover;
+
+
+    }
+
+
+
+
+
+    .profile-dropdown {
+
+
+      position: absolute;
+
+
+      top: calc(100% + 12px);
+
+
+      right: 0;
+
+
+      min-width: 200px;
+
+
+      background: var(--dropdown-bg);
+
+
+      border: 1px solid var(--dropdown-border);
+
+
+      border-radius: 1rem;
+
+
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+
+
+      backdrop-filter: blur(20px);
+
+
+      padding: 0.5rem;
+
+
+      opacity: 0;
+
+
+      pointer-events: none;
+
+
+      transform: translateY(-8px);
+
+
+      transition: opacity 0.2s ease, transform 0.2s ease;
+
+
+      z-index: 100;
+
+
+    }
+
+
+    .profile-dropdown.open {
+
+
+      opacity: 1; pointer-events: all; transform: translateY(0);
+
+
+    }
+
+
+
+
+
+    .dropdown-header {
+
+
+      padding: 0.6rem 0.85rem;
+
+
+      border-bottom: 1px solid var(--dropdown-border);
+
+
+      margin-bottom: 0.4rem;
+
+
+    }
+
+
+    .dropdown-header p {
+
+
+      margin: 0; font-size: 0.75rem; font-weight: 700; color: var(--text-primary);
+
+
+    }
+
+
+    .dropdown-header span {
+
+
+      font-size: 0.65rem; color: var(--text-muted);
+
+
+    }
+
+
+
+
+
+    .dropdown-item {
+
+
+      display: flex; align-items: center; gap: 0.65rem;
+
+
+      padding: 0.6rem 0.85rem;
+
+
+      border-radius: 0.6rem;
+
+
+      font-size: 0.8rem; color: var(--text-primary);
+
+
+      cursor: pointer;
+
+
+      transition: background 0.2s;
+
+
+      text-decoration: none;
+
+
+      user-select: none;
+
+
+    }
+
+
+    .dropdown-item:hover { background: var(--dropdown-hover); }
+
+
+    .dropdown-item svg { flex-shrink: 0; opacity: 0.6; }
+
+
+    .dropdown-item.danger { color: #e53e3e; }
+
+
+    .dropdown-item.danger svg { opacity: 0.8; }
+
+
+
+
+
+    .theme-toggle-row {
+
+
+      display: flex; align-items: center; justify-content: space-between;
+
+
+      padding: 0.5rem 0.85rem;
+
+
+      border-radius: 0.6rem;
+
+
+      cursor: pointer;
+
+
+      transition: background 0.2s;
+
+
+    }
+
+
+    .theme-toggle-row:hover { background: var(--dropdown-hover); }
+
+
+    .theme-toggle-label {
+
+
+      display: flex; align-items: center; gap: 0.65rem;
+
+
+      font-size: 0.8rem; color: var(--text-primary);
+
+
+    }
+
+
+    .theme-toggle-label svg { opacity: 0.6; }
+
+
+
+
+
+    .toggle-switch { position: relative; width: 36px; height: 20px; }
+
+
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+
+    .toggle-slider {
+
+
+      position: absolute; inset: 0;
+
+
+      border-radius: 20px;
+
+
+      background: rgba(0,0,0,0.15);
+
+
+      transition: background 0.3s;
+
+
+      cursor: pointer;
+
+
+    }
+
+
+    .toggle-slider:before {
+
+
+      content: '';
+
+
+      position: absolute;
+
+
+      width: 14px; height: 14px;
+
+
+      border-radius: 50%;
+
+
+      background: var(--text-primary);
+
+
+      top: 3px; left: 3px;
+
+
+      transition: transform 0.3s;
+
+
+    }
+
+
+    input:checked + .toggle-slider { background: rgba(0,0,0,0.35); }
+
+
+    input:checked + .toggle-slider:before { transform: translateX(16px); }
+
+
+  </style>
+
+
+</head>
+
+
+<body class="font-['Inter'] min-h-screen relative overflow-x-hidden" style="color:var(--text-primary);">
+
+
+
+
+
+  <!-- Consistent Background Image -->
+
+
+  <div class="fixed inset-0 z-[-2]">
+
+
+    <img id="bgImage" src="public/images/dark.avif" alt="Background" class="w-full h-full object-cover">
+
+
+  </div>
+
+
+  <div class="bg-overlay" style="position:fixed;inset:0;z-index:-1;background:var(--bg-overlay);transition:background 0.4s ease;"></div>
+
+
+
+
+
+  <!-- NAVBAR -->
+
+
+  <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center backdrop-blur-[18px] rounded-[50px] z-50 border shadow-[0_18px_40px_rgba(0,0,0,0.5)]" style="background:var(--nav-bg);border-color:var(--nav-border);">
+
+
+    <div id="navLogo" class="font-bold text-2xl font-['Satisfy'] cursor-pointer" style="color:var(--text-primary);">
+
+
+      Event<span>Hive</span>
+
+
+    </div>
+
+
+    <ul id="navLinks" class="flex gap-6 list-none m-0 p-0 hidden md:flex">
+
+
+      <li><a href="/organiser-home" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Home<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+
+
+      <li><a href="#events" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Events<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+
+
+      <li><a href="#analytics" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Analytics<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+
+
+    </ul>
+
+
+    <li class="profile-wrapper" style="list-style:none;">
+
+
+      <div class="profile-avatar" id="profileAvatarBtn" title="Account options">
+
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);">
+
+
+          <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/>
+
+
+        </svg>
+
+
+      </div>
+
+
+
+
+
+      <div class="profile-dropdown" id="profileDropdown">
+
+
+        <div class="dropdown-header">
+
+
+          <p id="dropdownName">Organizer</p>
+
+
+          <span id="dropdownRole">Organizer</span>
+
+
+        </div>
+
+
+
+
+
+        <!-- Theme toggle (stored in localStorage; background stays dark) -->
+
+
+        <div class="theme-toggle-row" id="themeToggleRow">
+
+
+          <div class="theme-toggle-label">
+
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+
+              <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+
+
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+
+
+              <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+
+
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+
+
+            </svg>
+
+
+            Dark Mode
+
+
+          </div>
+
+
+          <label class="toggle-switch">
+
+
+            <input type="checkbox" id="themeToggle">
+
+
+            <span class="toggle-slider"></span>
+
+
+          </label>
+
+
+        </div>
+
+
+
+
+
+        <a class="dropdown-item" href="/organiser-home">
+
+
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+
+
+          </svg>
+
+
+          Home
+
+
+        </a>
+
+
+
+
+
+        <a class="dropdown-item" href="/profile">
+
+
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+
+
+          </svg>
+
+
+          My Profile
+
+
+        </a>
+
+
+
+
+
+        <div class="dropdown-item danger" id="dropdownLogoutBtn">
+
+
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+
+
+          </svg>
+
+
+          Logout
+
+
+        </div>
+
+
+      </div>
+
+
+    </li>
+
+
+  </nav>
+
+
+
+
+
+  <main class="w-[90%] max-w-6xl mx-auto my-20 relative z-10 flex flex-col gap-20 pb-20">
+
+
+
+
+
+    <!-- DASHBOARD -->
+
+
+    <section id="dashboard" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 mt-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+
+
+      <h2 class="text-3xl font-bold font-['Satisfy'] mb-8 border-b pb-4" style="color:var(--text-primary);border-color:var(--card-border);">Dashboard Overview</h2>
+
+
+      
+
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+
+        <div class="rounded-[1.5rem] p-6 hover:-translate-y-1 transition-transform border" style="background:var(--article-bg);border-color:var(--article-border);">
+
+
+          <h3 class="text-sm uppercase tracking-widest mb-2" style="color:var(--text-muted);">Active Events</h3>
+
+
+          <p id="stat-active" class="text-4xl font-bold" style="color:var(--text-primary);">…</p>
+
+
+        </div>
+
+
+        <div class="rounded-[1.5rem] p-6 hover:-translate-y-1 transition-transform border" style="background:var(--article-bg);border-color:var(--article-border);">
+
+
+          <h3 class="text-sm uppercase tracking-widest mb-2" style="color:var(--text-muted);">Total Volunteers</h3>
+
+
+          <p id="stat-volunteers" class="text-4xl font-bold" style="color:var(--text-primary);">…</p>
+
+
+        </div>
+
+
+        <div class="rounded-[1.5rem] p-6 hover:-translate-y-1 transition-transform border" style="background:var(--article-bg);border-color:var(--article-border);">
+
+
+          <h3 class="text-sm uppercase tracking-widest mb-2" style="color:var(--text-muted);">Upcoming Events</h3>
+
+
+          <p id="stat-upcoming" class="text-4xl font-bold" style="color:var(--text-primary);">…</p>
+
+
+        </div>
+
+
+        <div class="rounded-[1.5rem] p-6 hover:-translate-y-1 transition-transform border" style="background:var(--article-bg);border-color:var(--article-border);">
+
+
+          <h3 class="text-sm uppercase tracking-widest mb-2" style="color:var(--text-muted);">Volunteer Requests</h3>
+
+
+          <p id="stat-requests" class="text-4xl font-bold text-yellow-400">…</p>
+
+
+        </div>
+
+
+      </div>
+
+
+    </section>
+
+
+
+
+
+    <!-- EVENTS -->
+
+
+    <section id="events" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+
+
+      <h2 class="text-3xl font-bold font-['Satisfy'] mb-8 border-b pb-4" style="color:var(--text-primary);border-color:var(--card-border);">Manage Events</h2>
+
+
+
+
+
+      <div class="overflow-x-auto">
+
+
+        <table class="w-full text-left text-sm whitespace-nowrap">
+
+
+          <thead class="uppercase tracking-wider text-xs font-bold border-b" style="color:var(--text-muted);border-color:var(--card-border);">
+
+
+            <tr>
+
+
+              <th class="px-4 py-4">Event</th>
+
+
+              <th class="px-4 py-4">Date</th>
+
+
+              <th class="px-4 py-4">Status</th>
+
+
+              <th class="px-4 py-4">Volunteers</th>
+
+
+              <th class="px-4 py-4">Actions</th>
+
+
+            </tr>
+
+
+          </thead>
+
+
+          <tbody id="eventsTableBody" style="color:var(--text-secondary);">
+
+
+            <!-- Populated via JS -->
+
+
+          </tbody>
+
+
+        </table>
+
+
+      </div>
+
+
+    </section>
+
+
+
+
+
+    <!-- ANALYTICS -->
+
+
+    <section id="analytics" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 text-center border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+
+
+      <h2 class="text-3xl font-bold font-['Satisfy'] mb-4" style="color:var(--text-primary);">Analytics</h2>
+
+
+      <p class="italic" style="color:var(--text-secondary);">Advanced charts and insights coming soon.</p>
+
+
+    </section>
+
+
+
+
+
+    <!-- FUTURE UPDATES BLOCK -->
+
+
+    <section class="bg-gradient-to-r from-blue-900/40 to-[#0A0F14]/80 backdrop-blur-[32px] border border-blue-500/20 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2.5rem] p-10">
+
+
+      <h2 class="text-xl font-bold mb-6 flex items-center gap-2" style="color:var(--text-primary);"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Upcoming Dashboard Updates</h2>
+
+
+      <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm" style="color:var(--text-secondary);">
+
+
+        <li class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div> Advanced Event Analytics</li>
+
+
+        <li class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 9h.01M15 9h.01M9 15h6"/></svg></div> AI Volunteer Suggestions</li>
+
+
+        <li class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div> Interactive Calendar View</li>
+
+
+        <li class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M2 10h20"/></svg></div> Expense Tracking System</li>
+
+
+        <li class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg></div> Real-time Notifications</li>
+
+
+      </ul>
+
+
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+  </main>
+
+
+
+
+
+  <footer class="mt-auto py-8 text-center text-sm" style="color:var(--footer-text);">
+
+
+    <p>&copy; 2026 EventHive. All rights reserved.</p>
+
+
+  </footer>
+
+
+
+
+
+  <script>
+
+
+    // -- Auth guard --
+
+
+    (async function checkAuth() {
+
+
+      const token = localStorage.getItem('token');
+
+
+      if (!token) return showUnauthorized('not-logged-in');
+
+
+      try {
+
+
+        const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
+
+
+        if (!res.ok) return showUnauthorized('not-logged-in');
+
+
+        const data = await res.json();
+
+
+        if (data.data?.role !== 'organizer') return showUnauthorized(data.data?.role || 'unknown');
+
+
+      } catch { showUnauthorized('not-logged-in'); }
+
+
+    })();
+
+
+
+
+
+    function showUnauthorized(role) {
+
+
+      const isLoggedIn = role !== 'not-logged-in';
+
+
+      const roleLabels = { volunteer: 'Volunteer', client: 'Client' };
+
+
+      document.body.innerHTML = `
+
+
+        <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0f14;font-family:'Inter',sans-serif;padding:2rem;">
+
+
+          <div style="max-width:480px;width:100%;text-align:center;">
+
+
+            <div style="width:72px;height:72px;border-radius:50%;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
+
+
+              <svg xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;color:#f87171;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+
+
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+
+
+              </svg>
+
+
+            </div>
+
+
+            <h1 style="font-family:'Satisfy',cursive;font-size:2rem;color:#fff;margin-bottom:0.75rem;">Access Restricted</h1>
+
+
+            <p style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:0.5rem;">
+
+
+              ${isLoggedIn
+
+
+                ? `You're logged in as a <strong style="color:rgba(255,255,255,0.8);">${roleLabels[role] || role}</strong>, but this page is for <strong style="color:rgba(255,255,255,0.8);">Organizers</strong> only.`
+
+
+                : `You need to be logged in as an <strong style="color:rgba(255,255,255,0.8);">Organizer</strong> to access this page.`}
+
+
+            </p>
+
+
+            <p style="color:rgba(255,255,255,0.3);font-size:0.75rem;margin-bottom:2rem;">
+
+
+              ${isLoggedIn ? 'Please log out and sign in with your organizer account.' : 'Please log in with your organizer account to continue.'}
+
+
+            </p>
+
+
+            <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;">
+
+
+              ${isLoggedIn ? `
+
+
+              <button onclick="localStorage.removeItem('token');window.location.href='/register';"
+
+
+                style="padding:0.75rem 1.5rem;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
+
+
+                Log Out
+
+
+              </button>` : ''}
+
+
+              <button onclick="window.location.href='/register';"
+
+
+                style="padding:0.75rem 1.5rem;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
+
+
+                ${isLoggedIn ? 'Switch Account' : 'Log In'}
+
+
+              </button>
+
+
+              <button onclick="history.back();"
+
+
+                style="padding:0.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
+
+
+                ✓ Back
+
+
+              </button>
+
+
+              <button onclick="window.location.href='/';"
+
+
+                style="padding:0.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
+
+
+                Home
+
+
+              </button>
+
+
+            </div>
+
+
+          </div>
+
+
+        </div>`;
+
+
+    }
+
+
+
+
+
+    document.addEventListener("DOMContentLoaded", async () => {
+
+
+      const navLogo = document.getElementById('navLogo');
+
+
+      if (navLogo) navLogo.onclick = () => window.location.href = '/organiser-home';
+
+
+
+
+
+      // -- Theme toggle --
+
+
+      const bgImage = document.getElementById('bgImage');
+
+
+      const themeToggle = document.getElementById('themeToggle');
+
+
+      function applyTheme(dark) {
+
+
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+
+
+        bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
+
+
+        themeToggle.checked = dark;
+
+
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+
+
+      }
+
+
+      applyTheme(localStorage.getItem('theme') !== 'light');
+
+
+      themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
+
+
+
+
+
+      // -- Profile Avatar Dropdown --
+
+
+      const avatarBtn   = document.getElementById('profileAvatarBtn');
+
+
+      const dropdown    = document.getElementById('profileDropdown');
+
+
+
+
+
+      avatarBtn.addEventListener('click', (e) => {
+
+
+        e.stopPropagation();
+
+
+        dropdown.classList.toggle('open');
+
+
+      });
+
+
+      document.addEventListener('click', (e) => {
+
+
+        if (!dropdown.contains(e.target) && e.target !== avatarBtn) {
+
+
+          dropdown.classList.remove('open');
+
+
+        }
+
+
+      });
+
+
+
+
+
+      // -- Dropdown Logout --
+
+
+      document.getElementById('dropdownLogoutBtn').addEventListener('click', () => {
+
+
+        localStorage.removeItem('token');
+
+
+        localStorage.removeItem('user');
+
+
+        window.location.href = '/';
+
+
+      });
+
+
+
+
+
+      // -- Load organizer profile into dropdown --
+
+
+      (async function loadProfile() {
+
+
+        try {
+
+
+          const cached = JSON.parse(localStorage.getItem('user') || '{}');
+
+
+          const dName = cached.profile?.name || cached.profile?.orgName || cached.username;
+
+
+          if (dName) document.getElementById('dropdownName').textContent = dName;
+
+
+
+
+
+          const token = localStorage.getItem('token');
+
+
+          if (!token) return;
+
+
+          const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
+
+
+          if (!res.ok) return;
+
+
+          const data = await res.json();
+
+
+          if (!data.success) return;
+
+
+          const u = data.data;
+
+
+          const displayName = u.profile?.name || u.profile?.orgName || u.username;
+
+
+          if (displayName) document.getElementById('dropdownName').textContent = displayName;
+
+
+          const roleLabel = u.role ? u.role.charAt(0).toUpperCase() + u.role.slice(1) : 'Organizer';
+
+
+          document.getElementById('dropdownRole').textContent = roleLabel;
+
+
+
+
+
+          const pic = u.profile?.profilePic;
+
+
+          if (pic) {
+
+
+            const img = document.createElement('img');
+
+
+            img.src = pic;
+
+
+            img.alt = 'Profile';
+
+
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+
+
+            img.onerror = () => {
+
+
+              avatarBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/></svg>`;
+
+
+            };
+
+
+            avatarBtn.innerHTML = '';
+
+
+            avatarBtn.appendChild(img);
+
+
+          }
+
+
+        } catch(e) { /* silently fail */ }
+
+
+      })();
+
+
+
+
+
+      loadDashboardStats();
+
+
+      async function loadDashboardStats() {
+
+
+        const token = localStorage.getItem('token');
+
+
+        if (!token) return;
+
+
+
+
+
+        try {
+
+
+          const res = await fetch('/api/events/my', { headers: { Authorization: `Bearer ${token}` } });
+
+
+          if (!res.ok) return;
+
+
+          const data = await res.json();
+
+
+          const events = data.data || [];
+
+
+          const now = new Date();
+
+
+
+
+
+          let activeCount = 0;
+
+
+          let upcomingCount = 0;
+
+
+          events.forEach(ev => {
+
+
+            const start = ev.schedule?.start ? new Date(ev.schedule.start) : null;
+
+
+            const end = ev.schedule?.end ? new Date(ev.schedule.end) : null;
+
+
+            if (ev.status === 'ongoing' || (start && start <= now && (!end || end >= now))) {
+
+
+              activeCount++;
+
+
+            } else if (start && start > now) {
+
+
+              upcomingCount++;
+
+
+            }
+
+
+          });
+
+
+
+
+
+          document.getElementById('stat-active').textContent = activeCount;
+
+
+          document.getElementById('stat-upcoming').textContent = upcomingCount;
+
+
+
+
+
+          const totalVolunteers = events.reduce((sum, ev) => {
+
+
+            return sum + (ev.volunteerRequirements?.totalVolunteers || 0);
+
+
+          }, 0);
+
+
+          document.getElementById('stat-volunteers').textContent = totalVolunteers;
+
+
+
+
+
+          let pendingCount = 0;
+
+
+          const fetchPromises = events.map(ev =>
+
+
+            fetch(`/api/applications/event/${ev._id}`, { headers: { Authorization: `Bearer ${token}` } })
+
+
+              .then(r => r.ok ? r.json() : { data: [] })
+
+
+              .then(d => {
+
+
+                const apps = d.data || [];
+
+
+                pendingCount += apps.filter(a => a.status === 'pending').length;
+
+
+              })
+
+
+              .catch(() => {})
+
+
+          );
+
+
+          await Promise.all(fetchPromises);
+
+
+          document.getElementById('stat-requests').textContent = pendingCount;
+
+
+
+
+
+          const tbody = document.getElementById('eventsTableBody');
+
+
+          if (!tbody) return;
+
+
+          if (!events.length) {
+
+
+            tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center italic" style="color:var(--text-muted);">No events yet.</td></tr>`;
+
+
+            return;
+
+
+          }
+
+
+          const EVENTS_INITIAL = 5;
+          function renderEventsTable(showAll) {
+            const visible = showAll ? events : events.slice(0, EVENTS_INITIAL);
+            tbody.innerHTML = visible.map(ev => {
+
+
+            const start = ev.schedule?.start
+
+
+              ? new Date(ev.schedule.start).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+
+
+              : '…';
+
+
+            const isLive = ev.status === 'ongoing';
+
+
+            const isUpcoming = ev.status === 'upcoming' || (ev.schedule?.start && new Date(ev.schedule.start) > now);
+
+
+            const statusLabel = isLive ? 'Live' : isUpcoming ? 'Upcoming' : (ev.status || 'Published');
+
+
+            const statusClass = isLive
+
+
+              ? 'bg-green-500/20 text-green-400 border-green-500/30'
+
+
+              : isUpcoming
+
+
+                ? 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+
+
+                : 'bg-white/10 text-white/50 border-white/20';
+
+
+            const volunteers = ev.volunteerRequirements?.totalVolunteers || 0;
+
+
+            const isPast = ev.schedule?.end && new Date(ev.schedule.end) < now;
+
+
+            const overviewBtn = isPast ? '' : `<a href="/event-overview?id=${ev._id}" class="px-3 py-1 bg-purple-500/20 hover:bg-purple-500/40 text-purple-400 border border-purple-500/30 rounded text-xs">Overview</a>`;
+
+
+
+
+
+            return `
+
+
+              <tr class="border-b hover:opacity-90 transition-colors" style="border-color:var(--card-border);">
+
+
+                <td class="px-4 py-4 font-bold" style="color:var(--text-primary);">${ev.title || 'Untitled'}</td>
+
+
+                <td class="px-4 py-4" style="color:var(--text-secondary);">${start}</td>
+
+
+                <td class="px-4 py-4"><span class="px-3 py-1 border rounded-full text-xs font-bold ${statusClass}">${statusLabel}</span></td>
+
+
+                <td class="px-4 py-4" style="color:var(--text-secondary);">${volunteers}</td>
+
+
+                <td class="px-4 py-4 space-x-2">
+
+
+                  <a href="/create-event?id=${ev._id}" class="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 border border-blue-500/30 rounded text-xs">Edit</a>
+
+
+                  <a href="/event-info?id=${ev._id}" class="px-3 py-1 bg-white/10 hover:bg-white/20 border border-white/20 rounded text-xs" style="color:var(--text-primary);">View</a>
+
+
+                  ${overviewBtn}
+
+
+                </td>
+
+
+              </tr>`;
+
+
+          }).join('');
+            if (events.length > EVENTS_INITIAL) {
+              const rem = events.length - EVENTS_INITIAL;
+              const btnRow = document.createElement('tr');
+              btnRow.innerHTML = '<td colspan="5" class="px-4 py-3 text-center"><button onclick="window._showEventsAll(' + !showAll + ')" class="text-xs uppercase tracking-widest font-bold opacity-50 hover:opacity-80 transition-opacity" style="color:var(--text-primary);">' + (showAll ? 'Show less ↑' : 'Show ' + rem + ' more ↓') + '</button></td>';
+              tbody.appendChild(btnRow);
+            }
+          }
+          window._showEventsAll = function(v) { renderEventsTable(v); };
+          renderEventsTable(false);
+        } catch (err) {
+
+
+          console.error('Failed to load dashboard stats:', err);
+
+
+        }
+
+
+      }
+
+
+
+
+
+      loadDashboardStats();
+
+
+    });
+
+
+  </script>
+
+
+</body>
+
+
+</html>
+
+
