@@ -4,12 +4,30 @@ const User = require("../models/User");
 const ClientOffer = require("../models/ClientOffer");
 const { protect, authorize } = require("../middleware/auth");
 
+// Helper: Calculate composite rating based on client reviews (50%) and events hosted (50%)
+// Cap event score at 5 (10 events = 5 stars).
+function getCompositeRating(clientRatingAvg, eventsHosted) {
+  const eventScore = Math.min(5, eventsHosted * 0.5);
+  // If no client ratings exist, purely use the experience score
+  if (!clientRatingAvg || clientRatingAvg === 0) {
+    return Number(eventScore.toFixed(1));
+  }
+  return Number(((clientRatingAvg + eventScore) / 2).toFixed(1));
+}
+
 // @route   GET /api/organizers
 // @desc    Get all organizers (public)
 router.get("/organizers", async (req, res) => {
   try {
     const organizers = await User.find({ role: "organizer" })
-      .select("-password_hash -ratings");
+      .select("-password_hash -ratings").lean();
+      
+    const Event = require("../models/Event");
+    for (let org of organizers) {
+      org.eventsHosted = await Event.countDocuments({ organizerId: org._id });
+      org.ratingAvg = getCompositeRating(org.ratingAvg || 0, org.eventsHosted);
+    }
+    
     res.json(organizers);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -21,8 +39,13 @@ router.get("/organizers", async (req, res) => {
 router.get("/organizers/:id", async (req, res) => {
   try {
     const organizer = await User.findOne({ _id: req.params.id, role: "organizer" })
-      .select("-password_hash");
+      .select("-password_hash").lean();
     if (!organizer) return res.status(404).json({ error: "Organizer not found" });
+    
+    const Event = require("../models/Event");
+    organizer.eventsHosted = await Event.countDocuments({ organizerId: organizer._id });
+    organizer.ratingAvg = getCompositeRating(organizer.ratingAvg || 0, organizer.eventsHosted);
+    
     res.json(organizer);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -34,12 +57,17 @@ router.get("/organizers/:id", async (req, res) => {
 router.get("/organizers/:id/ratings", async (req, res) => {
   try {
     const organizer = await User.findOne({ _id: req.params.id, role: "organizer" })
-      .select("ratings ratingAvg eventsHosted username profile.orgName profile.leadName")
-      .populate("ratings.clientId", "username profile.clientName");
+      .select("ratings ratingAvg username profile.orgName profile.leadName")
+      .populate("ratings.clientId", "username profile.clientName").lean();
     if (!organizer) return res.status(404).json({ error: "Organizer not found" });
+    
+    const Event = require("../models/Event");
+    const count = await Event.countDocuments({ organizerId: organizer._id });
+    const compositeAvg = getCompositeRating(organizer.ratingAvg || 0, count);
+    
     res.json({
-      ratingAvg: organizer.ratingAvg,
-      eventsHosted: organizer.eventsHosted,
+      ratingAvg: compositeAvg,
+      eventsHosted: count,
       count: organizer.ratings.length,
       ratings: organizer.ratings
     });
@@ -95,11 +123,16 @@ router.post("/organizers/:id/rate", protect, authorize("client"), async (req, re
       review: review || ""
     });
 
-    // Recompute average
+    // Recompute client average
     const total = organizer.ratings.reduce((sum, r) => sum + r.score, 0);
-    organizer.ratingAvg = Math.round((total / organizer.ratings.length) * 10) / 10;
+    const clientRatingAvg = Math.round((total / organizer.ratings.length) * 10) / 10;
+    organizer.ratingAvg = clientRatingAvg;
 
     await organizer.save();
+
+    const Event = require("../models/Event");
+    const count = await Event.countDocuments({ organizerId: organizer._id });
+    const compositeAvg = getCompositeRating(clientRatingAvg, count);
 
     // Mark offer as rated
     offer.isRated = true;
@@ -107,7 +140,7 @@ router.post("/organizers/:id/rate", protect, authorize("client"), async (req, re
 
     res.json({
       success: true,
-      ratingAvg: organizer.ratingAvg,
+      ratingAvg: compositeAvg,
       totalRatings: organizer.ratings.length
     });
   } catch (err) {

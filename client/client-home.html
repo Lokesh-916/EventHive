@@ -24,9 +24,11 @@
 <body class="bg-[#0A0F14] text-white font-['Inter'] min-h-screen relative overflow-x-hidden">
 
   <!-- Background -->
-  <div class="fixed inset-0 z-[-1]">
-    <img src="https://images.unsplash.com/photo-1686425374911-e0d752e09806?q=80&w=1493&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Background" class="w-full h-full object-cover">
+  <div class="fixed inset-0 z-[-2]">
+    <img src="public/images/dark.avif" alt="Background" class="w-full h-full object-cover">
   </div>
+  <!-- Overlay -->
+  <div class="fixed inset-0 z-[-1] bg-[#0A0F14]/80"></div>
 
   <!-- NAVBAR -->
   <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center bg-[#0f0f23]/65 border border-white/15 shadow-[0_18px_40px_rgba(0,0,0,0.5)] backdrop-blur-[18px] rounded-[50px] z-50">
@@ -41,7 +43,7 @@
     </ul>
     <div class="flex gap-4">
       <button onclick="window.location.href='/home'" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all text-white">Events Home</button>
-      <button id="logout-btn" class="px-5 py-2 text-xs uppercase tracking-widest font-bold bg-gradient-to-r from-blue-500 to-cyan-500 hover:opacity-90 rounded-full transition-all shadow-lg text-white">Logout</button>
+      <button id="logout-btn" class="px-5 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white hover:opacity-90 rounded-full transition-all shadow-lg text-white">Logout</button>
     </div>
   </nav>
 
@@ -54,7 +56,7 @@
         <p class="text-lg text-white/70 mb-8 max-w-xl">Browse top-rated event organizers, compare experience and ratings, and send an offer to book the best fit for your next event.</p>
 
         <div class="flex gap-4 mb-10">
-          <button onclick="document.getElementById('organizers').scrollIntoView({behavior: 'smooth'})" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg hover:shadow-[0_0_20px_rgba(0,198,255,0.4)] transition-all transform hover:-translate-y-1">Browse Organizers</button>
+          <button onclick="document.getElementById('organizers').scrollIntoView({behavior: 'smooth'})" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white rounded-lg hover:shadow-[0_4px_16px_rgba(0,0,0,0.5)] transition-all transform hover:-translate-y-1">Browse Organizers</button>
           <button onclick="document.getElementById('my-bookings').scrollIntoView({behavior: 'smooth'})" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 transition-all transform hover:-translate-y-1">My Bookings</button>
         </div>
 
@@ -172,20 +174,27 @@
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs uppercase tracking-widest text-white/40 font-bold mb-2">Budget</label>
-            <input id="offer-budget" type="text" placeholder="e.g. ₹2,00,000"
+            <label class="block text-xs uppercase tracking-widest text-white/40 font-bold mb-2">Min Budget (₹)</label>
+            <input id="offer-budget-min" type="number" placeholder="50000"
               class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 transition-all">
           </div>
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-white/40 font-bold mb-2">Max Budget (₹)</label>
+            <input id="offer-budget-max" type="number" placeholder="200000"
+              class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 transition-all">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-xs uppercase tracking-widest text-white/40 font-bold mb-2">Event Date</label>
             <input id="offer-date" type="date"
               class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm transition-all [color-scheme:dark]">
           </div>
-        </div>
-        <div>
-          <label class="block text-xs uppercase tracking-widest text-white/40 font-bold mb-2">City</label>
-          <input id="offer-city" type="text" placeholder="e.g. Hyderabad"
-            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 transition-all">
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-white/40 font-bold mb-2">City</label>
+            <input id="offer-city" type="text" placeholder="e.g. Hyderabad"
+              class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 transition-all">
+          </div>
         </div>
         <div>
           <label class="block text-xs uppercase tracking-widest text-white/40 font-bold mb-2">Description</label>
@@ -194,7 +203,7 @@
         </div>
         <p id="offer-error" class="text-red-400 text-xs hidden"></p>
         <button type="submit" id="offer-submit-btn"
-          class="mt-2 w-full py-3 font-bold uppercase tracking-wider text-sm bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl hover:opacity-90 transition-all shadow-lg">
+          class="mt-2 w-full py-3 font-bold uppercase tracking-wider text-sm bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white rounded-xl hover:opacity-90 transition-all shadow-lg">
           Send Offer
         </button>
       </form>
@@ -259,7 +268,7 @@
                 View Profile
               </button>
               <button onclick="openOfferModal('${org._id}', '${name.replace(/'/g, "\\'")}' )"
-                class="flex-1 py-2 text-xs uppercase tracking-widest font-bold bg-gradient-to-r from-blue-500 to-cyan-500 hover:opacity-90 rounded-xl transition-all shadow-lg">
+                class="flex-1 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white hover:opacity-90 rounded-xl transition-all shadow-lg">
                 Send Offer
               </button>
             </div>
@@ -335,8 +344,40 @@
             ? `<span class="px-4 py-2 text-xs text-green-400 border border-green-500/30 rounded-xl bg-green-500/10 font-bold">✓ Rated</span>`
             : '';
 
+        let budgetStr = '';
+        if (offer.budgetMin || offer.budgetMax) {
+          budgetStr = `<span>💰 ₹${offer.budgetMin || 0} - ₹${offer.budgetMax || 'Any'}</span>`;
+        } else if (offer.budget) {
+          budgetStr = `<span>💰 ${offer.budget}</span>`;
+        }
+
+        let expensesHtml = '';
+        if ((offer.status === 'accepted' || offer.status === 'completed') && offer.expenses && offer.expenses.length > 0) {
+          const expenseList = offer.expenses.map(exp => {
+            const expDate = new Date(exp.date).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+            if (exp.isDeleted) {
+              return `<li class="flex justify-between items-center text-white/30 line-through text-xs px-2 py-1"><span>${exp.description}</span><span>₹${exp.amount}</span></li>`;
+            }
+            return `<li class="flex justify-between items-center text-white/70 text-xs px-2 py-1 border-b border-white/5 last:border-0 hover:bg-white/5"><span>${expDate} - ${exp.description}</span><span class="font-bold text-red-300">₹${exp.amount}</span></li>`;
+          }).join('');
+          
+          const totalValid = offer.expenses.filter(e => !e.isDeleted).reduce((sum, e) => sum + e.amount, 0);
+
+          expensesHtml = `
+            <div class="mt-4 bg-[#0d1117]/50 border border-white/10 rounded-xl p-4">
+              <div class="flex justify-between items-center mb-2">
+                <h4 class="text-xs uppercase tracking-widest text-white/50 font-bold">Tracked Expenses</h4>
+                <span class="text-xs font-bold text-red-400">Total: ₹${totalValid}</span>
+              </div>
+              <ul class="flex flex-col gap-1 max-h-32 overflow-y-auto pr-2">
+                ${expenseList}
+              </ul>
+            </div>
+          `;
+        }
+
         return `
-          <div class="bg-white/5 border border-white/10 rounded-[1.5rem] p-6 flex flex-col sm:flex-row sm:items-center gap-5 hover:bg-white/8 transition-colors">
+          <div class="bg-white/5 border border-white/10 rounded-[1.5rem] p-6 flex flex-col sm:flex-row gap-5 hover:bg-white/8 transition-colors items-start">
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-3 mb-1">
                 <h3 class="text-white font-bold text-base truncate">${offer.title}</h3>
@@ -344,10 +385,11 @@
               </div>
               <p class="text-white/50 text-sm">Organizer: <span class="text-white/80">${orgName}</span></p>
               <div class="flex gap-4 mt-2 text-xs text-white/40">
-                ${offer.budget ? `<span>💰 ${offer.budget}</span>` : ''}
+                ${budgetStr}
                 <span>📅 ${date}</span>
                 ${offer.city ? `<span>📍 ${offer.city}</span>` : ''}
               </div>
+              ${expensesHtml}
             </div>
             <div class="flex gap-2 flex-shrink-0 sm:flex-col items-end">
               <button onclick="window.location.href='/organiser-profile?id=${offer.organizerId?._id}'"
@@ -394,7 +436,8 @@
           body: JSON.stringify({
             organizerId: selectedOrganizerId,
             title:       document.getElementById('offer-title').value,
-            budget:      document.getElementById('offer-budget').value,
+            budgetMin:   document.getElementById('offer-budget-min').value,
+            budgetMax:   document.getElementById('offer-budget-max').value,
             eventDate:   document.getElementById('offer-date').value || undefined,
             city:        document.getElementById('offer-city').value,
             description: document.getElementById('offer-description').value

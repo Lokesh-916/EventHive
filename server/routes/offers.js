@@ -8,7 +8,7 @@ const { protect, authorize } = require('../middleware/auth');
 // @access  Private (Client)
 router.post('/', protect, authorize('client'), async (req, res) => {
   try {
-    const { organizerId, title, description, budget, eventDate, city } = req.body;
+    const { organizerId, title, description, budgetMin, budgetMax, eventDate, city } = req.body;
     if (!organizerId || !title) {
       return res.status(400).json({ success: false, error: 'organizerId and title are required' });
     }
@@ -18,7 +18,8 @@ router.post('/', protect, authorize('client'), async (req, res) => {
       organizerId,
       title,
       description,
-      budget,
+      budgetMin,
+      budgetMax,
       eventDate,
       city
     });
@@ -48,7 +49,7 @@ router.get('/my-offers', protect, authorize('client'), async (req, res) => {
 // @access  Private (Organizer)
 router.get('/incoming', protect, authorize('organizer'), async (req, res) => {
   try {
-    const offers = await ClientOffer.find({ organizerId: req.user.id, status: 'pending' })
+    const offers = await ClientOffer.find({ organizerId: req.user.id, status: { $in: ['pending', 'accepted', 'completed'] } })
       .populate('clientId', 'username profile.clientName profile.clientType email')
       .sort({ createdAt: -1 });
     res.json({ success: true, data: offers });
@@ -108,6 +109,54 @@ router.patch('/:id/complete', protect, authorize('organizer'), async (req, res) 
     // Increment eventsHosted on the organizer
     const User = require('../models/User');
     await User.findByIdAndUpdate(req.user.id, { $inc: { eventsHosted: 1 } });
+
+    res.json({ success: true, data: offer });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// @route   POST /api/offers/:id/expenses
+// @desc    Organizer adds an expense to an active offer
+// @access  Private (Organizer)
+router.post('/:id/expenses', protect, authorize('organizer'), async (req, res) => {
+  try {
+    const { description, amount } = req.body;
+    if (!description || amount === undefined) {
+      return res.status(400).json({ success: false, error: 'Description and amount are required' });
+    }
+
+    const offer = await ClientOffer.findOne({ _id: req.params.id, organizerId: req.user.id });
+    if (!offer) return res.status(404).json({ success: false, error: 'Offer not found' });
+    if (offer.status !== 'accepted') {
+      return res.status(400).json({ success: false, error: 'Expenses can only be added to actively accepted offers' });
+    }
+
+    offer.expenses.push({ description, amount: Number(amount) });
+    await offer.save();
+
+    res.json({ success: true, data: offer });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// @route   DELETE /api/offers/:id/expenses/:expenseId
+// @desc    Organizer marks an expense as deleted (soft delete)
+// @access  Private (Organizer)
+router.delete('/:id/expenses/:expenseId', protect, authorize('organizer'), async (req, res) => {
+  try {
+    const offer = await ClientOffer.findOne({ _id: req.params.id, organizerId: req.user.id });
+    if (!offer) return res.status(404).json({ success: false, error: 'Offer not found' });
+    if (offer.status !== 'accepted') {
+      return res.status(400).json({ success: false, error: 'Expenses can only be deleted from actively accepted offers' });
+    }
+
+    const expense = offer.expenses.id(req.params.expenseId);
+    if (!expense) return res.status(404).json({ success: false, error: 'Expense not found' });
+
+    expense.isDeleted = true;
+    await offer.save();
 
     res.json({ success: true, data: offer });
   } catch (err) {

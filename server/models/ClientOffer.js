@@ -5,7 +5,14 @@ const clientOfferSchema = new mongoose.Schema({
   organizerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   title: { type: String, required: true },
   description: { type: String },
-  budget: { type: String },
+  budgetMin: { type: Number },
+  budgetMax: { type: Number },
+  expenses: [{
+    description: { type: String, required: true },
+    amount: { type: Number, required: true },
+    date: { type: Date, default: Date.now },
+    isDeleted: { type: Boolean, default: false }
+  }],
   eventDate: { type: Date },
   city: { type: String },
   status: {

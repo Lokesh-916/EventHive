@@ -376,82 +376,85 @@
       margin-top: 0.4rem;
     }
 
-    /* GRID */
-    .events-grid {
-      display: grid;
-      grid-template-columns: repeat(1, 1fr);
-      gap: 1.25rem;
+    /* LIST VIEW */
+    .events-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
     }
 
-    @media (min-width: 640px) { .events-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (min-width: 1024px) { .events-grid { grid-template-columns: repeat(4, 1fr); } }
-
-    /* CARD */
-    .event-card {
+    .event-list-item {
+      display: flex;
+      flex-direction: column;
       background: var(--article-bg);
       border: 1px solid var(--article-border);
       border-radius: 1.5rem;
-      padding: 1rem;
+      padding: 1.5rem;
       transition: background 0.2s ease, border-color 0.2s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
       cursor: pointer;
       text-decoration: none;
-      display: block;
       color: inherit;
     }
 
-    .event-card:hover {
+    @media (min-width: 640px) {
+      .event-list-item {
+        flex-direction: row;
+        align-items: center;
+      }
+    }
+
+    .event-list-item:hover {
       background: var(--article-hover);
       border-color: var(--article-border-hover);
-      transform: translateY(-8px) scale(1.02);
+      transform: translateY(-8px) scale(1.01);
       box-shadow: 0 20px 40px rgba(0,0,0,0.12);
     }
-    [data-theme="dark"] .event-card:hover {
+    [data-theme="dark"] .event-list-item:hover {
       box-shadow: 0 20px 40px rgba(0,0,0,0.5);
     }
 
-    .event-card img {
+    .event-list-item img, .event-list-item .event-card-img-placeholder {
       width: 100%;
-      height: 10rem;
+      height: 12rem;
       object-fit: cover;
       border-radius: 1rem;
       margin-bottom: 1rem;
+      flex-shrink: 0;
     }
 
-    .event-card-img-placeholder {
-      width: 100%;
-      height: 10rem;
-      border-radius: 1rem;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, rgba(0,0,0,0.05), rgba(0,0,0,0.12));
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    @media (min-width: 640px) {
+      .event-list-item img, .event-list-item .event-card-img-placeholder {
+        width: 240px;
+        height: 160px;
+        margin-bottom: 0;
+        margin-right: 1.5rem;
+      }
     }
 
-    .event-card-img-placeholder svg {
-      width: 2.5rem;
-      height: 2.5rem;
-      opacity: 0.3;
+    .event-list-item .content {
+      flex: 1;
+      min-width: 0;
     }
 
-    .event-card h3 {
-      font-size: 1rem;
+    .event-list-item h3 {
+      font-size: 1.25rem;
       font-weight: 700;
       color: var(--text-primary);
-      margin: 0 0 0.25rem;
+      margin: 0 0 0.4rem;
     }
 
-    .event-card p {
-      font-size: 0.8rem;
+    .event-list-item p {
+      font-size: 0.9rem;
       color: var(--text-secondary);
       margin: 0;
+      line-height: 1.5;
     }
 
-    .event-card .event-meta {
+    .event-list-item .event-meta {
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
-      margin-top: 0.5rem;
+      margin-top: 0.8rem;
     }
 
     .event-tag-chip {
@@ -499,7 +502,7 @@
     }
 
     .skeleton-card {
-      height: 220px;
+      height: 160px;
       border-radius: 1.5rem;
     }
 
@@ -594,44 +597,13 @@
   <!-- MAIN CONTENT -->
   <main>
 
-    <!-- ONGOING EVENTS -->
-    <section id="ongoing" class="events-section">
+    <!-- ALL EVENTS SECTION -->
+    <section id="all-events-section" class="events-section w-full">
       <div class="section-header">
-        <div class="section-badge badge-green">Live now</div>
-        <h2 class="section-title">Ongoing Events</h2>
-        <p class="section-subtitle">Events happening right now.</p>
+        <h2 class="section-title" id="all-title">All Events</h2>
+        <p class="section-subtitle" id="all-subtitle">Browse through our complete catalog of events.</p>
       </div>
-      <div class="events-grid" id="ongoing-grid">
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-      </div>
-    </section>
-
-    <!-- UPCOMING EVENTS -->
-    <section id="upcoming" class="events-section">
-      <div class="section-header">
-        <div class="section-badge badge-blue">Coming soon</div>
-        <h2 class="section-title">Upcoming Events</h2>
-        <p class="section-subtitle">Plan ahead and stay excited.</p>
-      </div>
-      <div class="events-grid" id="upcoming-grid">
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-      </div>
-    </section>
-
-    <!-- PAST EVENTS -->
-    <section id="past" class="events-section">
-      <div class="section-header">
-        <div class="section-badge badge-gray">Previously</div>
-        <h2 class="section-title">Past Events</h2>
-        <p class="section-subtitle">Events you may have missed.</p>
-      </div>
-      <div class="events-grid" id="past-grid">
+      <div class="events-list" id="all-grid">
         <div class="skeleton skeleton-card"></div>
         <div class="skeleton skeleton-card"></div>
         <div class="skeleton skeleton-card"></div>
@@ -764,11 +736,11 @@
       return { ongoing, upcoming, past };
     }
 
-    function buildCard(ev) {
+    function buildListItem(ev) {
       const eventId = ev._id;
       const title = ev.title || 'Untitled Event';
       const tagline = ev.tagline || ev.description || '';
-      const tags = (ev.tags || []).slice(0, 3);
+      const tags = (ev.tags || []).slice(0, 4);
       const dateStr = ev.schedule?.start ? formatDate(ev.schedule.start) : '';
       const city = ev.location?.city || '';
 
@@ -780,60 +752,65 @@
       const metaText = [dateStr, city].filter(Boolean).join(' · ');
 
       return `
-        <a class="event-card" href="/event-info?id=${eventId}">
+        <a class="event-list-item" href="/event-info?id=${eventId}">
           ${imgHtml}
-          <h3>${title}</h3>
-          <p>${tagline.slice(0, 80)}${tagline.length > 80 ? '…' : ''}</p>
-          ${metaText ? `<p style="font-size:0.7rem;opacity:0.5;margin-top:0.35rem;">${metaText}</p>` : ''}
-          ${tagChips ? `<div class="event-meta">${tagChips}</div>` : ''}
+          <div class="content">
+            <h3>${title}</h3>
+            <p>${tagline.slice(0, 160)}${tagline.length > 160 ? '…' : ''}</p>
+            ${metaText ? `<p style="font-size:0.8rem;opacity:0.6;margin-top:0.4rem;font-weight:600;">🗓️ ${metaText}</p>` : ''}
+            ${tagChips ? `<div class="event-meta">${tagChips}</div>` : ''}
+          </div>
         </a>`;
     }
 
     function renderGrid(gridId, events, type) {
       const grid = document.getElementById(gridId);
       if (!events.length) {
-        grid.innerHTML = `<div class="empty-state">No events here yet.</div>`;
+        grid.innerHTML = `<div class="empty-state">No events available in this category.</div>`;
         return;
       }
 
-      // Show max 4 events
-      const displayEvents = events.slice(0, 4);
-      grid.innerHTML = displayEvents.map(buildCard).join('');
-
-      // Add "See All" option if there are more than 4
-      if (events.length > 4) {
-        const existingSeeAll = grid.parentNode.querySelector('.see-all-container');
-        if (existingSeeAll) existingSeeAll.remove();
-        
-        const seeAllDiv = document.createElement('div');
-        seeAllDiv.className = 'see-all-container';
-        seeAllDiv.style.textAlign = 'center';
-        seeAllDiv.style.marginTop = '2.5rem';
-        seeAllDiv.innerHTML = `<a href="/all-events?type=${type}" style="display:inline-block; padding:0.8rem 2.5rem; background:var(--text-primary); color:var(--section-bg); border-radius:99px; text-decoration:none; font-weight:bold; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.05em; transition:transform 0.2s; box-shadow:var(--shadow);">See all ${type} events &rarr;</a>`;
-        
-        // Add hover effect via JS since it's inline logic
-        seeAllDiv.firstChild.onmouseover = function() { this.style.transform = 'translateY(-3px)'; };
-        seeAllDiv.firstChild.onmouseout = function() { this.style.transform = 'translateY(0)'; };
-        
-        grid.parentNode.appendChild(seeAllDiv);
-      }
+      // Show unlimited events on this page
+      grid.innerHTML = events.map(buildListItem).join('');
     }
 
     async function loadEvents() {
       try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const filterType = urlParams.get('type');
+
         const res = await fetch('/api/events');
         const data = await res.json();
         if (!data.success) throw new Error(data.error);
 
         const { ongoing, upcoming, past } = categorise(data.data);
-        renderGrid('ongoing-grid', ongoing, 'ongoing');
-        renderGrid('upcoming-grid', upcoming, 'upcoming');
-        renderGrid('past-grid', past, 'past');
+
+        let displayData = [];
+        const titleEl = document.getElementById('all-title');
+        
+        switch (filterType) {
+          case 'ongoing':
+            displayData = ongoing;
+            titleEl.textContent = 'All Ongoing Events';
+            break;
+          case 'upcoming':
+            displayData = upcoming;
+            titleEl.textContent = 'All Upcoming Events';
+            break;
+          case 'past':
+            displayData = past;
+            titleEl.textContent = 'All Past Events';
+            break;
+          default:
+            displayData = data.data; // Show all indiscriminately
+            break;
+        }
+
+        renderGrid('all-grid', displayData, filterType || 'all');
+        
       } catch (err) {
         console.error('Failed to load events:', err);
-        ['ongoing-grid', 'upcoming-grid', 'past-grid'].forEach(id => {
-          document.getElementById(id).innerHTML = `<div class="empty-state">Could not load events. Please try again.</div>`;
-        });
+        document.getElementById('all-grid').innerHTML = `<div class="empty-state">Could not load events. Please try again.</div>`;
       }
     }
 
