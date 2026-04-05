@@ -842,6 +842,12 @@ function updateNavbar(u) {
   document.getElementById('dropdownName').textContent = dName || u.username;
   document.getElementById('dropdownRole').textContent =
     u.role ? u.role.charAt(0).toUpperCase() + u.role.slice(1) : '—';
+
+  // Set role-specific home links
+  const homeMap = { organizer: '/organiser-home', client: '/client-home', volunteer: '/home' };
+  const homeUrl = homeMap[u.role] || '/home';
+  document.querySelectorAll('a.brand, a[href="/home"]').forEach(el => el.href = homeUrl);
+
   const pic = p.profilePic || p.logo;
   if (pic) {
     const img = document.createElement('img');
