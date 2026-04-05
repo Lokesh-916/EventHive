@@ -1,595 +1,596 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EventHive Client Home</title>
-  <meta name="description" content="Browse top-rated event organizers on EventHive and find the perfect fit for your next event.">
-  <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
-  <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="src/styles/output.css">
-  <script>
-    // Apply theme before paint to prevent flash
-    (function() {
-      const t = localStorage.getItem('theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', t);
-    })();
-  </script>
-  <style>
-    :root {
-      --bg-overlay: rgba(255,255,255,0.72);
-      --section-bg: rgba(255,255,255,0.6);
-      --card-bg: rgba(255,255,255,0.5);
-      --card-border: rgba(0,0,0,0.08);
-      --text-primary: #1a1a2e;
-      --text-secondary: rgba(20,20,40,0.6);
-      --text-muted: rgba(20,20,40,0.4);
-      --nav-bg: rgba(255,255,255,0.65);
-      --nav-border: rgba(0,0,0,0.08);
-      --article-bg: rgba(255,255,255,0.5);
-      --article-border: rgba(0,0,0,0.06);
-      --input-bg: rgba(255,255,255,0.5);
-      --dropdown-bg: rgba(255,255,255,0.92);
-      --dropdown-border: rgba(0,0,0,0.1);
-      --dropdown-hover: rgba(0,0,0,0.05);
-      --shadow: 0 8px 32px rgba(0,0,0,0.1);
-      --footer-text: rgba(20,20,40,0.4);
-    }
-    [data-theme="dark"] {
-      --bg-overlay: rgba(10,15,20,0.80);
-      --section-bg: rgba(10,15,20,0.85);
-      --card-bg: rgba(255,255,255,0.04);
-      --card-border: rgba(255,255,255,0.08);
-      --text-primary: #ffffff;
-      --text-secondary: rgba(255,255,255,0.6);
-      --text-muted: rgba(255,255,255,0.35);
-      --nav-bg: rgba(15,15,35,0.65);
-      --nav-border: rgba(255,255,255,0.12);
-      --article-bg: rgba(255,255,255,0.05);
-      --article-border: rgba(255,255,255,0.08);
-      --input-bg: rgba(255,255,255,0.06);
-      --dropdown-bg: rgba(20,25,35,0.96);
-      --dropdown-border: rgba(255,255,255,0.12);
-      --dropdown-hover: rgba(255,255,255,0.08);
-      --shadow: 0 20px 50px rgba(0,0,0,0.6);
-      --footer-text: rgba(255,255,255,0.4);
-    }
-    * { box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; min-height: 100vh; color: var(--text-primary); margin: 0; overflow-x: hidden; }
-    /* Modal backdrop */
-    .modal-backdrop { backdrop-filter: blur(12px); background: rgba(0,0,0,0.7); }
-    /* Status badges */
-    .badge-pending   { background: rgba(234,179,8,0.2);   color:#facc15; border:1px solid rgba(234,179,8,0.3); }
-    .badge-accepted  { background: rgba(59,130,246,0.2);  color:#60a5fa; border:1px solid rgba(59,130,246,0.3); }
-    .badge-rejected  { background: rgba(239,68,68,0.2);   color:#f87171; border:1px solid rgba(239,68,68,0.3); }
-    .badge-completed { background: rgba(16,185,129,0.2);  color:#34d399; border:1px solid rgba(16,185,129,0.3); }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: rgba(59,130,246,0.5); }
-    /* Profile dropdown */
-    .profile-wrapper { position: relative; }
-    .profile-avatar { width:40px;height:40px;border-radius:50%;border:2px solid var(--card-border);cursor:pointer;background:var(--card-bg);display:flex;align-items:center;justify-content:center;overflow:hidden;transition:border-color .3s,box-shadow .3s; }
-    .profile-avatar:hover { border-color:var(--text-primary);box-shadow:0 0 0 3px rgba(0,0,0,.08); }
-    .profile-avatar svg,.profile-avatar img { width:100%;height:100%;object-fit:cover; }
-    .profile-dropdown { position:absolute;top:calc(100% + 12px);right:0;min-width:200px;background:var(--dropdown-bg);border:1px solid var(--dropdown-border);border-radius:1rem;box-shadow:0 12px 40px rgba(0,0,0,.15);backdrop-filter:blur(20px);padding:.5rem;opacity:0;pointer-events:none;transform:translateY(-8px);transition:opacity .2s,transform .2s;z-index:100; }
-    .profile-dropdown.open { opacity:1;pointer-events:all;transform:translateY(0); }
-    .dropdown-header { padding:.6rem .85rem;border-bottom:1px solid var(--dropdown-border);margin-bottom:.4rem; }
-    .dropdown-header p { margin:0;font-size:.75rem;font-weight:700;color:var(--text-primary); }
-    .dropdown-header span { font-size:.65rem;color:var(--text-muted); }
-    .dropdown-item { display:flex;align-items:center;gap:.65rem;padding:.6rem .85rem;border-radius:.6rem;font-size:.8rem;color:var(--text-primary);cursor:pointer;transition:background .2s;text-decoration:none;user-select:none; }
-    .dropdown-item:hover { background:var(--dropdown-hover); }
-    .dropdown-item.danger { color:#e53e3e; }
-    .theme-toggle-row { display:flex;align-items:center;justify-content:space-between;padding:.5rem .85rem;border-radius:.6rem;cursor:pointer;transition:background .2s; }
-    .theme-toggle-row:hover { background:var(--dropdown-hover); }
-    .theme-toggle-label { display:flex;align-items:center;gap:.65rem;font-size:.8rem;color:var(--text-primary); }
-    .toggle-switch { position:relative;width:36px;height:20px; }
-    .toggle-switch input { opacity:0;width:0;height:0; }
-    .toggle-slider { position:absolute;inset:0;border-radius:20px;background:rgba(0,0,0,.15);transition:background .3s;cursor:pointer; }
-    .toggle-slider:before { content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:var(--text-primary);top:3px;left:3px;transition:transform .3s; }
-    input:checked + .toggle-slider { background:rgba(0,0,0,.35); }
-    input:checked + .toggle-slider:before { transform:translateX(16px); }
-  </style>
-</head>
-<body class="font-['Inter'] min-h-screen relative overflow-x-hidden" style="background:#0a0f14;">
-
-  <!-- Background -->
-  <div class="fixed inset-0 z-[-2]">
-    <img id="bgImage" src="public/images/dark.avif" alt="Background" class="w-full h-full object-cover">
-  </div>
-  <div class="fixed inset-0 z-[-1]" style="background:var(--bg-overlay);transition:background .4s;"></div>
-  <script>
-    document.getElementById('bgImage').src = (localStorage.getItem('theme') === 'light') ? 'public/images/light.jpeg' : 'public/images/dark.avif';
-  </script>
-
-  <!-- NAVBAR -->
-  <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center backdrop-blur-[18px] rounded-[50px] z-50 border shadow-[0_18px_40px_rgba(0,0,0,0.5)]" style="background:var(--nav-bg);border-color:var(--nav-border);">
-    <div class="font-bold text-2xl font-['Satisfy'] cursor-pointer" style="color:var(--text-primary);" onclick="window.location.href='/client-home'">
-      Event<span>Hive</span>
-    </div>
-    <ul class="flex gap-6 list-none m-0 p-0">
-      <li><a href="#hero" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Home<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-      <li><a href="#organizers" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Organizers<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-      <li><a href="#my-bookings" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">My Bookings<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-      <li><a href="/support" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Support<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-    </ul>
-    <div class="flex gap-4 items-center">
-      <div class="profile-wrapper">
-        <div class="profile-avatar" id="profileAvatarBtn">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);">
-            <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/>
-          </svg>
-        </div>
-        <div class="profile-dropdown" id="profileDropdown">
-          <div class="dropdown-header"><p id="dropdownName">Client</p><span id="dropdownRole">Client</span></div>
-          <div class="theme-toggle-row">
-            <div class="theme-toggle-label">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
-              Dark Mode
-            </div>
-            <label class="toggle-switch"><input type="checkbox" id="themeToggle" checked><span class="toggle-slider"></span></label>
-          </div>
-          <a class="dropdown-item" href="/profile">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
-            </svg>
-            My Profile
-          </a>
-          <div class="dropdown-item danger" id="logout-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            Logout
-          </div>
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  <main class="w-[90%] max-w-6xl mx-auto my-20 relative z-10 flex flex-col gap-20 pb-20">
-
-    <!-- HERO SECTION -->
-    <section id="hero" class="flex flex-col md:flex-row items-center gap-10">
-      <div class="flex-1">
-        <h1 class="text-4xl md:text-6xl font-['Satisfy'] mb-4" style="color:var(--text-primary);">Find Your Perfect Organizer</h1>
-        <p class="text-lg mb-8 max-w-xl" style="color:var(--text-secondary);">Browse top-rated event organizers, compare experience and ratings, and send an offer to book the best fit for your next event.</p>
-
-        <div class="flex gap-4 mb-10">
-          <button onclick="document.getElementById('organizers').scrollIntoView({behavior: 'smooth'})" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 rounded-lg hover:shadow-[0_4px_16px_rgba(0,0,0,0.5)] transition-all transform hover:-translate-y-1" style="color:var(--text-primary);">Browse Organizers</button>
-          <button onclick="document.getElementById('my-bookings').scrollIntoView({behavior: 'smooth'})" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 transition-all transform hover:-translate-y-1" style="color:var(--text-primary);">My Bookings</button>
-        </div>
-
-
-      </div>
-
-      <div class="backdrop-blur-[32px] rounded-[2rem] p-8 md:w-[350px] border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-        <h3 class="text-sm uppercase tracking-widest font-bold mb-6" style="color:var(--text-muted);">Quick Snapshot</h3>
-        <ul class="space-y-4">
-          <li class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
-            <div>
-              <p class="text-sm font-bold" style="color:var(--text-primary);">Your next event</p>
-              <p id="snap-next" class="text-xs" style="color:var(--text-secondary);">No upcoming events yet</p>
-            </div>
-          </li>
-          <li class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
-            <div>
-              <p class="text-sm font-bold" style="color:var(--text-primary);">Active bookings</p>
-              <p id="snap-bookings" class="text-xs" style="color:var(--text-secondary);">Loading…</p>
-            </div>
-          </li>
-          <li class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
-            <div>
-              <p class="text-sm font-bold" style="color:var(--text-primary);">Pending ratings</p>
-              <p id="snap-ratings" class="text-xs" style="color:var(--text-secondary);">Loading…</p>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- BROWSE ORGANIZERS -->
-    <section id="organizers" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-      <div class="mb-10 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Browse Organizers</h2>
-        <p class="text-sm mt-2" style="color:var(--text-secondary);">Find the perfect organizer. Send them an offer to get started.</p>
-      </div>
-      <!-- Filters -->
-      <div class="flex flex-col sm:flex-row gap-4 mb-8">
-        <div class="relative flex-1">
-          <span class="absolute left-4 top-1/2 -translate-y-1/2" style="color:var(--text-muted);">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          </span>
-          <input id="search" type="text" placeholder="Search organizers by name..."
-            class="w-full pl-10 pr-4 py-3 rounded-xl text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
-        </div>
-        <select id="sort" class="px-5 py-3 rounded-xl text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
-          <option value="rating">Sort by Rating</option>
-          <option value="events">Sort by Experience</option>
-        </select>
-      </div>
-      <!-- Cards -->
-      <div id="organizer-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-      <div id="empty-state" class="hidden text-center py-16 italic" style="color:var(--text-muted);">No organizers found.</div>
-    </section>
-
-    <!-- MY BOOKINGS -->
-    <section id="my-bookings" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-      <div class="mb-10 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">My Bookings</h2>
-        <p class="text-sm mt-2" style="color:var(--text-secondary);">Track your offers to organizers. Rate them once your event is completed.</p>
-      </div>
-      <div id="bookings-list" class="flex flex-col gap-4"></div>
-      <div id="bookings-empty" class="hidden text-center py-10 italic" style="color:var(--text-muted);">You haven't sent any offers yet. Browse organizers above to get started.</div>
-      <div id="bookings-loading" class="text-center py-10 text-sm italic" style="color:var(--text-muted);">Loading bookings…</div>
-    </section>
-
-    <!-- WHY EVENTHIVE -->
-    <section class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-      <div class="mb-10 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Why Book with EventHive?</h2>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="p-6 rounded-[1.5rem] border hover:opacity-90 transition-colors" style="background:var(--article-bg);border-color:var(--article-border);">
-          <h3 class="text-lg font-bold mb-3 flex items-center gap-2" style="color:var(--text-primary);"><div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>Verified Organizers</h3>
-          <p class="text-sm leading-relaxed" style="color:var(--text-secondary);">Every organizer on our platform is verified and rated by real clients for full transparency.</p>
-        </div>
-        <div class="p-6 rounded-[1.5rem] border hover:opacity-90 transition-colors" style="background:var(--article-bg);border-color:var(--article-border);">
-          <h3 class="text-lg font-bold mb-3 flex items-center gap-2" style="color:var(--text-primary);"><div class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>Easy Booking</h3>
-          <p class="text-sm leading-relaxed" style="color:var(--text-secondary);">Browse profiles, compare options, and send offers in just a few clicks — no hassle.</p>
-        </div>
-        <div class="p-6 rounded-[1.5rem] border hover:opacity-90 transition-colors" style="background:var(--article-bg);border-color:var(--article-border);">
-          <h3 class="text-lg font-bold mb-3 flex items-center gap-2" style="color:var(--text-primary);"><div class="w-8 h-8 rounded-full bg-yellow-500/20 text-yellow-500 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>Top Experiences</h3>
-          <p class="text-sm leading-relaxed" style="color:var(--text-secondary);">From corporate summits to weddings, find specialists for every type of event.</p>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <footer class="mt-auto py-8 text-center text-sm" style="color:var(--footer-text);">
-    <p>&copy; 2026 EventHive. All rights reserved.</p>
-  </footer>
-
-  <!-- ============================================================ -->
-  <!-- SEND OFFER MODAL -->
-  <!-- ============================================================ -->
-  <div id="offer-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
-    <div class="modal-backdrop absolute inset-0" id="offer-backdrop"></div>
-    <div class="relative border rounded-[2rem] p-8 w-full max-w-lg shadow-[0_30px_80px_rgba(0,0,0,0.8)] z-10 transition-all" style="background:var(--section-bg);border-color:var(--card-border);">
-      <button id="close-offer-modal" class="absolute top-5 right-6 text-2xl leading-none transition-colors" style="color:var(--text-muted);">&times;</button>
-      <h3 class="text-xl font-bold font-['Satisfy'] mb-1" style="color:var(--text-primary);">Send an Offer</h3>
-      <p id="offer-modal-org-name" class="text-sm mb-6" style="color:var(--text-secondary);">to —</p>
-      <form id="offer-form" class="flex flex-col gap-4">
-        <div>
-          <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">Event Title *</label>
-          <input id="offer-title" type="text" required placeholder="e.g. Annual Corporate Gala"
-            class="w-full rounded-xl px-4 py-3 text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
-        </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">Min Budget (₹)</label>
-            <input id="offer-budget-min" type="number" placeholder="50000"
-              class="w-full rounded-xl px-4 py-3 text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
-          </div>
-          <div>
-            <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">Max Budget (₹)</label>
-            <input id="offer-budget-max" type="number" placeholder="200000"
-              class="w-full rounded-xl px-4 py-3 text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">Event Date</label>
-            <input id="offer-date" type="date"
-              class="w-full rounded-xl px-4 py-3 text-sm border transition-all [color-scheme:dark]" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
-          </div>
-          <div>
-            <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">City</label>
-            <input id="offer-city" type="text" placeholder="e.g. Hyderabad"
-              class="w-full rounded-xl px-4 py-3 text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
-          </div>
-        </div>
-        <div>
-          <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">Description</label>
-          <textarea id="offer-description" rows="3" placeholder="Describe your event needs..."
-            class="w-full rounded-xl px-4 py-3 text-sm resize-none border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);"></textarea>
-        </div>
-        <p id="offer-error" class="text-red-400 text-xs hidden"></p>
-        <button type="submit" id="offer-submit-btn"
-          class="mt-2 w-full py-3 font-bold uppercase tracking-wider text-sm bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 rounded-xl hover:opacity-90 transition-all shadow-lg" style="color:var(--text-primary);">
-          Send Offer
-        </button>
-      </form>
-
-      <!-- Success state -->
-      <div id="offer-success" class="hidden text-center py-6">
-        <p class="text-4xl mb-3"><svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></p>
-        <h4 class="text-lg font-bold text-white mb-1">Offer Sent!</h4>
-        <p class="text-white/50 text-sm mb-5">The organizer will review your offer and respond soon.</p>
-        <button onclick="closeOfferModal()" class="px-6 py-2 bg-white/10 border border-white/20 rounded-xl text-sm font-bold hover:bg-white/20 transition-all">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // — Auth guard: client only —————————————————
-    (async function checkAuth() {
-      const token = localStorage.getItem('token');
-      if (!token) return showUnauth('not-logged-in');
-      try {
-        const r = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
-        if (!r.ok) return showUnauth('not-logged-in');
-        const d = await r.json();
-        if (d.data?.role !== 'client') return showUnauth(d.data?.role || 'unknown');
-        const u = d.data;
-        document.getElementById('dropdownName').textContent = u.profile?.clientName || u.username || 'Client';
-        document.getElementById('dropdownRole').textContent = 'Client';
-      } catch { showUnauth('not-logged-in'); }
-    })();
-
-    function showUnauth(role) {
-      const isIn = role !== 'not-logged-in';
-      const labels = { volunteer:'Volunteer', organizer:'Organizer' };
-      document.body.innerHTML = `<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0f14;font-family:Inter,sans-serif;padding:2rem;"><div style="max-width:480px;width:100%;text-align:center;"><div style="width:72px;height:72px;border-radius:50%;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;"><svg xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;color:#f87171;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg></div><h1 style="font-family:Satisfy,cursive;font-size:2rem;color:#fff;margin-bottom:.75rem;">Access Restricted</h1><p style="color:rgba(255,255,255,.5);font-size:.9rem;margin-bottom:.5rem;">${isIn ? `You're logged in as a <strong style="color:rgba(255,255,255,.8);">${labels[role]||role}</strong>, but this page is for <strong style="color:rgba(255,255,255,.8);">Clients</strong> only.` : `You need to log in as a <strong style="color:rgba(255,255,255,.8);">Client</strong> to access this page.`}</p><p style="color:rgba(255,255,255,.3);font-size:.75rem;margin-bottom:2rem;">${isIn ? 'Please log out and sign in with your client account.' : 'Please log in with your client account to continue.'}</p><div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">${isIn ? `<button onclick="localStorage.removeItem('token');window.location.href='/register';" style="padding:.75rem 1.5rem;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">Log Out</button>` : ''}<button onclick="window.location.href='/register';" style="padding:.75rem 1.5rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">${isIn ? 'Switch Account' : 'Log In'}</button><button onclick="window.location.href='/';" style="padding:.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;" onclick="history.back();">← Back</button><button onclick="window.location.href='/'" style="padding:.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">Home</button></div></div></div>`;
-    }
-
-    // — Theme ——————————————————————————
-    const bgImage = document.getElementById('bgImage');
-    const themeToggle = document.getElementById('themeToggle');
-    function applyTheme(dark) {
-      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-      bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
-      themeToggle.checked = dark;
-      localStorage.setItem('theme', dark ? 'dark' : 'light');
-    }
-    applyTheme(localStorage.getItem('theme') !== 'light');
-    themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
-    const avatarBtn = document.getElementById('profileAvatarBtn');
-    const dropdown  = document.getElementById('profileDropdown');
-    avatarBtn.addEventListener('click', e => { e.stopPropagation(); dropdown.classList.toggle('open'); });
-    document.addEventListener('click', e => { if (!dropdown.contains(e.target) && e.target !== avatarBtn) dropdown.classList.remove('open'); });
-
-    const token = localStorage.getItem('token');
-    let organizers = [];
-    let selectedOrganizerId = null;
-
-    // — Organizer cards —————————————————————
-    async function loadOrganizers() {
-      try {
-        const res = await fetch('/api/organizers');
-        organizers = await res.json();
-        renderOrganizers(organizers);
-      } catch (err) { showEmpty(true); }
-    }
-
-    function showEmpty(show) { document.getElementById('empty-state').classList.toggle('hidden', !show); }
-
-    function renderOrganizers(data) {
-      const container = document.getElementById('organizer-list');
-      if (!data.length) { container.innerHTML = ''; showEmpty(true); return; }
-      showEmpty(false);
-      container.innerHTML = data.map(org => {
-        const name = org.profile?.orgName || org.username || 'Unknown';
-        const initials = name[0].toUpperCase();
-        const rating = org.ratingAvg > 0 ? `★ ${org.ratingAvg.toFixed(1)}` : '★ New';
-        const events = org.eventsHosted || 0;
-        return `
-          <div class="backdrop-blur-md rounded-[1.5rem] p-6 hover:-translate-y-1 transition-all duration-300 border flex flex-col gap-4" style="background:var(--article-bg);border-color:var(--article-border);box-shadow:var(--shadow);">
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">${initials}</div>
-              <div>
-                <h3 class="text-base font-bold" style="color:var(--text-primary);">${name}</h3>
-                <p class="text-xs" style="color:var(--text-muted);">${org.email || ''}</p>
-              </div>
-            </div>
-            <div class="flex justify-between items-center text-sm border-t pt-4" style="border-color:var(--card-border);">
-              <span class="text-yellow-400 font-bold">${rating}</span>
-              <span style="color:var(--text-secondary);">${events} event${events===1?'':'s'} hosted</span>
-            </div>
-            <div class="flex gap-2">
-              <button onclick="window.location.href='/organiser-profile?id=${org._id}'"
-                class="flex-1 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-all" style="color:var(--text-primary);">
-                View Profile
-              </button>
-              <button onclick="openOfferModal('${org._id}', '${name.replace(/'/g, "\\'")}')"
-                class="flex-1 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all" style="color:var(--text-primary);">
-                Send Offer
-              </button>
-            </div>
-          </div>`;
-      }).join('');
-    }
-
-    document.getElementById('search').addEventListener('input', e => {
-      const v = e.target.value.toLowerCase();
-      renderOrganizers(organizers.filter(o => (o.profile?.orgName || o.username || '').toLowerCase().includes(v)));
-    });
-    document.getElementById('sort').addEventListener('change', e => {
-      let sorted = [...organizers];
-      if (e.target.value === 'rating') sorted.sort((a,b) => (b.ratingAvg||0)-(a.ratingAvg||0));
-      else sorted.sort((a,b) => (b.eventsHosted||0)-(a.eventsHosted||0));
-      renderOrganizers(sorted);
-    });
-
-    // — My Bookings ———————————————————————
-    async function loadBookings() {
-      if (!token) { showBookingsEmpty(); return; }
-      try {
-        const res = await fetch('/api/offers/my-offers', { headers: { Authorization: `Bearer ${token}` } });
-        document.getElementById('bookings-loading').classList.add('hidden');
-        if (!res.ok) { showBookingsEmpty(); return; }
-        const data = await res.json();
-        renderBookings(data.data || []);
-      } catch (err) {
-        document.getElementById('bookings-loading').classList.add('hidden');
-        showBookingsEmpty();
-      }
-    }
-
-    function showBookingsEmpty() {
-      document.getElementById('bookings-loading').classList.add('hidden');
-      document.getElementById('bookings-empty').classList.remove('hidden');
-    }
-
-    function renderBookings(offers) {
-      const container = document.getElementById('bookings-list');
-      if (!offers.length) { showBookingsEmpty(); return; }
-
-      // Update snapshot
-      const active = offers.filter(o => o.status === 'accepted').length;
-      const pendingRatings = offers.filter(o => o.status === 'completed' && !o.isRated).length;
-      document.getElementById('snap-bookings').textContent = active > 0 ? `${active} accepted` : 'None active';
-      document.getElementById('snap-ratings').textContent = pendingRatings > 0 ? `${pendingRatings} awaiting your review` : 'All caught up!';
-
-      // Next upcoming event
-      const upcoming = offers
-        .filter(o => o.eventDate && o.status === 'accepted' && new Date(o.eventDate) > new Date())
-        .sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
-      if (upcoming.length) {
-        const d = new Date(upcoming[0].eventDate);
-        document.getElementById('snap-next').textContent = `${upcoming[0].title} — ${d.toLocaleDateString('en-IN', { day:'numeric', month:'short' })}`;
-      }
-
-      container.innerHTML = offers.map(offer => {
-        const orgName = offer.organizerId?.profile?.orgName || offer.organizerId?.username || 'Organizer';
-        const statusMap = { pending:'badge-pending', accepted:'badge-accepted', rejected:'badge-rejected', completed:'badge-completed' };
-        const badgeClass = statusMap[offer.status] || 'badge-pending';
-        const statusLabel = offer.status.charAt(0).toUpperCase() + offer.status.slice(1);
-        const date = offer.eventDate ? new Date(offer.eventDate).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }) : 'No date';
-
-        const rateBtn = offer.status === 'completed' && !offer.isRated
-          ? `<a href="/rate-organizer?organizerId=${offer.organizerId?._id}&offerId=${offer._id}"
-               class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-gradient-to-r from-yellow-500 to-amber-400 hover:opacity-90 rounded-xl transition-all shadow-lg whitespace-nowrap">
-               Rate Organizer
-             </a>`
-          : offer.isRated
-            ? `<span class="px-4 py-2 text-xs text-green-400 border border-green-500/30 rounded-xl bg-green-500/10 font-bold">✓ Rated</span>`
-            : '';
-
-        let budgetStr = '';
-        if (offer.budgetMin || offer.budgetMax) {
-          budgetStr = `<span>₹${offer.budgetMin || 0} — ₹${offer.budgetMax || 'Any'}</span>`;
-        } else if (offer.budget) {
-          budgetStr = `<span>${offer.budget}</span>`;
-        }
-
-        let expensesHtml = '';
-        if ((offer.status === 'accepted' || offer.status === 'completed') && offer.expenses && offer.expenses.length > 0) {
-          const expenseList = offer.expenses.map(exp => {
-            const expDate = new Date(exp.date).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
-            if (exp.isDeleted) {
-              return `<li class="flex justify-between items-center text-white/30 line-through text-xs px-2 py-1"><span>${exp.description}</span><span>₹${exp.amount}</span></li>`;
-            }
-            return `<li class="flex justify-between items-center text-white/70 text-xs px-2 py-1 border-b border-white/5 last:border-0 hover:bg-white/5"><span>${expDate} - ${exp.description}</span><span class="font-bold text-red-300">₹${exp.amount}</span></li>`;
-          }).join('');
-          
-          const totalValid = offer.expenses.filter(e => !e.isDeleted).reduce((sum, e) => sum + e.amount, 0);
-
-          expensesHtml = `
-            <div class="mt-4 rounded-xl p-4 border" style="background:var(--card-bg);border-color:var(--card-border);">
-              <div class="flex justify-between items-center mb-2">
-                <h4 class="text-xs uppercase tracking-widest font-bold" style="color:var(--text-muted);">Tracked Expenses</h4>
-                <span class="text-xs font-bold text-red-400">Total: ₹${totalValid}</span>
-              </div>
-              <ul class="flex flex-col gap-1 max-h-32 overflow-y-auto pr-2">
-                ${expenseList}
-              </ul>
-            </div>
-          `;
-        }
-
-        return `
-          <div class="rounded-[1.5rem] p-6 flex flex-col sm:flex-row gap-5 transition-colors items-start border" style="background:var(--article-bg);border-color:var(--article-border);">
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-3 mb-1">
-                <h3 class="font-bold text-base truncate" style="color:var(--text-primary);">${offer.title}</h3>
-                <span class="px-2 py-0.5 text-xs font-bold rounded-full flex-shrink-0 ${badgeClass}">${statusLabel}</span>
-              </div>
-              <p class="text-sm" style="color:var(--text-secondary);">Organizer: <span style="color:var(--text-primary);">${orgName}</span></p>
-              <div class="flex gap-4 mt-2 text-xs" style="color:var(--text-muted);">
-                ${budgetStr}
-                <span>${date}</span>
-                ${offer.city ? `<span>${offer.city}</span>` : ''}
-              </div>
-              ${expensesHtml}
-            </div>
-            <div class="flex gap-2 flex-shrink-0 sm:flex-col items-end">
-              <button onclick="window.location.href='/organiser-profile?id=${offer.organizerId?._id}'"
-                class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-all" style="color:var(--text-primary);">
-                View Profile
-              </button>
-              ${rateBtn}
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // — Offer Modal ———————————————————————
-    function openOfferModal(orgId, orgName) {
-      if (!token) { alert('Please log in to send an offer.'); return; }
-      selectedOrganizerId = orgId;
-      document.getElementById('offer-modal-org-name').textContent = `to ${orgName}`;
-      document.getElementById('offer-form').classList.remove('hidden');
-      document.getElementById('offer-success').classList.add('hidden');
-      document.getElementById('offer-form').reset();
-      document.getElementById('offer-error').classList.add('hidden');
-      document.getElementById('offer-modal').classList.remove('hidden');
-    }
-
-    function closeOfferModal() {
-      document.getElementById('offer-modal').classList.add('hidden');
-    }
-
-    document.getElementById('close-offer-modal').addEventListener('click', closeOfferModal);
-    document.getElementById('offer-backdrop').addEventListener('click', closeOfferModal);
-
-    document.getElementById('offer-form').addEventListener('submit', async e => {
-      e.preventDefault();
-      const btn = document.getElementById('offer-submit-btn');
-      const errEl = document.getElementById('offer-error');
-      errEl.classList.add('hidden');
-      btn.disabled = true; btn.textContent = 'Sending…';
-
-      try {
-        const res = await fetch('/api/offers', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({
-            organizerId: selectedOrganizerId,
-            title:       document.getElementById('offer-title').value,
-            budgetMin:   document.getElementById('offer-budget-min').value,
-            budgetMax:   document.getElementById('offer-budget-max').value,
-            eventDate:   document.getElementById('offer-date').value || undefined,
-            city:        document.getElementById('offer-city').value,
-            description: document.getElementById('offer-description').value
-          })
-        });
-        const data = await res.json();
-        if (data.success) {
-          document.getElementById('offer-form').classList.add('hidden');
-          document.getElementById('offer-success').classList.remove('hidden');
-          loadBookings(); // refresh bookings
-        } else {
-          errEl.textContent = data.error || 'Failed to send offer.';
-          errEl.classList.remove('hidden');
-          btn.disabled = false; btn.textContent = 'Send Offer';
-        }
-      } catch (err) {
-        errEl.textContent = 'Network error. Please try again.';
-        errEl.classList.remove('hidden');
-        btn.disabled = false; btn.textContent = 'Send Offer';
-      }
-    });
-
-    // — Logout ——————————————————————————
-    document.getElementById('logout-btn').addEventListener('click', () => {
-      localStorage.removeItem('token');
-      window.location.href = '/';
-    });
-
-    // — Init ———————————————————————————
-    loadOrganizers();
-    loadBookings();
-  </script>
-</body>
-</html>
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventHive Client Home</title>
+  <meta name="description" content="Browse top-rated event organizers on EventHive and find the perfect fit for your next event.">
+  <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
+  <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/styles/output.css">
+  <script>
+    // Apply theme before paint to prevent flash
+    (function() {
+      const t = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <style>
+    :root {
+      --bg-overlay: rgba(255,255,255,0.72);
+      --section-bg: rgba(255,255,255,0.6);
+      --card-bg: rgba(255,255,255,0.5);
+      --card-border: rgba(0,0,0,0.08);
+      --text-primary: #1a1a2e;
+      --text-secondary: rgba(20,20,40,0.6);
+      --text-muted: rgba(20,20,40,0.4);
+      --nav-bg: rgba(255,255,255,0.65);
+      --nav-border: rgba(0,0,0,0.08);
+      --article-bg: rgba(255,255,255,0.5);
+      --article-border: rgba(0,0,0,0.06);
+      --input-bg: rgba(255,255,255,0.5);
+      --dropdown-bg: rgba(255,255,255,0.92);
+      --dropdown-border: rgba(0,0,0,0.1);
+      --dropdown-hover: rgba(0,0,0,0.05);
+      --shadow: 0 8px 32px rgba(0,0,0,0.1);
+      --footer-text: rgba(20,20,40,0.4);
+    }
+    [data-theme="dark"] {
+      --bg-overlay: rgba(10,15,20,0.80);
+      --section-bg: rgba(10,15,20,0.85);
+      --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(255,255,255,0.08);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255,255,255,0.6);
+      --text-muted: rgba(255,255,255,0.35);
+      --nav-bg: rgba(15,15,35,0.65);
+      --nav-border: rgba(255,255,255,0.12);
+      --article-bg: rgba(255,255,255,0.05);
+      --article-border: rgba(255,255,255,0.08);
+      --input-bg: rgba(255,255,255,0.06);
+      --dropdown-bg: rgba(20,25,35,0.96);
+      --dropdown-border: rgba(255,255,255,0.12);
+      --dropdown-hover: rgba(255,255,255,0.08);
+      --shadow: 0 20px 50px rgba(0,0,0,0.6);
+      --footer-text: rgba(255,255,255,0.4);
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; min-height: 100vh; color: var(--text-primary); margin: 0; overflow-x: hidden; }
+    /* Modal backdrop */
+    .modal-backdrop { backdrop-filter: blur(12px); background: rgba(0,0,0,0.7); }
+    /* Status badges */
+    .badge-pending   { background: rgba(234,179,8,0.2);   color:#facc15; border:1px solid rgba(234,179,8,0.3); }
+    .badge-accepted  { background: rgba(59,130,246,0.2);  color:#60a5fa; border:1px solid rgba(59,130,246,0.3); }
+    .badge-rejected  { background: rgba(239,68,68,0.2);   color:#f87171; border:1px solid rgba(239,68,68,0.3); }
+    .badge-completed { background: rgba(16,185,129,0.2);  color:#34d399; border:1px solid rgba(16,185,129,0.3); }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: rgba(59,130,246,0.5); }
+    select option { background: #1a1f2e; color: #ffffff; }
+    /* Profile dropdown */
+    .profile-wrapper { position: relative; }
+    .profile-avatar { width:40px;height:40px;border-radius:50%;border:2px solid var(--card-border);cursor:pointer;background:var(--card-bg);display:flex;align-items:center;justify-content:center;overflow:hidden;transition:border-color .3s,box-shadow .3s; }
+    .profile-avatar:hover { border-color:var(--text-primary);box-shadow:0 0 0 3px rgba(0,0,0,.08); }
+    .profile-avatar svg,.profile-avatar img { width:100%;height:100%;object-fit:cover; }
+    .profile-dropdown { position:absolute;top:calc(100% + 12px);right:0;min-width:200px;background:var(--dropdown-bg);border:1px solid var(--dropdown-border);border-radius:1rem;box-shadow:0 12px 40px rgba(0,0,0,.15);backdrop-filter:blur(20px);padding:.5rem;opacity:0;pointer-events:none;transform:translateY(-8px);transition:opacity .2s,transform .2s;z-index:100; }
+    .profile-dropdown.open { opacity:1;pointer-events:all;transform:translateY(0); }
+    .dropdown-header { padding:.6rem .85rem;border-bottom:1px solid var(--dropdown-border);margin-bottom:.4rem; }
+    .dropdown-header p { margin:0;font-size:.75rem;font-weight:700;color:var(--text-primary); }
+    .dropdown-header span { font-size:.65rem;color:var(--text-muted); }
+    .dropdown-item { display:flex;align-items:center;gap:.65rem;padding:.6rem .85rem;border-radius:.6rem;font-size:.8rem;color:var(--text-primary);cursor:pointer;transition:background .2s;text-decoration:none;user-select:none; }
+    .dropdown-item:hover { background:var(--dropdown-hover); }
+    .dropdown-item.danger { color:#e53e3e; }
+    .theme-toggle-row { display:flex;align-items:center;justify-content:space-between;padding:.5rem .85rem;border-radius:.6rem;cursor:pointer;transition:background .2s; }
+    .theme-toggle-row:hover { background:var(--dropdown-hover); }
+    .theme-toggle-label { display:flex;align-items:center;gap:.65rem;font-size:.8rem;color:var(--text-primary); }
+    .toggle-switch { position:relative;width:36px;height:20px; }
+    .toggle-switch input { opacity:0;width:0;height:0; }
+    .toggle-slider { position:absolute;inset:0;border-radius:20px;background:rgba(0,0,0,.15);transition:background .3s;cursor:pointer; }
+    .toggle-slider:before { content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:var(--text-primary);top:3px;left:3px;transition:transform .3s; }
+    input:checked + .toggle-slider { background:rgba(0,0,0,.35); }
+    input:checked + .toggle-slider:before { transform:translateX(16px); }
+  </style>
+</head>
+<body class="font-['Inter'] min-h-screen relative overflow-x-hidden" style="background:#0a0f14;">
+
+  <!-- Background -->
+  <div class="fixed inset-0 z-[-2]">
+    <img id="bgImage" src="public/images/dark.avif" alt="Background" class="w-full h-full object-cover">
+  </div>
+  <div class="fixed inset-0 z-[-1]" style="background:var(--bg-overlay);transition:background .4s;"></div>
+  <script>
+    document.getElementById('bgImage').src = (localStorage.getItem('theme') === 'light') ? 'public/images/light.jpeg' : 'public/images/dark.avif';
+  </script>
+
+  <!-- NAVBAR -->
+  <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center backdrop-blur-[18px] rounded-[50px] z-50 border shadow-[0_18px_40px_rgba(0,0,0,0.5)]" style="background:var(--nav-bg);border-color:var(--nav-border);">
+    <div class="font-bold text-2xl font-['Satisfy'] cursor-pointer" style="color:var(--text-primary);" onclick="window.location.href='/client-home'">
+      Event<span>Hive</span>
+    </div>
+    <ul class="flex gap-6 list-none m-0 p-0">
+      <li><a href="#hero" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Home<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+      <li><a href="#organizers" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Organizers<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+      <li><a href="#my-bookings" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">My Bookings<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+      <li><a href="/support" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Support<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+    </ul>
+    <div class="flex gap-4 items-center">
+      <div class="profile-wrapper">
+        <div class="profile-avatar" id="profileAvatarBtn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);">
+            <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="dropdown-header"><p id="dropdownName">Client</p><span id="dropdownRole">Client</span></div>
+          <div class="theme-toggle-row">
+            <div class="theme-toggle-label">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+              Dark Mode
+            </div>
+            <label class="toggle-switch"><input type="checkbox" id="themeToggle" checked><span class="toggle-slider"></span></label>
+          </div>
+          <a class="dropdown-item" href="/profile">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+            My Profile
+          </a>
+          <div class="dropdown-item danger" id="logout-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Logout
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="w-[90%] max-w-6xl mx-auto my-20 relative z-10 flex flex-col gap-20 pb-20">
+
+    <!-- HERO SECTION -->
+    <section id="hero" class="flex flex-col md:flex-row items-center gap-10">
+      <div class="flex-1">
+        <h1 class="text-4xl md:text-6xl font-['Satisfy'] mb-4" style="color:var(--text-primary);">Find Your Perfect Organizer</h1>
+        <p class="text-lg mb-8 max-w-xl" style="color:var(--text-secondary);">Browse top-rated event organizers, compare experience and ratings, and send an offer to book the best fit for your next event.</p>
+
+        <div class="flex gap-4 mb-10">
+          <button onclick="document.getElementById('organizers').scrollIntoView({behavior: 'smooth'})" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 rounded-lg hover:shadow-[0_4px_16px_rgba(0,0,0,0.5)] transition-all transform hover:-translate-y-1" style="color:var(--text-primary);">Browse Organizers</button>
+          <button onclick="document.getElementById('my-bookings').scrollIntoView({behavior: 'smooth'})" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 transition-all transform hover:-translate-y-1" style="color:var(--text-primary);">My Bookings</button>
+        </div>
+
+
+      </div>
+
+      <div class="backdrop-blur-[32px] rounded-[2rem] p-8 md:w-[350px] border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+        <h3 class="text-sm uppercase tracking-widest font-bold mb-6" style="color:var(--text-muted);">Quick Snapshot</h3>
+        <ul class="space-y-4">
+          <li class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
+            <div>
+              <p class="text-sm font-bold" style="color:var(--text-primary);">Your next event</p>
+              <p id="snap-next" class="text-xs" style="color:var(--text-secondary);">No upcoming events yet</p>
+            </div>
+          </li>
+          <li class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
+            <div>
+              <p class="text-sm font-bold" style="color:var(--text-primary);">Active bookings</p>
+              <p id="snap-bookings" class="text-xs" style="color:var(--text-secondary);">Loading…</p>
+            </div>
+          </li>
+          <li class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div>
+              <p class="text-sm font-bold" style="color:var(--text-primary);">Pending ratings</p>
+              <p id="snap-ratings" class="text-xs" style="color:var(--text-secondary);">Loading…</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- BROWSE ORGANIZERS -->
+    <section id="organizers" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+      <div class="mb-10 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Browse Organizers</h2>
+        <p class="text-sm mt-2" style="color:var(--text-secondary);">Find the perfect organizer. Send them an offer to get started.</p>
+      </div>
+      <!-- Filters -->
+      <div class="flex flex-col sm:flex-row gap-4 mb-8">
+        <div class="relative flex-1">
+          <span class="absolute left-4 top-1/2 -translate-y-1/2" style="color:var(--text-muted);">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </span>
+          <input id="search" type="text" placeholder="Search organizers by name..."
+            class="w-full pl-10 pr-4 py-3 rounded-xl text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
+        </div>
+        <select id="sort" class="px-5 py-3 rounded-xl text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);color-scheme:dark;appearance:none;-webkit-appearance:none;padding-right:2rem;background-image:url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'rgba(255,255,255,0.5)\' stroke-width=\'2\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 0.75rem center;;color-scheme:dark;">
+          <option value="rating">Sort by Rating</option>
+          <option value="events">Sort by Experience</option>
+        </select>
+      </div>
+      <!-- Cards -->
+      <div id="organizer-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      <div id="empty-state" class="hidden text-center py-16 italic" style="color:var(--text-muted);">No organizers found.</div>
+    </section>
+
+    <!-- MY BOOKINGS -->
+    <section id="my-bookings" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+      <div class="mb-10 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">My Bookings</h2>
+        <p class="text-sm mt-2" style="color:var(--text-secondary);">Track your offers to organizers. Rate them once your event is completed.</p>
+      </div>
+      <div id="bookings-list" class="flex flex-col gap-4"></div>
+      <div id="bookings-empty" class="hidden text-center py-10 italic" style="color:var(--text-muted);">You haven't sent any offers yet. Browse organizers above to get started.</div>
+      <div id="bookings-loading" class="text-center py-10 text-sm italic" style="color:var(--text-muted);">Loading bookings…</div>
+    </section>
+
+    <!-- WHY EVENTHIVE -->
+    <section class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+      <div class="mb-10 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Why Book with EventHive?</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="p-6 rounded-[1.5rem] border hover:opacity-90 transition-colors" style="background:var(--article-bg);border-color:var(--article-border);">
+          <h3 class="text-lg font-bold mb-3 flex items-center gap-2" style="color:var(--text-primary);"><div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>Verified Organizers</h3>
+          <p class="text-sm leading-relaxed" style="color:var(--text-secondary);">Every organizer on our platform is verified and rated by real clients for full transparency.</p>
+        </div>
+        <div class="p-6 rounded-[1.5rem] border hover:opacity-90 transition-colors" style="background:var(--article-bg);border-color:var(--article-border);">
+          <h3 class="text-lg font-bold mb-3 flex items-center gap-2" style="color:var(--text-primary);"><div class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>Easy Booking</h3>
+          <p class="text-sm leading-relaxed" style="color:var(--text-secondary);">Browse profiles, compare options, and send offers in just a few clicks — no hassle.</p>
+        </div>
+        <div class="p-6 rounded-[1.5rem] border hover:opacity-90 transition-colors" style="background:var(--article-bg);border-color:var(--article-border);">
+          <h3 class="text-lg font-bold mb-3 flex items-center gap-2" style="color:var(--text-primary);"><div class="w-8 h-8 rounded-full bg-yellow-500/20 text-yellow-500 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>Top Experiences</h3>
+          <p class="text-sm leading-relaxed" style="color:var(--text-secondary);">From corporate summits to weddings, find specialists for every type of event.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="mt-auto py-8 text-center text-sm" style="color:var(--footer-text);">
+    <p>&copy; 2026 EventHive. All rights reserved.</p>
+  </footer>
+
+  <!-- ============================================================ -->
+  <!-- SEND OFFER MODAL -->
+  <!-- ============================================================ -->
+  <div id="offer-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+    <div class="modal-backdrop absolute inset-0" id="offer-backdrop"></div>
+    <div class="relative border rounded-[2rem] p-8 w-full max-w-lg shadow-[0_30px_80px_rgba(0,0,0,0.8)] z-10 transition-all" style="background:var(--section-bg);border-color:var(--card-border);">
+      <button id="close-offer-modal" class="absolute top-5 right-6 text-2xl leading-none transition-colors" style="color:var(--text-muted);">&times;</button>
+      <h3 class="text-xl font-bold font-['Satisfy'] mb-1" style="color:var(--text-primary);">Send an Offer</h3>
+      <p id="offer-modal-org-name" class="text-sm mb-6" style="color:var(--text-secondary);">to —</p>
+      <form id="offer-form" class="flex flex-col gap-4">
+        <div>
+          <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">Event Title *</label>
+          <input id="offer-title" type="text" required placeholder="e.g. Annual Corporate Gala"
+            class="w-full rounded-xl px-4 py-3 text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">Min Budget (₹)</label>
+            <input id="offer-budget-min" type="number" placeholder="50000"
+              class="w-full rounded-xl px-4 py-3 text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">Max Budget (₹)</label>
+            <input id="offer-budget-max" type="number" placeholder="200000"
+              class="w-full rounded-xl px-4 py-3 text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">Event Date</label>
+            <input id="offer-date" type="date"
+              class="w-full rounded-xl px-4 py-3 text-sm border transition-all [color-scheme:dark]" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">City</label>
+            <input id="offer-city" type="text" placeholder="e.g. Hyderabad"
+              class="w-full rounded-xl px-4 py-3 text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">Description</label>
+          <textarea id="offer-description" rows="3" placeholder="Describe your event needs..."
+            class="w-full rounded-xl px-4 py-3 text-sm resize-none border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);"></textarea>
+        </div>
+        <p id="offer-error" class="text-red-400 text-xs hidden"></p>
+        <button type="submit" id="offer-submit-btn"
+          class="mt-2 w-full py-3 font-bold uppercase tracking-wider text-sm bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 rounded-xl hover:opacity-90 transition-all shadow-lg" style="color:var(--text-primary);">
+          Send Offer
+        </button>
+      </form>
+
+      <!-- Success state -->
+      <div id="offer-success" class="hidden text-center py-6">
+        <p class="text-4xl mb-3"><svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></p>
+        <h4 class="text-lg font-bold text-white mb-1">Offer Sent!</h4>
+        <p class="text-white/50 text-sm mb-5">The organizer will review your offer and respond soon.</p>
+        <button onclick="closeOfferModal()" class="px-6 py-2 bg-white/10 border border-white/20 rounded-xl text-sm font-bold hover:bg-white/20 transition-all">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // — Auth guard: client only —————————————————
+    (async function checkAuth() {
+      const token = localStorage.getItem('token');
+      if (!token) return showUnauth('not-logged-in');
+      try {
+        const r = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
+        if (!r.ok) return showUnauth('not-logged-in');
+        const d = await r.json();
+        if (d.data?.role !== 'client') return showUnauth(d.data?.role || 'unknown');
+        const u = d.data;
+        document.getElementById('dropdownName').textContent = u.profile?.clientName || u.username || 'Client';
+        document.getElementById('dropdownRole').textContent = 'Client';
+      } catch { showUnauth('not-logged-in'); }
+    })();
+
+    function showUnauth(role) {
+      const isIn = role !== 'not-logged-in';
+      const labels = { volunteer:'Volunteer', organizer:'Organizer' };
+      document.body.innerHTML = `<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0f14;font-family:Inter,sans-serif;padding:2rem;"><div style="max-width:480px;width:100%;text-align:center;"><div style="width:72px;height:72px;border-radius:50%;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;"><svg xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;color:#f87171;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg></div><h1 style="font-family:Satisfy,cursive;font-size:2rem;color:#fff;margin-bottom:.75rem;">Access Restricted</h1><p style="color:rgba(255,255,255,.5);font-size:.9rem;margin-bottom:.5rem;">${isIn ? `You're logged in as a <strong style="color:rgba(255,255,255,.8);">${labels[role]||role}</strong>, but this page is for <strong style="color:rgba(255,255,255,.8);">Clients</strong> only.` : `You need to log in as a <strong style="color:rgba(255,255,255,.8);">Client</strong> to access this page.`}</p><p style="color:rgba(255,255,255,.3);font-size:.75rem;margin-bottom:2rem;">${isIn ? 'Please log out and sign in with your client account.' : 'Please log in with your client account to continue.'}</p><div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">${isIn ? `<button onclick="localStorage.removeItem('token');window.location.href='/register';" style="padding:.75rem 1.5rem;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">Log Out</button>` : ''}<button onclick="window.location.href='/register';" style="padding:.75rem 1.5rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">${isIn ? 'Switch Account' : 'Log In'}</button><button onclick="window.location.href='/';" style="padding:.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;" onclick="history.back();">← Back</button><button onclick="window.location.href='/'" style="padding:.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">Home</button></div></div></div>`;
+    }
+
+    // — Theme ——————————————————————————
+    const bgImage = document.getElementById('bgImage');
+    const themeToggle = document.getElementById('themeToggle');
+    function applyTheme(dark) {
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
+      themeToggle.checked = dark;
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    applyTheme(localStorage.getItem('theme') !== 'light');
+    themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
+    const avatarBtn = document.getElementById('profileAvatarBtn');
+    const dropdown  = document.getElementById('profileDropdown');
+    avatarBtn.addEventListener('click', e => { e.stopPropagation(); dropdown.classList.toggle('open'); });
+    document.addEventListener('click', e => { if (!dropdown.contains(e.target) && e.target !== avatarBtn) dropdown.classList.remove('open'); });
+
+    const token = localStorage.getItem('token');
+    let organizers = [];
+    let selectedOrganizerId = null;
+
+    // — Organizer cards —————————————————————
+    async function loadOrganizers() {
+      try {
+        const res = await fetch('/api/organizers');
+        organizers = await res.json();
+        renderOrganizers(organizers);
+      } catch (err) { showEmpty(true); }
+    }
+
+    function showEmpty(show) { document.getElementById('empty-state').classList.toggle('hidden', !show); }
+
+    function renderOrganizers(data) {
+      const container = document.getElementById('organizer-list');
+      if (!data.length) { container.innerHTML = ''; showEmpty(true); return; }
+      showEmpty(false);
+      container.innerHTML = data.map(org => {
+        const name = org.profile?.orgName || org.username || 'Unknown';
+        const initials = name[0].toUpperCase();
+        const rating = org.ratingAvg > 0 ? `★ ${org.ratingAvg.toFixed(1)}` : '★ New';
+        const events = org.eventsHosted || 0;
+        return `
+          <div class="backdrop-blur-md rounded-[1.5rem] p-6 hover:-translate-y-1 transition-all duration-300 border flex flex-col gap-4" style="background:var(--article-bg);border-color:var(--article-border);box-shadow:var(--shadow);">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">${initials}</div>
+              <div>
+                <h3 class="text-base font-bold" style="color:var(--text-primary);">${name}</h3>
+                <p class="text-xs" style="color:var(--text-muted);">${org.email || ''}</p>
+              </div>
+            </div>
+            <div class="flex justify-between items-center text-sm border-t pt-4" style="border-color:var(--card-border);">
+              <span class="text-yellow-400 font-bold">${rating}</span>
+              <span style="color:var(--text-secondary);">${events} event${events===1?'':'s'} hosted</span>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="window.location.href='/organiser-profile?id=${org._id}'"
+                class="flex-1 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-all" style="color:var(--text-primary);">
+                View Profile
+              </button>
+              <button onclick="openOfferModal('${org._id}', '${name.replace(/'/g, "\\'")}')"
+                class="flex-1 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all" style="color:var(--text-primary);">
+                Send Offer
+              </button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    document.getElementById('search').addEventListener('input', e => {
+      const v = e.target.value.toLowerCase();
+      renderOrganizers(organizers.filter(o => (o.profile?.orgName || o.username || '').toLowerCase().includes(v)));
+    });
+    document.getElementById('sort').addEventListener('change', e => {
+      let sorted = [...organizers];
+      if (e.target.value === 'rating') sorted.sort((a,b) => (b.ratingAvg||0)-(a.ratingAvg||0));
+      else sorted.sort((a,b) => (b.eventsHosted||0)-(a.eventsHosted||0));
+      renderOrganizers(sorted);
+    });
+
+    // — My Bookings ———————————————————————
+    async function loadBookings() {
+      if (!token) { showBookingsEmpty(); return; }
+      try {
+        const res = await fetch('/api/offers/my-offers', { headers: { Authorization: `Bearer ${token}` } });
+        document.getElementById('bookings-loading').classList.add('hidden');
+        if (!res.ok) { showBookingsEmpty(); return; }
+        const data = await res.json();
+        renderBookings(data.data || []);
+      } catch (err) {
+        document.getElementById('bookings-loading').classList.add('hidden');
+        showBookingsEmpty();
+      }
+    }
+
+    function showBookingsEmpty() {
+      document.getElementById('bookings-loading').classList.add('hidden');
+      document.getElementById('bookings-empty').classList.remove('hidden');
+    }
+
+    function renderBookings(offers) {
+      const container = document.getElementById('bookings-list');
+      if (!offers.length) { showBookingsEmpty(); return; }
+
+      // Update snapshot
+      const active = offers.filter(o => o.status === 'accepted').length;
+      const pendingRatings = offers.filter(o => o.status === 'completed' && !o.isRated).length;
+      document.getElementById('snap-bookings').textContent = active > 0 ? `${active} accepted` : 'None active';
+      document.getElementById('snap-ratings').textContent = pendingRatings > 0 ? `${pendingRatings} awaiting your review` : 'All caught up!';
+
+      // Next upcoming event
+      const upcoming = offers
+        .filter(o => o.eventDate && o.status === 'accepted' && new Date(o.eventDate) > new Date())
+        .sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
+      if (upcoming.length) {
+        const d = new Date(upcoming[0].eventDate);
+        document.getElementById('snap-next').textContent = `${upcoming[0].title} — ${d.toLocaleDateString('en-IN', { day:'numeric', month:'short' })}`;
+      }
+
+      container.innerHTML = offers.map(offer => {
+        const orgName = offer.organizerId?.profile?.orgName || offer.organizerId?.username || 'Organizer';
+        const statusMap = { pending:'badge-pending', accepted:'badge-accepted', rejected:'badge-rejected', completed:'badge-completed' };
+        const badgeClass = statusMap[offer.status] || 'badge-pending';
+        const statusLabel = offer.status.charAt(0).toUpperCase() + offer.status.slice(1);
+        const date = offer.eventDate ? new Date(offer.eventDate).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }) : 'No date';
+
+        const rateBtn = offer.status === 'completed' && !offer.isRated
+          ? `<a href="/rate-organizer?organizerId=${offer.organizerId?._id}&offerId=${offer._id}"
+               class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-gradient-to-r from-yellow-500 to-amber-400 hover:opacity-90 rounded-xl transition-all shadow-lg whitespace-nowrap">
+               Rate Organizer
+             </a>`
+          : offer.isRated
+            ? `<span class="px-4 py-2 text-xs text-green-400 border border-green-500/30 rounded-xl bg-green-500/10 font-bold">✓ Rated</span>`
+            : '';
+
+        let budgetStr = '';
+        if (offer.budgetMin || offer.budgetMax) {
+          budgetStr = `<span>₹${offer.budgetMin || 0} — ₹${offer.budgetMax || 'Any'}</span>`;
+        } else if (offer.budget) {
+          budgetStr = `<span>${offer.budget}</span>`;
+        }
+
+        let expensesHtml = '';
+        if ((offer.status === 'accepted' || offer.status === 'completed') && offer.expenses && offer.expenses.length > 0) {
+          const expenseList = offer.expenses.map(exp => {
+            const expDate = new Date(exp.date).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+            if (exp.isDeleted) {
+              return `<li class="flex justify-between items-center text-white/30 line-through text-xs px-2 py-1"><span>${exp.description}</span><span>₹${exp.amount}</span></li>`;
+            }
+            return `<li class="flex justify-between items-center text-white/70 text-xs px-2 py-1 border-b border-white/5 last:border-0 hover:bg-white/5"><span>${expDate} - ${exp.description}</span><span class="font-bold text-red-300">₹${exp.amount}</span></li>`;
+          }).join('');
+          
+          const totalValid = offer.expenses.filter(e => !e.isDeleted).reduce((sum, e) => sum + e.amount, 0);
+
+          expensesHtml = `
+            <div class="mt-4 rounded-xl p-4 border" style="background:var(--card-bg);border-color:var(--card-border);">
+              <div class="flex justify-between items-center mb-2">
+                <h4 class="text-xs uppercase tracking-widest font-bold" style="color:var(--text-muted);">Tracked Expenses</h4>
+                <span class="text-xs font-bold text-red-400">Total: ₹${totalValid}</span>
+              </div>
+              <ul class="flex flex-col gap-1 max-h-32 overflow-y-auto pr-2">
+                ${expenseList}
+              </ul>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="rounded-[1.5rem] p-6 flex flex-col sm:flex-row gap-5 transition-colors items-start border" style="background:var(--article-bg);border-color:var(--article-border);">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-3 mb-1">
+                <h3 class="font-bold text-base truncate" style="color:var(--text-primary);">${offer.title}</h3>
+                <span class="px-2 py-0.5 text-xs font-bold rounded-full flex-shrink-0 ${badgeClass}">${statusLabel}</span>
+              </div>
+              <p class="text-sm" style="color:var(--text-secondary);">Organizer: <span style="color:var(--text-primary);">${orgName}</span></p>
+              <div class="flex gap-4 mt-2 text-xs" style="color:var(--text-muted);">
+                ${budgetStr}
+                <span>${date}</span>
+                ${offer.city ? `<span>${offer.city}</span>` : ''}
+              </div>
+              ${expensesHtml}
+            </div>
+            <div class="flex gap-2 flex-shrink-0 sm:flex-col items-end">
+              <button onclick="window.location.href='/organiser-profile?id=${offer.organizerId?._id}'"
+                class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-all" style="color:var(--text-primary);">
+                View Profile
+              </button>
+              ${rateBtn}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // — Offer Modal ———————————————————————
+    function openOfferModal(orgId, orgName) {
+      if (!token) { alert('Please log in to send an offer.'); return; }
+      selectedOrganizerId = orgId;
+      document.getElementById('offer-modal-org-name').textContent = `to ${orgName}`;
+      document.getElementById('offer-form').classList.remove('hidden');
+      document.getElementById('offer-success').classList.add('hidden');
+      document.getElementById('offer-form').reset();
+      document.getElementById('offer-error').classList.add('hidden');
+      document.getElementById('offer-modal').classList.remove('hidden');
+    }
+
+    function closeOfferModal() {
+      document.getElementById('offer-modal').classList.add('hidden');
+    }
+
+    document.getElementById('close-offer-modal').addEventListener('click', closeOfferModal);
+    document.getElementById('offer-backdrop').addEventListener('click', closeOfferModal);
+
+    document.getElementById('offer-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('offer-submit-btn');
+      const errEl = document.getElementById('offer-error');
+      errEl.classList.add('hidden');
+      btn.disabled = true; btn.textContent = 'Sending…';
+
+      try {
+        const res = await fetch('/api/offers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            organizerId: selectedOrganizerId,
+            title:       document.getElementById('offer-title').value,
+            budgetMin:   document.getElementById('offer-budget-min').value,
+            budgetMax:   document.getElementById('offer-budget-max').value,
+            eventDate:   document.getElementById('offer-date').value || undefined,
+            city:        document.getElementById('offer-city').value,
+            description: document.getElementById('offer-description').value
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('offer-form').classList.add('hidden');
+          document.getElementById('offer-success').classList.remove('hidden');
+          loadBookings(); // refresh bookings
+        } else {
+          errEl.textContent = data.error || 'Failed to send offer.';
+          errEl.classList.remove('hidden');
+          btn.disabled = false; btn.textContent = 'Send Offer';
+        }
+      } catch (err) {
+        errEl.textContent = 'Network error. Please try again.';
+        errEl.classList.remove('hidden');
+        btn.disabled = false; btn.textContent = 'Send Offer';
+      }
+    });
+
+    // — Logout ——————————————————————————
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      localStorage.removeItem('token');
+      window.location.href = '/';
+    });
+
+    // — Init ———————————————————————————
+    loadOrganizers();
+    loadBookings();
+  </script>
+</body>
+</html>
