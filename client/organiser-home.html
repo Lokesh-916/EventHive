@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,73 +9,112 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/styles/output.css">
   <style>
+    /* ====== THEME VARIABLES ====== */
+    :root {
+      --bg-overlay: rgba(255,255,255,0.72);
+      --section-bg: rgba(255,255,255,0.6);
+      --card-border: rgba(0,0,0,0.08);
+      --text-primary: #1a1a2e;
+      --text-secondary: rgba(20,20,40,0.6);
+      --text-muted: rgba(20,20,40,0.4);
+      --nav-bg: rgba(255,255,255,0.65);
+      --nav-border: rgba(0,0,0,0.08);
+      --article-bg: rgba(255,255,255,0.5);
+      --article-border: rgba(0,0,0,0.06);
+      --shadow: 0 8px 32px rgba(0,0,0,0.1);
+      --dropdown-bg: rgba(255,255,255,0.92);
+      --dropdown-border: rgba(0,0,0,0.1);
+      --dropdown-hover: rgba(0,0,0,0.05);
+      --footer-text: rgba(20,20,40,0.4);
+      --input-bg: rgba(255,255,255,0.5);
+    }
+    [data-theme="dark"] {
+      --bg-overlay: rgba(10,15,20,0.80);
+      --section-bg: rgba(10,15,20,0.85);
+      --card-border: rgba(255,255,255,0.08);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255,255,255,0.6);
+      --text-muted: rgba(255,255,255,0.4);
+      --nav-bg: rgba(15,15,35,0.65);
+      --nav-border: rgba(255,255,255,0.12);
+      --article-bg: rgba(255,255,255,0.05);
+      --article-border: rgba(255,255,255,0.08);
+      --shadow: 0 20px 50px rgba(0,0,0,0.6);
+      --dropdown-bg: rgba(20,25,35,0.96);
+      --dropdown-border: rgba(255,255,255,0.12);
+      --dropdown-hover: rgba(255,255,255,0.08);
+      --footer-text: rgba(255,255,255,0.4);
+      --input-bg: rgba(255,255,255,0.06);
+    }
+
     .profile-wrapper { position: relative; }
     .profile-avatar {
       width: 40px; height: 40px; border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.15); cursor: pointer;
-      background: rgba(255,255,255,0.07);
+      border: 2px solid var(--card-border); cursor: pointer;
+      background: var(--article-bg);
       display: flex; align-items: center; justify-content: center;
       overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s;
     }
-    .profile-avatar:hover { border-color: rgba(255,255,255,0.5); box-shadow: 0 0 0 3px rgba(255,255,255,0.08); }
+    .profile-avatar:hover { border-color: var(--text-primary); box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
     .profile-avatar svg, .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .profile-dropdown {
       position: absolute; top: calc(100% + 12px); right: 0; min-width: 200px;
-      background: rgba(20,25,35,0.96); border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 1rem; box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      background: var(--dropdown-bg); border: 1px solid var(--dropdown-border);
+      border-radius: 1rem; box-shadow: 0 12px 40px rgba(0,0,0,0.15);
       backdrop-filter: blur(20px); padding: 0.5rem;
       opacity: 0; pointer-events: none; transform: translateY(-8px);
       transition: opacity 0.2s ease, transform 0.2s ease; z-index: 100;
     }
     .profile-dropdown.open { opacity: 1; pointer-events: all; transform: translateY(0); }
-    .dropdown-header { padding: 0.6rem 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.12); margin-bottom: 0.4rem; }
-    .dropdown-header p { margin: 0; font-size: 0.75rem; font-weight: 700; color: #fff; }
-    .dropdown-header span { font-size: 0.65rem; color: rgba(255,255,255,0.4); }
+    .dropdown-header { padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--dropdown-border); margin-bottom: 0.4rem; }
+    .dropdown-header p { margin: 0; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); }
+    .dropdown-header span { font-size: 0.65rem; color: var(--text-muted); }
     .dropdown-item {
       display: flex; align-items: center; gap: 0.65rem;
       padding: 0.6rem 0.85rem; border-radius: 0.6rem;
-      font-size: 0.8rem; color: #fff; cursor: pointer;
+      font-size: 0.8rem; color: var(--text-primary); cursor: pointer;
       transition: background 0.2s; text-decoration: none; user-select: none;
     }
-    .dropdown-item:hover { background: rgba(255,255,255,0.08); }
+    .dropdown-item:hover { background: var(--dropdown-hover); }
     .dropdown-item svg { flex-shrink: 0; opacity: 0.6; }
     .dropdown-item.danger { color: #e53e3e; }
     .theme-toggle-row {
       display: flex; align-items: center; justify-content: space-between;
       padding: 0.5rem 0.85rem; border-radius: 0.6rem; cursor: pointer; transition: background 0.2s;
     }
-    .theme-toggle-row:hover { background: rgba(255,255,255,0.08); }
-    .theme-toggle-label { display: flex; align-items: center; gap: 0.65rem; font-size: 0.8rem; color: #fff; }
+    .theme-toggle-row:hover { background: var(--dropdown-hover); }
+    .theme-toggle-label { display: flex; align-items: center; gap: 0.65rem; font-size: 0.8rem; color: var(--text-primary); }
     .theme-toggle-label svg { opacity: 0.6; }
     .toggle-switch { position: relative; width: 36px; height: 20px; }
     .toggle-switch input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider { position: absolute; inset: 0; border-radius: 20px; background: rgba(255,255,255,0.15); transition: background 0.3s; cursor: pointer; }
-    .toggle-slider:before { content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: #fff; top: 3px; left: 3px; transition: transform 0.3s; }
-    input:checked + .toggle-slider { background: rgba(255,255,255,0.35); }
+    .toggle-slider { position: absolute; inset: 0; border-radius: 20px; background: rgba(0,0,0,0.15); transition: background 0.3s; cursor: pointer; }
+    .toggle-slider:before { content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--text-primary); top: 3px; left: 3px; transition: transform 0.3s; }
+    input:checked + .toggle-slider { background: rgba(0,0,0,0.35); }
     input:checked + .toggle-slider:before { transform: translateX(16px); }
   </style>
 </head>
-<body class="bg-[#0A0F14] text-white font-['Inter'] min-h-screen relative overflow-x-hidden">
+<body class="font-['Inter'] min-h-screen relative overflow-x-hidden" style="color:var(--text-primary);">
 
   <!-- Consistent Background Image -->
-  <div class="fixed inset-0 z-[-1]">
+  <div class="fixed inset-0 z-[-2]">
     <img id="bgImage" src="public/images/dark.avif" alt="Background" class="w-full h-full object-cover">
   </div>
+  <div class="bg-overlay" style="position:fixed;inset:0;z-index:-1;background:var(--bg-overlay);transition:background 0.4s ease;"></div>
 
   <!-- NAVBAR -->
-  <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center bg-[#0f0f23]/65 border border-white/15 shadow-[0_18px_40px_rgba(0,0,0,0.5)] backdrop-blur-[18px] rounded-[50px] z-50">
-    <div class="font-bold text-2xl font-['Satisfy'] text-[#ffffff] cursor-pointer" onclick="window.location.href='/organiser-home'">
+  <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center backdrop-blur-[18px] rounded-[50px] z-50 border shadow-[0_18px_40px_rgba(0,0,0,0.5)]" style="background:var(--nav-bg);border-color:var(--nav-border);">
+    <div class="font-bold text-2xl font-['Satisfy'] cursor-pointer" style="color:var(--text-primary);" onclick="window.location.href='/organiser-home'">
       Event<span>Hive</span>
     </div>
     <ul class="flex gap-6 list-none m-0 p-0">
-      <li><a href="#hero" class="relative text-white text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity">Home<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-      <li><a href="/create-event" class="relative text-white text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity">Create Event<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-      <li><a href="#offers" class="relative text-white text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity">Offers<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+      <li><a href="#hero" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Home<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+      <li><a href="/create-event" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Create Event<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+      <li><a href="#offers" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Offers<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
     </ul>
     <div class="flex gap-4 items-center">
       <li class="profile-wrapper" style="list-style:none;">
         <div class="profile-avatar" id="profileAvatarBtn" title="Account options">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:rgba(255,255,255,0.4);">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);">
             <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/>
           </svg>
         </div>
@@ -118,52 +157,52 @@
     <!-- HERO SECTION -->
     <section id="hero" class="flex flex-col md:flex-row items-center gap-10">
       <div class="flex-1">
-        <h1 class="text-4xl md:text-6xl font-['Satisfy'] text-white mb-4">Welcome, Organizer</h1>
-        <p class="text-lg text-white/70 mb-8 max-w-xl">Create unforgettable experiences, match with clients, and manage your events in one powerful hub.</p>
+        <h1 class="text-4xl md:text-6xl font-['Satisfy'] mb-4" style="color:var(--text-primary);">Welcome, Organizer</h1>
+        <p class="text-lg mb-8 max-w-xl" style="color:var(--text-secondary);">Create unforgettable experiences, match with clients, and manage your events in one powerful hub.</p>
 
         <div class="flex gap-4 mb-10">
-          <button onclick="window.location.href='/create-event'" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white rounded-lg hover:shadow-[0_4px_16px_rgba(0,0,0,0.5)] transition-all transform hover:-translate-y-1">Start New Event</button>
+          <button onclick="window.location.href='/create-event'" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 rounded-lg hover:shadow-[0_4px_16px_rgba(0,0,0,0.5)] transition-all transform hover:-translate-y-1" style="color:var(--text-primary);">Start New Event</button>
           <button onclick="document.getElementById('offers').scrollIntoView({behavior: 'smooth'})" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 transition-all transform hover:-translate-y-1">View Client Offers</button>
         </div>
 
         <div class="flex gap-8">
           <div>
-            <span class="block text-3xl font-bold text-white mb-1">32</span>
-            <span class="text-xs uppercase tracking-wider text-white/50 font-bold">Active Organizers</span>
+            <span class="block text-3xl font-bold mb-1" style="color:var(--text-primary);">32</span>
+            <span class="text-xs uppercase tracking-wider font-bold" style="color:var(--text-muted);">Active Organizers</span>
           </div>
           <div>
-            <span class="block text-3xl font-bold text-white mb-1">58</span>
-            <span class="text-xs uppercase tracking-wider text-white/50 font-bold">Live Offers</span>
+            <span class="block text-3xl font-bold mb-1" style="color:var(--text-primary);">58</span>
+            <span class="text-xs uppercase tracking-wider font-bold" style="color:var(--text-muted);">Live Offers</span>
           </div>
           <div>
-            <span class="block text-3xl font-bold text-white mb-1">210+</span>
-            <span class="text-xs uppercase tracking-wider text-white/50 font-bold">Events Delivered</span>
+            <span class="block text-3xl font-bold mb-1" style="color:var(--text-primary);">210+</span>
+            <span class="text-xs uppercase tracking-wider font-bold" style="color:var(--text-muted);">Events Delivered</span>
           </div>
         </div>
       </div>
 
-      <div class="bg-[#0A0F14]/85 backdrop-blur-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2rem] p-8 md:w-[350px]">
-        <h3 class="text-sm uppercase tracking-widest font-bold text-white/50 mb-6">Quick Snapshot</h3>
+      <div class="backdrop-blur-[32px] rounded-[2rem] p-8 md:w-[350px] border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+        <h3 class="text-sm uppercase tracking-widest font-bold mb-6" style="color:var(--text-muted);">Quick Snapshot</h3>
         <ul class="space-y-4">
           <li class="flex items-center gap-4">
             <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
             <div>
-              <p class="text-sm font-bold text-white">Pending offers</p>
-              <p id="snap-offers" class="text-xs text-white/60">Loading…</p>
+              <p class="text-sm font-bold" style="color:var(--text-primary);">Pending offers</p>
+              <p id="snap-offers" class="text-xs" style="color:var(--text-secondary);">Loading…</p>
             </div>
           </li>
           <li class="flex items-center gap-4">
             <div class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>
             <div>
-              <p class="text-sm font-bold text-white">Events hosted</p>
-              <p id="snap-hosted" class="text-xs text-white/60">Loading…</p>
+              <p class="text-sm font-bold" style="color:var(--text-primary);">Events hosted</p>
+              <p id="snap-hosted" class="text-xs" style="color:var(--text-secondary);">Loading…</p>
             </div>
           </li>
           <li class="flex items-center gap-4">
             <div class="w-10 h-10 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
             <div>
-              <p class="text-sm font-bold text-white">Your rating</p>
-              <p id="snap-rating" class="text-xs text-white/60">Loading…</p>
+              <p class="text-sm font-bold" style="color:var(--text-primary);">Your rating</p>
+              <p id="snap-rating" class="text-xs" style="color:var(--text-secondary);">Loading…</p>
             </div>
           </li>
         </ul>
@@ -171,56 +210,56 @@
     </section>
 
     <!-- CLIENT OFFERS SECTION -->
-    <section id="offers" class="bg-[#0A0F14]/85 backdrop-blur-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2.5rem] p-10">
+    <section id="offers" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
       <div class="mb-10 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy'] text-white">Client Offers for You</h2>
-        <p class="text-white/60 text-sm mt-2">Clients looking for organizers like you. Accept, reject, or mark as completed once the event is done.</p>
+        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Client Offers for You</h2>
+        <p class="text-sm mt-2" style="color:var(--text-secondary);">Clients looking for organizers like you. Accept, reject, or mark as completed once the event is done.</p>
       </div>
 
       <div id="offersList" class="flex flex-col gap-4"></div>
-      <div id="offers-loading" class="text-center py-8 text-white/30 italic text-sm">Loading offers…</div>
-      <div id="offers-empty" class="hidden text-center py-10 text-white/40 italic">No pending offers right now. Check back later.</div>
+      <div id="offers-loading" class="text-center py-8 italic text-sm" style="color:var(--text-muted);">Loading offers…</div>
+      <div id="offers-empty" class="hidden text-center py-10 italic" style="color:var(--text-muted);">No pending offers right now. Check back later.</div>
     </section>
 
     <!-- MY EVENTS SECTION -->
-    <section id="my-events" class="bg-[#0A0F14]/85 backdrop-blur-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2.5rem] p-10">
+    <section id="my-events" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
       <div class="mb-10 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy'] text-white">Your Created Events</h2>
-        <p class="text-white/60 text-sm mt-2">Track the events you’ve planned with current status and matched offers.</p>
+        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Your Created Events</h2>
+        <p class="text-sm mt-2" style="color:var(--text-secondary);">Track the events you’ve planned with current status and matched offers.</p>
       </div>
 
       <div id="activeOffersList" class="flex flex-col gap-6"></div>
-      <div id="active-empty" class="hidden text-center py-10 text-white/40 italic">You don't have any active events currently. Accept offers to see them here!</div>
+      <div id="active-empty" class="hidden text-center py-10 italic" style="color:var(--text-muted);">You don't have any active events currently. Accept offers to see them here!</div>
 
       <!-- Directly created events -->
       <div id="my-events-list" class="flex flex-col gap-6 mt-6"></div>
-      <div id="my-events-empty" class="hidden text-center py-6 text-white/40 italic text-sm">No directly created events yet. <a href="/create-event" class="text-blue-400 hover:underline">Create one →</a></div>
+      <div id="my-events-empty" class="hidden text-center py-6 italic text-sm" style="color:var(--text-muted);">No directly created events yet. <a href="/create-event" class="text-blue-400 hover:underline">Create one →</a></div>
     </section>
 
     <!-- WHY EVENTHIVE / INFO SECTION -->
-    <section class="bg-[#0A0F14]/85 backdrop-blur-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2.5rem] p-10">
+    <section class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
       <div class="mb-10 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy'] text-white">Why Organize with EventHive?</h2>
+        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Why Organize with EventHive?</h2>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="bg-white/5 p-6 rounded-[1.5rem] border border-white/10 hover:bg-white/10 transition-colors">
-          <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>Smart Matching</h3>
-          <p class="text-sm text-white/60 leading-relaxed">Get offers only from clients whose budgets, cities, and dates match your preferences.</p>
+        <div class="p-6 rounded-[1.5rem] border hover:opacity-90 transition-colors" style="background:var(--article-bg);border-color:var(--article-border);">
+          <h3 class="text-lg font-bold mb-3 flex items-center gap-2" style="color:var(--text-primary);"><div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>Smart Matching</h3>
+          <p class="text-sm leading-relaxed" style="color:var(--text-secondary);">Get offers only from clients whose budgets, cities, and dates match your preferences.</p>
         </div>
-        <div class="bg-white/5 p-6 rounded-[1.5rem] border border-white/10 hover:bg-white/10 transition-colors">
-          <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg></div>Centralized Management</h3>
-          <p class="text-sm text-white/60 leading-relaxed">Track your events, client negotiations, and volunteer assignments from one clean dashboard.</p>
+        <div class="p-6 rounded-[1.5rem] border hover:opacity-90 transition-colors" style="background:var(--article-bg);border-color:var(--article-border);">
+          <h3 class="text-lg font-bold mb-3 flex items-center gap-2" style="color:var(--text-primary);"><div class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg></div>Centralized Management</h3>
+          <p class="text-sm leading-relaxed" style="color:var(--text-secondary);">Track your events, client negotiations, and volunteer assignments from one clean dashboard.</p>
         </div>
-        <div class="bg-white/5 p-6 rounded-[1.5rem] border border-white/10 hover:bg-white/10 transition-colors">
-          <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-yellow-500/20 text-yellow-500 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>Reputation & Ratings</h3>
-          <p class="text-sm text-white/60 leading-relaxed">Build your profile, earn ratings from clients, and unlock more premium event opportunities.</p>
+        <div class="p-6 rounded-[1.5rem] border hover:opacity-90 transition-colors" style="background:var(--article-bg);border-color:var(--article-border);">
+          <h3 class="text-lg font-bold mb-3 flex items-center gap-2" style="color:var(--text-primary);"><div class="w-8 h-8 rounded-full bg-yellow-500/20 text-yellow-500 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>Reputation & Ratings</h3>
+          <p class="text-sm leading-relaxed" style="color:var(--text-secondary);">Build your profile, earn ratings from clients, and unlock more premium event opportunities.</p>
         </div>
       </div>
     </section>
 
   </main>
 
-  <footer class="mt-auto py-8 text-center text-white/40 text-sm">
+  <footer class="mt-auto py-8 text-center text-sm" style="color:var(--footer-text);">
     <p>&copy; 2026 EventHive. All rights reserved.</p>
   </footer>
 
@@ -238,6 +277,7 @@
     const bgImage = document.getElementById('bgImage');
     const themeToggle = document.getElementById('themeToggle');
     function applyTheme(dark) {
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
       bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
       themeToggle.checked = dark;
       localStorage.setItem('theme', dark ? 'dark' : 'light');
@@ -310,19 +350,19 @@
             }
 
             return `
-              <div class="bg-white/5 border border-white/10 rounded-[1.5rem] p-6 flex flex-col sm:flex-row sm:items-center gap-5 hover:bg-white/8 transition-colors" id="offer-${offer._id}">
+              <div class="rounded-[1.5rem] p-6 flex flex-col sm:flex-row sm:items-center gap-5 transition-colors border" style="background:var(--article-bg);border-color:var(--article-border);" id="offer-${offer._id}">
                 <div class="flex-1 min-w-0">
-                  <h3 class="text-white font-bold text-base mb-1">${offer.title}</h3>
-                  <p class="text-white/50 text-sm">From: <span class="text-white/80">${clientName}</span></p>
-                  <div class="flex flex-wrap gap-4 mt-2 text-xs text-white/40">
+                  <h3 class="font-bold text-base mb-1" style="color:var(--text-primary);">${offer.title}</h3>
+                  <p class="text-sm" style="color:var(--text-muted);">From: <span style="color:var(--text-secondary);">${clientName}</span></p>
+                  <div class="flex flex-wrap gap-4 mt-2 text-xs" style="color:var(--text-muted);">
                     ${budgetStr}
                     <span>${date}</span>
                     ${offer.city ? `<span>${offer.city}</span>` : ''}
                   </div>
-                  ${offer.description ? `<p class="text-white/40 text-xs mt-2 line-clamp-2">${offer.description}</p>` : ''}
+                  ${offer.description ? `<p class="text-xs mt-2 line-clamp-2" style="color:var(--text-muted);">${offer.description}</p>` : ''}
                 </div>
                 <div class="flex gap-2 flex-shrink-0 flex-col">
-                  <button onclick="acceptOffer('${offer._id}')" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white hover:opacity-90 rounded-xl transition-all shadow-lg">Accept</button>
+                  <button onclick="acceptOffer('${offer._id}')" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:opacity-90 rounded-xl transition-all shadow-lg" style="color:var(--text-primary);">Accept</button>
                   <button onclick="rejectOffer('${offer._id}')" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-all">Reject</button>
                 </div>
               </div>
@@ -344,10 +384,10 @@
             const expenseList = (offer.expenses || []).map(exp => {
               const expDate = new Date(exp.date).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
               if (exp.isDeleted) {
-                return `<li class="flex justify-between items-center text-white/30 line-through text-sm px-2 py-1"><span>${exp.description}</span><span>₹${exp.amount}</span></li>`;
+                return `<li class="flex justify-between items-center line-through text-sm px-2 py-1" style="color:var(--text-muted);"><span>${exp.description}</span><span>₹${exp.amount}</span></li>`;
               }
               const delBtn = !isCompleted ? `<button onclick="deleteExpense('${offer._id}','${exp._id}')" class="text-red-400 hover:text-red-300 ml-3 text-xs uppercase tracking-widest font-bold">Del</button>` : '';
-              return `<li class="flex justify-between items-center text-white/70 text-sm px-2 py-1 border-b border-white/5 last:border-0 hover:bg-white/5"><span>${expDate} - ${exp.description}</span><div class="flex items-center"><span class="font-bold text-red-300">₹${exp.amount}</span>${delBtn}</div></li>`;
+              return `<li class="flex justify-between items-center text-sm px-2 py-1 border-b last:border-0 hover:opacity-90" style="color:var(--text-secondary);border-color:var(--card-border);"><span>${expDate} - ${exp.description}</span><div class="flex items-center"><span class="font-bold text-red-300">₹${exp.amount}</span>${delBtn}</div></li>`;
             }).join('');
             
             const totalValid = (offer.expenses || []).filter(e => !e.isDeleted).reduce((sum, e) => sum + e.amount, 0);
@@ -356,21 +396,21 @@
             if (!isCompleted) {
               addExpHtml = `
                 <div class="mt-4 flex gap-2">
-                  <input id="exp-desc-${offer._id}" type="text" placeholder="Expense description" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white text-xs placeholder-white/25">
-                  <input id="exp-amt-${offer._id}" type="number" placeholder="Amt" class="w-24 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white text-xs placeholder-white/25">
+                  <input id="exp-desc-${offer._id}" type="text" placeholder="Expense description" class="flex-1 rounded-xl px-4 py-2 text-xs border" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
+                  <input id="exp-amt-${offer._id}" type="number" placeholder="Amt" class="w-24 rounded-xl px-4 py-2 text-xs border" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
                   <button id="exp-btn-${offer._id}" onclick="addExpense('${offer._id}')" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all">Add</button>
                 </div>
               `;
             }
 
             expensesHtml = `
-              <div class="mt-6 bg-[#0d1117] border border-white/10 rounded-xl p-5">
+              <div class="mt-6 rounded-xl p-5 border" style="background:var(--section-bg);border-color:var(--card-border);">
                 <div class="flex justify-between items-center mb-3">
-                  <h4 class="text-sm uppercase tracking-widest text-white/50 font-bold">Tracked Expenses</h4>
+                  <h4 class="text-sm uppercase tracking-widest font-bold" style="color:var(--text-muted);">Tracked Expenses</h4>
                   <span class="text-sm font-bold text-red-400">Total: ₹${totalValid}</span>
                 </div>
                 <ul class="flex flex-col gap-1 max-h-40 overflow-y-auto pr-2">
-                  ${expenseList || '<li class="text-white/30 text-xs italic">No expenses logged yet.</li>'}
+                  ${expenseList || '<li class="text-xs italic" style="color:var(--text-muted);">No expenses logged yet.</li>'}
                 </ul>
                 ${addExpHtml}
               </div>
@@ -381,10 +421,10 @@
                 <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-5 border-b border-white/10 pb-5">
                   <div class="flex-1">
                     <div class="flex items-center gap-3 mb-2">
-                      <h3 class="text-white font-bold text-xl">${offer.title}</h3>
+                      <h3 class="font-bold text-xl" style="color:var(--text-primary);">${offer.title}</h3>
                       ${isCompleted ? `<span class="px-3 py-1 bg-green-500/20 text-green-400 border border-green-500/30 rounded-full text-xs font-bold">Completed</span>` : `<span class="px-3 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-xs font-bold">Active</span>`}
                     </div>
-                    <p class="text-white/50 text-sm">Client: <span class="text-white/80">${clientName}</span>, Date: <span class="text-white/80">${date}</span></p>
+                    <p class="text-sm" style="color:var(--text-muted);">Client: <span style="color:var(--text-secondary);">${clientName}</span>, Date: <span style="color:var(--text-secondary);">${date}</span></p>
                   </div>
                   ${!isCompleted ? `<button onclick="completeOffer('${offer._id}')" class="flex-shrink-0 px-6 py-3 text-xs uppercase tracking-widest font-bold bg-green-500/20 hover:bg-green-500/30 text-green-400 border border-green-500/30 rounded-xl transition-all flex items-center gap-2">✓ Mark Event Completed</button>` : ''}
                 </div>
@@ -485,15 +525,15 @@
             : ev.status === 'completed' ? 'text-white/40 border-white/10 bg-white/5'
             : 'text-blue-400 border-blue-500/30 bg-blue-500/10';
           return `
-            <div class="bg-white/5 border border-white/10 rounded-[1.5rem] p-6 flex flex-col sm:flex-row sm:items-center gap-5 hover:bg-white/8 transition-colors">
+            <div class="rounded-[1.5rem] p-6 flex flex-col sm:flex-row sm:items-center gap-5 transition-colors border" style="background:var(--article-bg);border-color:var(--article-border);">
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-3 mb-1">
-                  <h3 class="text-white font-bold text-base">${ev.title}</h3>
+                  <h3 class="font-bold text-base" style="color:var(--text-primary);">${ev.title}</h3>
                   <span class="px-2 py-0.5 rounded-full text-xs font-bold border ${statusColor}">${ev.status || 'published'}</span>
                 </div>
-                <p class="text-white/40 text-xs">${start}${ev.location?.city ? ' · ' + ev.location.city : ''}</p>
+                <p class="text-xs" style="color:var(--text-muted);">${start}${ev.location?.city ? ' · ' + ev.location.city : ''}</p>
               </div>
-              <a href="/event-info?id=${ev._id}" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all text-white">View</a>
+              <a href="/event-info?id=${ev._id}" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all" style="color:var(--text-primary);">View</a>
               <a href="/organiser?eventId=${ev._id}" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-xl transition-all text-blue-400">Manage</a>
             </div>`;
         }).join('');
