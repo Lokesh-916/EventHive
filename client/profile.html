@@ -1114,8 +1114,8 @@
     #progress-panel-backdrop.open { display: flex !important; }
 
     .panel-badge-row {
-      display: flex; align-items: center; gap: 1rem;
-      padding: 0.7rem 0; border-bottom: 1px solid var(--article-border);
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.65rem 0; border-bottom: 1px solid var(--article-border);
     }
     .panel-badge-row:last-child { border-bottom: none; }
     .panel-badge-icon { width: 28px; height: 28px; flex-shrink: 0; }
@@ -1206,13 +1206,13 @@
 
   <!-- Badge Progress Panel -->
   <div id="progress-panel-backdrop" role="dialog" aria-modal="true" style="position:fixed;inset:0;background:rgba(0,0,0,0.35);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;">
-    <div id="progress-panel" style="background:var(--dropdown-bg);border:1px solid var(--dropdown-border);border-radius:1.5rem;box-shadow:var(--shadow);width:90%;max-width:480px;max-height:80vh;overflow-y:auto;padding:1.75rem;position:relative;">
+    <div id="progress-panel" style="background:var(--dropdown-bg);border:1px solid var(--dropdown-border);border-radius:1.5rem;box-shadow:var(--shadow);width:90%;max-width:680px;max-height:80vh;overflow-y:auto;padding:2rem;position:relative;">
       <button id="panel-close-btn" aria-label="Close" style="position:absolute;top:1rem;right:1rem;width:30px;height:30px;border-radius:50%;border:1px solid var(--card-border);background:transparent;color:var(--text-primary);cursor:pointer;display:flex;align-items:center;justify-content:center;">
         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
       <h2 style="font-family:'Satisfy',cursive;font-size:1.6rem;color:var(--text-primary);margin:0 0 0.25rem;">Badge Progress</h2>
       <p style="font-size:0.75rem;color:var(--text-secondary);margin:0 0 1.25rem;">All badges and your progress toward each.</p>
-      <div id="progress-panel-list"></div>
+      <div id="progress-panel-list" style="display:grid;grid-template-columns:repeat(2,1fr);gap:0 1.5rem;"></div>
     </div>
   </div>
 

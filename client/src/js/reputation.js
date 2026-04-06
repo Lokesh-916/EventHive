@@ -357,9 +357,19 @@ function loadReputationSection(volunteerId) {
       '<div class="badge-scroll" id="badge-grid"></div>',
     ].join('');
 
-    // Append after last section in profileMain
+    // Append after hero (second position) in profileMain
     var main = document.getElementById('profileMain');
-    if (main) main.appendChild(section);
+    if (main) {
+      // Insert after the first child (hero section)
+      var firstSection = main.querySelector('.profile-section');
+      if (firstSection && firstSection.nextSibling) {
+        main.insertBefore(section, firstSection.nextSibling);
+      } else if (firstSection) {
+        main.insertBefore(section, firstSection.nextSibling);
+      } else {
+        main.appendChild(section);
+      }
+    }
 
     // Render badges
     renderBadgeGrid(earnedBadges, catalog);
