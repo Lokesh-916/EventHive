@@ -63,4 +63,23 @@ router.get('/event/:eventId', protect, authorize('organizer'), async (req, res) 
   }
 });
 
+// @route   POST /api/applications/:id/approve
+// @desc    Approve a volunteer application
+// @access  Private (Organizer)
+router.post('/:id/approve', protect, authorize('organizer'), async (req, res) => {
+  try {
+    const application = await Application.findById(req.params.id);
+    if (!application) return res.status(404).json({ success: false, error: 'Application not found' });
+    const event = await Event.findById(application.eventId);
+    if (!event || event.organizerId.toString() !== req.user.id) {
+      return res.status(403).json({ success: false, error: 'Not authorized' });
+    }
+    application.status = 'approved';
+    await application.save();
+    res.status(200).json({ success: true, data: application });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = router;

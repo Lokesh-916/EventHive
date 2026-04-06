@@ -8,6 +8,112 @@
   <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/styles/output.css">
+  <style>
+    /* ── Profile Avatar & Dropdown ── */
+    .profile-wrapper { position: relative; }
+
+    .profile-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.15);
+      object-fit: cover;
+      cursor: pointer;
+      background: rgba(255,255,255,0.07);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .profile-avatar:hover {
+      border-color: rgba(255,255,255,0.5);
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.08);
+    }
+    .profile-avatar svg, .profile-avatar img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+
+    .profile-dropdown {
+      position: absolute;
+      top: calc(100% + 12px);
+      right: 0;
+      min-width: 200px;
+      background: rgba(20,25,35,0.96);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 1rem;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      backdrop-filter: blur(20px);
+      padding: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 100;
+    }
+    .profile-dropdown.open {
+      opacity: 1; pointer-events: all; transform: translateY(0);
+    }
+
+    .dropdown-header {
+      padding: 0.6rem 0.85rem;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      margin-bottom: 0.4rem;
+    }
+    .dropdown-header p {
+      margin: 0; font-size: 0.75rem; font-weight: 700; color: #fff;
+    }
+    .dropdown-header span {
+      font-size: 0.65rem; color: rgba(255,255,255,0.4);
+    }
+
+    .dropdown-item {
+      display: flex; align-items: center; gap: 0.65rem;
+      padding: 0.6rem 0.85rem;
+      border-radius: 0.6rem;
+      font-size: 0.8rem; color: #fff;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+      user-select: none;
+    }
+    .dropdown-item:hover { background: rgba(255,255,255,0.08); }
+    .dropdown-item svg { flex-shrink: 0; opacity: 0.6; }
+    .dropdown-item.danger { color: #e53e3e; }
+    .dropdown-item.danger svg { opacity: 0.8; }
+
+    .theme-toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.5rem 0.85rem;
+      border-radius: 0.6rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .theme-toggle-row:hover { background: rgba(255,255,255,0.08); }
+    .theme-toggle-label {
+      display: flex; align-items: center; gap: 0.65rem;
+      font-size: 0.8rem; color: #fff;
+    }
+    .theme-toggle-label svg { opacity: 0.6; }
+
+    .toggle-switch { position: relative; width: 36px; height: 20px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.15);
+      transition: background 0.3s;
+      cursor: pointer;
+    }
+    .toggle-slider:before {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      top: 3px; left: 3px;
+      transition: transform 0.3s;
+    }
+    input:checked + .toggle-slider { background: rgba(255,255,255,0.35); }
+    input:checked + .toggle-slider:before { transform: translateX(16px); }
+  </style>
 </head>
 <body class="bg-[#0A0F14] text-white font-['Inter'] min-h-screen relative overflow-x-hidden">
 
@@ -27,10 +133,51 @@
       <li><a href="#volunteers" class="relative text-white text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity">Volunteers<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
       <li><a href="#analytics" class="relative text-white text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity">Analytics<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
     </ul>
-    <div class="flex gap-4">
-      <button id="homeBtn" class="px-5 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all">Home</button>
-      <button id="logoutBtn" class="px-5 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white hover:opacity-90 rounded-full transition-all shadow-lg">Logout</button>
-    </div>
+    <li class="profile-wrapper" style="list-style:none;">
+      <div class="profile-avatar" id="profileAvatarBtn" title="Account options">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:rgba(255,255,255,0.4);">
+          <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/>
+        </svg>
+      </div>
+
+      <div class="profile-dropdown" id="profileDropdown">
+        <div class="dropdown-header">
+          <p id="dropdownName">Organizer</p>
+          <span id="dropdownRole">Organizer</span>
+        </div>
+
+        <!-- Theme toggle (stored in localStorage; background stays dark) -->
+        <div class="theme-toggle-row" id="themeToggleRow">
+          <div class="theme-toggle-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            Dark Mode
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="themeToggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <a class="dropdown-item" href="/organiser-home">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          Home
+        </a>
+
+        <div class="dropdown-item danger" id="dropdownLogoutBtn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Logout
+        </div>
+      </div>
+    </li>
   </nav>
 
   <main class="w-[90%] max-w-6xl mx-auto my-20 relative z-10 flex flex-col gap-20 pb-20">
@@ -88,36 +235,16 @@
         <p class="text-white/60 text-sm">Approve, assign roles and manage volunteers here.</p>
       </div>
 
-      <div class="bg-white/5 border border-white/10 rounded-[1.5rem] p-6 mb-8">
-        <h3 class="text-lg font-bold text-white mb-4">Assign Work to Volunteer</h3>
-        <form id="assignForm" class="flex flex-col md:flex-row gap-4 items-center">
-          <select id="selectVolunteer" required class="flex-1 bg-[#1A222C] border border-white/10 text-white text-sm rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500">
-            <option value="">Select Volunteer</option>
-          </select>
-
-          <input type="text" id="assignedEvent" placeholder="Event Name" required class="flex-1 bg-[#1A222C] border border-white/10 text-white text-sm rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500">
-
-          <select id="assignedRole" required class="flex-1 bg-[#1A222C] border border-white/10 text-white text-sm rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500">
-            <option value="">Select Role</option>
-            <option value="Registration Desk">Registration Desk</option>
-            <option value="Logistics">Logistics</option>
-            <option value="Stage Management">Stage Management</option>
-            <option value="Hospitality">Hospitality</option>
-          </select>
-
-          <button type="submit" class="px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white hover:opacity-90 text-white text-sm font-bold uppercase tracking-wider rounded-lg shadow-lg">Assign Work</button>
-        </form>
-      </div>
-
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm whitespace-nowrap">
           <thead class="uppercase tracking-wider text-xs font-bold text-white/50 border-b border-white/10">
             <tr>
               <th class="px-4 py-4">Name</th>
               <th class="px-4 py-4">Email</th>
-              <th class="px-4 py-4">Status</th>
-              <th class="px-4 py-4">Assigned Event</th>
+              <th class="px-4 py-4">Applied Event</th>
               <th class="px-4 py-4">Role</th>
+              <th class="px-4 py-4">Reputation</th>
+              <th class="px-4 py-4">Status</th>
               <th class="px-4 py-4">Action</th>
             </tr>
           </thead>
@@ -156,88 +283,198 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
-      const homeBtn = document.getElementById('homeBtn');
       const navLogo = document.getElementById('navLogo');
-      const logoutBtn = document.getElementById('logoutBtn');
-
-      if (homeBtn) homeBtn.onclick = () => window.location.href = '/organiser-home';
       if (navLogo) navLogo.onclick = () => window.location.href = '/organiser-home';
 
-      // --- Volunteer logic (organizer self-view only) ---
-      let volunteers = [
-        { name: "Arjun Kumar", email: "arjun@email.com", status: "Available", event: "-", role: "-" },
-        { name: "Meena Raj", email: "meena@email.com", status: "Available", event: "-", role: "-" }
-      ];
+      // ── Theme toggle (localStorage only; background stays dark) ──
+      const themeToggle = document.getElementById('themeToggle');
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      themeToggle.checked = savedTheme === 'dark';
+      themeToggle.addEventListener('change', () => {
+        localStorage.setItem('theme', themeToggle.checked ? 'dark' : 'light');
+      });
 
-      const assignForm = document.getElementById("assignForm");
-      const selectVolunteer = document.getElementById("selectVolunteer");
-      const table = document.getElementById("volunteerTable");
+      // ── Profile Avatar Dropdown ──
+      const avatarBtn   = document.getElementById('profileAvatarBtn');
+      const dropdown    = document.getElementById('profileDropdown');
 
-      function loadVolunteers() {
-        if (!table || !selectVolunteer) return;
+      avatarBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('open');
+      });
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target) && e.target !== avatarBtn) {
+          dropdown.classList.remove('open');
+        }
+      });
 
-        table.innerHTML = "";
-        selectVolunteer.innerHTML = '<option value="">Select Volunteer</option>';
+      // ── Dropdown Logout ──
+      document.getElementById('dropdownLogoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/';
+      });
 
-        volunteers.forEach((volunteer, index) => {
-          if (volunteer.status === "Available") {
-            selectVolunteer.innerHTML += `<option value="${index}">${volunteer.name}</option>`;
+      // ── Load organizer profile into dropdown ──
+      (async function loadProfile() {
+        try {
+          const cached = JSON.parse(localStorage.getItem('user') || '{}');
+          const dName = cached.profile?.name || cached.profile?.orgName || cached.username;
+          if (dName) document.getElementById('dropdownName').textContent = dName;
+
+          const token = localStorage.getItem('token');
+          if (!token) return;
+          const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
+          if (!res.ok) return;
+          const data = await res.json();
+          if (!data.success) return;
+          const u = data.data;
+          const displayName = u.profile?.name || u.profile?.orgName || u.username;
+          if (displayName) document.getElementById('dropdownName').textContent = displayName;
+          const roleLabel = u.role ? u.role.charAt(0).toUpperCase() + u.role.slice(1) : 'Organizer';
+          document.getElementById('dropdownRole').textContent = roleLabel;
+
+          const pic = u.profile?.profilePic;
+          if (pic) {
+            const img = document.createElement('img');
+            img.src = pic;
+            img.alt = 'Profile';
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+            img.onerror = () => {
+              avatarBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:rgba(255,255,255,0.4);"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/></svg>`;
+            };
+            avatarBtn.innerHTML = '';
+            avatarBtn.appendChild(img);
           }
+        } catch(e) { /* silently fail */ }
+      })();
 
-          let statusClass = volunteer.status === "Available" ? "text-green-400" : "text-blue-400";
-
-          table.innerHTML += `
-            <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
-              <td class="px-4 py-4 font-bold text-white">${volunteer.name}</td>
-              <td class="px-4 py-4 opacity-70">${volunteer.email}</td>
-              <td class="px-4 py-4 font-bold ${statusClass}">${volunteer.status}</td>
-              <td class="px-4 py-4 opacity-70">${volunteer.event}</td>
-              <td class="px-4 py-4 opacity-70">${volunteer.role}</td>
-              <td class="px-4 py-4">
-                <button class="px-3 py-1 bg-red-500/20 hover:bg-red-500/40 text-red-400 border border-red-500/30 rounded text-xs" onclick="removeAssignment(${index})">Remove</button>
-              </td>
-            </tr>
-          `;
-        });
+      // ── Reputation helpers ──
+      async function fetchReputation(userId) {
+        try {
+          const token = localStorage.getItem('token');
+          const res = await fetch(`/api/reputation/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
+          if (!res.ok) return null;
+          const d = await res.json();
+          return d.success ? d.data : null;
+        } catch { return null; }
       }
 
-      if (assignForm) {
-        assignForm.addEventListener("submit", function (e) {
-          e.preventDefault();
-          const volunteerIndex = selectVolunteer.value;
-          const eventName = document.getElementById("assignedEvent").value;
-          const role = document.getElementById("assignedRole").value;
+      function buildRepCell(rep) {
+        if (!rep) return '<span class="opacity-40 text-xs">—</span>';
+        const rank   = rep.rank   || rep.tier   || '—';
+        const badges = rep.badges || [];
+        const badgeHtml = badges.slice(0, 3).map(b =>
+          `<span title="${b.name || b}" style="font-size:1rem;">${b.icon || '🏅'}</span>`
+        ).join('');
+        return `<span class="text-xs font-bold text-yellow-400">${rank}</span>${badgeHtml ? ' ' + badgeHtml : ''}`;
+      }
 
-          if (volunteerIndex === "") {
-            alert("Select a volunteer.");
+      // ── Load Applications (Change 2) ──
+      async function loadApplications() {
+        const token = localStorage.getItem('token');
+        const table = document.getElementById('volunteerTable');
+        if (!table || !token) return;
+
+        table.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-white/40 italic">Loading…</td></tr>`;
+
+        try {
+          // 1. Get organizer's events
+          const evRes = await fetch('/api/events/my', { headers: { Authorization: `Bearer ${token}` } });
+          if (!evRes.ok) throw new Error('Failed to fetch events');
+          const evData = await evRes.json();
+          const events = evData.data || [];
+
+          // 2. Fetch applications for each event
+          const appFetches = events.map(ev =>
+            fetch(`/api/applications/event/${ev._id}`, { headers: { Authorization: `Bearer ${token}` } })
+              .then(r => r.ok ? r.json() : { data: [] })
+              .then(d => (d.data || []).map(app => ({ ...app, _eventTitle: ev.title || 'Untitled' })))
+              .catch(() => [])
+          );
+          const appArrays = await Promise.all(appFetches);
+          const applications = appArrays.flat();
+
+          if (!applications.length) {
+            table.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-white/40 italic">No applications yet.</td></tr>`;
             return;
           }
 
-          volunteers[volunteerIndex].event = eventName;
-          volunteers[volunteerIndex].role = role;
-          volunteers[volunteerIndex].status = "Assigned";
+          // 3. Render rows (reputation fetched per volunteer)
+          table.innerHTML = '';
+          for (const app of applications) {
+            const name       = app.volunteer?.profile?.name || app.volunteer?.username || '—';
+            const email      = app.volunteer?.email || '—';
+            const volunteerId = app.volunteer?._id || app.volunteerId || '';
+            const eventTitle = app._eventTitle;
+            const roleTitle  = app.role?.title || app.roleTitle || '—';
+            const status     = app.status || 'pending';
 
-          assignForm.reset();
-          loadVolunteers();
-        });
+            const statusClass = status === 'approved'
+              ? 'text-green-400'
+              : status === 'rejected'
+                ? 'text-red-400'
+                : 'text-yellow-400';
+
+            const actionBtn = status === 'pending'
+              ? `<button onclick="approveApp('${app._id}', this)" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/40 text-green-400 border border-green-500/30 rounded text-xs mr-1">Approve</button>`
+              : '';
+            const profileLink = volunteerId
+              ? `<a href="/profile?id=${volunteerId}" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded text-xs">View Profile</a>`
+              : '';
+
+            const tr = document.createElement('tr');
+            tr.className = 'border-b border-white/5 hover:bg-white/5 transition-colors';
+            tr.innerHTML = `
+              <td class="px-4 py-4 font-bold text-white">${name}</td>
+              <td class="px-4 py-4 opacity-70">${email}</td>
+              <td class="px-4 py-4 opacity-70">${eventTitle}</td>
+              <td class="px-4 py-4 opacity-70">${roleTitle}</td>
+              <td class="px-4 py-4" id="rep-${app._id}"><span class="opacity-40 text-xs">…</span></td>
+              <td class="px-4 py-4 font-bold ${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</td>
+              <td class="px-4 py-4">${actionBtn}${profileLink}</td>
+            `;
+            table.appendChild(tr);
+
+            // Fetch reputation async per volunteer
+            if (volunteerId) {
+              fetchReputation(volunteerId).then(rep => {
+                const cell = document.getElementById(`rep-${app._id}`);
+                if (cell) cell.innerHTML = buildRepCell(rep);
+              });
+            }
+          }
+        } catch (err) {
+          console.error('Failed to load applications:', err);
+          table.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-red-400 italic">Failed to load applications.</td></tr>`;
+        }
       }
 
-      window.removeAssignment = function (index) {
-        volunteers[index].event = "-";
-        volunteers[index].role = "-";
-        volunteers[index].status = "Available";
-        loadVolunteers();
+      // Approve application handler
+      window.approveApp = async function(appId, btn) {
+        const token = localStorage.getItem('token');
+        try {
+          btn.disabled = true;
+          btn.textContent = '…';
+          const res = await fetch(`/api/applications/${appId}/approve`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (!res.ok) throw new Error('Failed');
+          // Update status cell in the same row
+          const row = btn.closest('tr');
+          const statusCell = row.querySelectorAll('td')[5];
+          statusCell.className = 'px-4 py-4 font-bold text-green-400';
+          statusCell.textContent = 'Approved';
+          btn.remove();
+        } catch {
+          btn.disabled = false;
+          btn.textContent = 'Approve';
+          alert('Failed to approve application.');
+        }
       };
 
-      loadVolunteers();
-
-      if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          localStorage.removeItem('token');
-          window.location.href = '/';
-        });
-      }
+      loadApplications();
 
       // ── Dashboard Stats ──────────────────────────────────────
       async function loadDashboardStats() {
@@ -251,7 +488,6 @@
           const events = data.data || [];
           const now = new Date();
 
-          // Count active and upcoming
           let activeCount = 0;
           let upcomingCount = 0;
           events.forEach(ev => {
@@ -267,13 +503,11 @@
           document.getElementById('stat-active').textContent = activeCount;
           document.getElementById('stat-upcoming').textContent = upcomingCount;
 
-          // Volunteer count: sum totalVolunteers from volunteerRequirements
           const totalVolunteers = events.reduce((sum, ev) => {
             return sum + (ev.volunteerRequirements?.totalVolunteers || 0);
           }, 0);
           document.getElementById('stat-volunteers').textContent = totalVolunteers;
 
-          // Pending volunteer requests: fetch applications for each event
           let pendingCount = 0;
           const fetchPromises = events.map(ev =>
             fetch(`/api/applications/event/${ev._id}`, { headers: { Authorization: `Bearer ${token}` } })
@@ -287,7 +521,6 @@
           await Promise.all(fetchPromises);
           document.getElementById('stat-requests').textContent = pendingCount;
 
-          // Populate events table
           const tbody = document.getElementById('eventsTableBody');
           if (!tbody) return;
           if (!events.length) {
