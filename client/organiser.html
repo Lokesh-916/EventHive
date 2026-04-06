@@ -167,9 +167,8 @@
       Event<span>Hive</span>
     </div>
     <ul id="navLinks" class="flex gap-6 list-none m-0 p-0 hidden md:flex">
-      <li><a href="#dashboard" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Dashboard<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+      <li><a href="/organiser-home" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Home<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
       <li><a href="#events" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Events<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-      <li><a href="#volunteers" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Volunteers<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
       <li><a href="#analytics" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Analytics<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
     </ul>
     <li class="profile-wrapper" style="list-style:none;">
@@ -267,33 +266,6 @@
       </div>
     </section>
 
-    <!-- VOLUNTEERS -->
-    <section id="volunteers" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-      <div class="mb-8 border-b pb-4" style="border-color:var(--card-border);">
-        <h2 class="text-3xl font-bold font-['Satisfy'] mb-2" style="color:var(--text-primary);">Volunteer Management</h2>
-        <p class="text-sm" style="color:var(--text-secondary);">Approve, assign roles and manage volunteers here.</p>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm whitespace-nowrap">
-          <thead class="uppercase tracking-wider text-xs font-bold border-b" style="color:var(--text-muted);border-color:var(--card-border);">
-            <tr>
-              <th class="px-4 py-4">Name</th>
-              <th class="px-4 py-4">Email</th>
-              <th class="px-4 py-4">Applied Event</th>
-              <th class="px-4 py-4">Role</th>
-              <th class="px-4 py-4">Reputation</th>
-              <th class="px-4 py-4">Status</th>
-              <th class="px-4 py-4">Action</th>
-            </tr>
-          </thead>
-          <tbody id="volunteerTable" style="color:var(--text-secondary);">
-            <!-- Populated via JS -->
-          </tbody>
-        </table>
-      </div>
-    </section>
-
     <!-- ANALYTICS -->
     <section id="analytics" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 text-center border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
       <h2 class="text-3xl font-bold font-['Satisfy'] mb-4" style="color:var(--text-primary);">Analytics</h2>
@@ -321,6 +293,57 @@
   </footer>
 
   <script>
+    // ── Auth guard ──
+    (async function checkAuth() {
+      const token = localStorage.getItem('token');
+      if (!token) return showUnauthorized('not-logged-in');
+      try {
+        const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok) return showUnauthorized('not-logged-in');
+        const data = await res.json();
+        if (data.data?.role !== 'organizer') return showUnauthorized(data.data?.role || 'unknown');
+      } catch { showUnauthorized('not-logged-in'); }
+    })();
+
+    function showUnauthorized(role) {
+      const isLoggedIn = role !== 'not-logged-in';
+      const roleLabels = { volunteer: 'Volunteer', client: 'Client' };
+      document.body.innerHTML = `
+        <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0f14;font-family:'Inter',sans-serif;padding:2rem;">
+          <div style="max-width:480px;width:100%;text-align:center;">
+            <div style="width:72px;height:72px;border-radius:50%;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;color:#f87171;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+              </svg>
+            </div>
+            <h1 style="font-family:'Satisfy',cursive;font-size:2rem;color:#fff;margin-bottom:0.75rem;">Access Restricted</h1>
+            <p style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:0.5rem;">
+              ${isLoggedIn
+                ? `You're logged in as a <strong style="color:rgba(255,255,255,0.8);">${roleLabels[role] || role}</strong>, but this page is for <strong style="color:rgba(255,255,255,0.8);">Organizers</strong> only.`
+                : `You need to be logged in as an <strong style="color:rgba(255,255,255,0.8);">Organizer</strong> to access this page.`}
+            </p>
+            <p style="color:rgba(255,255,255,0.3);font-size:0.75rem;margin-bottom:2rem;">
+              ${isLoggedIn ? 'Please log out and sign in with your organizer account.' : 'Please log in with your organizer account to continue.'}
+            </p>
+            <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;">
+              ${isLoggedIn ? `
+              <button onclick="localStorage.removeItem('token');window.location.href='/register';"
+                style="padding:0.75rem 1.5rem;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
+                Log Out
+              </button>` : ''}
+              <button onclick="window.location.href='/register';"
+                style="padding:0.75rem 1.5rem;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
+                ${isLoggedIn ? 'Switch Account' : 'Log In'}
+              </button>
+              <button onclick="window.location.href='/';"
+                style="padding:0.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
+                Go Home
+              </button>
+            </div>
+          </div>
+        </div>`;
+    }
+
     document.addEventListener("DOMContentLoaded", async () => {
       const navLogo = document.getElementById('navLogo');
       if (navLogo) navLogo.onclick = () => window.location.href = '/organiser-home';
@@ -392,134 +415,7 @@
         } catch(e) { /* silently fail */ }
       })();
 
-      // ── Reputation helpers ──
-      async function fetchReputation(userId) {
-        try {
-          const token = localStorage.getItem('token');
-          const res = await fetch(`/api/reputation/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
-          if (!res.ok) return null;
-          const d = await res.json();
-          return d.success ? d.data : null;
-        } catch { return null; }
-      }
-
-      function buildRepCell(rep) {
-        if (!rep) return '<span class="opacity-40 text-xs">—</span>';
-        const rank   = rep.rank   || rep.tier   || '—';
-        const badges = rep.badges || [];
-        const badgeHtml = badges.slice(0, 3).map(b =>
-          `<span title="${b.name || b}" style="font-size:1rem;">${b.icon || '🏅'}</span>`
-        ).join('');
-        return `<span class="text-xs font-bold text-yellow-400">${rank}</span>${badgeHtml ? ' ' + badgeHtml : ''}`;
-      }
-
-      // ── Load Applications (Change 2) ──
-      async function loadApplications() {
-        const token = localStorage.getItem('token');
-        const table = document.getElementById('volunteerTable');
-        if (!table || !token) return;
-
-        table.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center italic" style="color:var(--text-muted);">Loading…</td></tr>`;
-
-        try {
-          // 1. Get organizer's events
-          const evRes = await fetch('/api/events/my', { headers: { Authorization: `Bearer ${token}` } });
-          if (!evRes.ok) throw new Error('Failed to fetch events');
-          const evData = await evRes.json();
-          const events = evData.data || [];
-
-          // 2. Fetch applications for each event
-          const appFetches = events.map(ev =>
-            fetch(`/api/applications/event/${ev._id}`, { headers: { Authorization: `Bearer ${token}` } })
-              .then(r => r.ok ? r.json() : { data: [] })
-              .then(d => (d.data || []).map(app => ({ ...app, _eventTitle: ev.title || 'Untitled' })))
-              .catch(() => [])
-          );
-          const appArrays = await Promise.all(appFetches);
-          const applications = appArrays.flat();
-
-          if (!applications.length) {
-            table.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center italic" style="color:var(--text-muted);">No applications yet.</td></tr>`;
-            return;
-          }
-
-          // 3. Render rows (reputation fetched per volunteer)
-          table.innerHTML = '';
-          for (const app of applications) {
-            const name       = app.volunteer?.profile?.name || app.volunteer?.username || '—';
-            const email      = app.volunteer?.email || '—';
-            const volunteerId = app.volunteer?._id || app.volunteerId || '';
-            const eventTitle = app._eventTitle;
-            const roleTitle  = app.role?.title || app.roleTitle || '—';
-            const status     = app.status || 'pending';
-
-            const statusClass = status === 'approved'
-              ? 'text-green-400'
-              : status === 'rejected'
-                ? 'text-red-400'
-                : 'text-yellow-400';
-
-            const actionBtn = status === 'pending'
-              ? `<button onclick="approveApp('${app._id}', this)" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/40 text-green-400 border border-green-500/30 rounded text-xs mr-1">Approve</button>`
-              : '';
-            const profileLink = volunteerId
-              ? `<a href="/profile?id=${volunteerId}" class="px-3 py-1 bg-white/10 hover:bg-white/20 border border-white/20 rounded text-xs" style="color:var(--text-primary);">View Profile</a>`
-              : '';
-
-            const tr = document.createElement('tr');
-            tr.className = 'border-b hover:opacity-90 transition-colors'; tr.style.cssText = 'border-color:var(--card-border);';
-            tr.innerHTML = `
-              <td class="px-4 py-4 font-bold" style="color:var(--text-primary);">${name}</td>
-              <td class="px-4 py-4" style="color:var(--text-secondary);">${email}</td>
-              <td class="px-4 py-4" style="color:var(--text-secondary);">${eventTitle}</td>
-              <td class="px-4 py-4" style="color:var(--text-secondary);">${roleTitle}</td>
-              <td class="px-4 py-4" id="rep-${app._id}"><span class="opacity-40 text-xs">…</span></td>
-              <td class="px-4 py-4 font-bold ${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</td>
-              <td class="px-4 py-4">${actionBtn}${profileLink}</td>
-            `;
-            table.appendChild(tr);
-
-            // Fetch reputation async per volunteer
-            if (volunteerId) {
-              fetchReputation(volunteerId).then(rep => {
-                const cell = document.getElementById(`rep-${app._id}`);
-                if (cell) cell.innerHTML = buildRepCell(rep);
-              });
-            }
-          }
-        } catch (err) {
-          console.error('Failed to load applications:', err);
-          table.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-red-400 italic">Failed to load applications.</td></tr>`;
-        }
-      }
-
-      // Approve application handler
-      window.approveApp = async function(appId, btn) {
-        const token = localStorage.getItem('token');
-        try {
-          btn.disabled = true;
-          btn.textContent = '…';
-          const res = await fetch(`/api/applications/${appId}/approve`, {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          if (!res.ok) throw new Error('Failed');
-          // Update status cell in the same row
-          const row = btn.closest('tr');
-          const statusCell = row.querySelectorAll('td')[5];
-          statusCell.className = 'px-4 py-4 font-bold text-green-400';
-          statusCell.textContent = 'Approved';
-          btn.remove();
-        } catch {
-          btn.disabled = false;
-          btn.textContent = 'Approve';
-          alert('Failed to approve application.');
-        }
-      };
-
-      loadApplications();
-
-      // ── Dashboard Stats ──────────────────────────────────────
+      loadDashboardStats();
       async function loadDashboardStats() {
         const token = localStorage.getItem('token');
         if (!token) return;

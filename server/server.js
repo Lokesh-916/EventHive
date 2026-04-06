@@ -48,7 +48,6 @@ const applicationRoutes = require('./routes/applications');
 const incidentRoutes = require('./routes/incidents');
 const organizerRoutes = require('./routes/organizer');
 const offerRoutes = require('./routes/offers');
-
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/applications', applicationRoutes);

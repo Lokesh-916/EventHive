@@ -9,7 +9,7 @@ const { protect, authorize } = require('../middleware/auth');
 // @access  Private (Volunteer)
 router.post('/', protect, authorize('volunteer'), async (req, res) => {
   try {
-    const { eventId, roleId, coverLetter } = req.body;
+    const { eventId, roleId, roleName, coverLetter } = req.body;
     
     // Get snapshot of user skills/exp
     const user = await User.findById(req.user.id);
@@ -23,6 +23,7 @@ router.post('/', protect, authorize('volunteer'), async (req, res) => {
       eventId,
       volunteerId: req.user.id,
       roleId,
+      roleName: roleName || roleId,
       coverLetter,
       volunteerSnapshot
     });
@@ -56,7 +57,8 @@ router.get('/my-applications', protect, authorize('volunteer'), async (req, res)
 router.get('/event/:eventId', protect, authorize('organizer'), async (req, res) => {
   try {
     const applications = await Application.find({ eventId: req.params.eventId })
-                                        .populate('volunteerId', 'profile.fullName profile.skills profile.profilePic email');
+                                        .populate('volunteerId', 'profile.fullName profile.skills profile.profilePic email')
+                                        .populate('eventId', 'volunteerRoles');
     res.status(200).json({ success: true, count: applications.length, data: applications });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
