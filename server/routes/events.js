@@ -30,6 +30,18 @@ router.post('/', protect, authorize('organizer'), upload.single('banner'), async
   }
 });
 
+// @route   GET /api/events/my
+// @desc    Get events created by the logged-in organizer
+// @access  Private (Organizer)
+router.get('/my', protect, authorize('organizer'), async (req, res) => {
+  try {
+    const events = await Event.find({ organizerId: req.user.id }).sort({ createdAt: -1 });
+    res.status(200).json({ success: true, count: events.length, data: events });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // @route   GET /api/events
 // @desc    Get all events
 // @access  Public
