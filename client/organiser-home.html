@@ -59,7 +59,7 @@
 
   <!-- Consistent Background Image -->
   <div class="fixed inset-0 z-[-1]">
-    <img src="public/images/dark.avif" alt="Background" class="w-full h-full object-cover">
+    <img id="bgImage" src="public/images/dark.avif" alt="Background" class="w-full h-full object-cover">
   </div>
 
   <!-- NAVBAR -->
@@ -198,7 +198,7 @@
     </section>
 
     <!-- WHY EVENTHIVE / INFO SECTION -->
-    <section class="bg-gradient-to-r justify-center from-blue-900/40 to-[#0A0F14]/80 backdrop-blur-[32px] border border-blue-500/20 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2.5rem] p-10">
+    <section class="bg-[#0A0F14]/85 backdrop-blur-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2.5rem] p-10">
       <div class="mb-10 text-center">
         <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy'] text-white">Why Organize with EventHive?</h2>
       </div>
@@ -234,7 +234,16 @@
     document.addEventListener('click', (e) => {
       if (!dropdown.contains(e.target) && e.target !== avatarBtn) dropdown.classList.remove('open');
     });
-    document.getElementById('themeToggle').checked = true; // always dark on this page
+    // ── Theme toggle ──
+    const bgImage = document.getElementById('bgImage');
+    const themeToggle = document.getElementById('themeToggle');
+    function applyTheme(dark) {
+      bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
+      themeToggle.checked = dark;
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    applyTheme(localStorage.getItem('theme') !== 'light');
+    themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
 
     // ── Load organizer name into dropdown ──
     (async function() {
