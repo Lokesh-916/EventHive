@@ -1,3 +1,6 @@
+const dns = require('node:dns');
+dns.setServers(['1.1.1.1', '8.8.8.8']);
+
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -47,6 +50,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/incidents', incidentRoutes);
+app.use('/api/reputation', require('./routes/reputation'));
 
 // Static file setup for uploads and client
 app.use('/uploads', express.static(path.join(__dirname, '../client/public/uploads')));
@@ -87,6 +91,10 @@ app.get('/organiser-home', (req, res) => {
 
 app.get('/organiser', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/organiser.html'));
+});
+
+app.get('/profile', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/profile.html'));
 });
 
 // Generic 404 handler for API vs Front-end

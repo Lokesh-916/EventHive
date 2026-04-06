@@ -966,6 +966,11 @@ window.handleAvatarUpload = function(input) {
 
     updateNavbar(CURRENT_USER);
     renderProfile(CURRENT_USER);
+
+    // Load reputation badge section for volunteers
+    if (CURRENT_USER.role === 'volunteer' && typeof loadReputationSection === 'function') {
+      loadReputationSection(CURRENT_USER._id);
+    }
   } catch (err) {
     renderError('Unable to connect to the server. Please try again later.');
   }

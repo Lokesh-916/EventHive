@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+const badgeSchema = new mongoose.Schema({
+  badgeId:   { type: String, required: true },
+  awardedAt: { type: Date, default: Date.now },
+  eventId:   { type: mongoose.Schema.Types.ObjectId, ref: 'Event', default: null }
+}, { _id: false });
+
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   username: { type: String, required: true },
@@ -35,6 +41,19 @@ const userSchema = new mongoose.Schema({
     },
     location: {
       city: String, state: String, country: String, coordinates: [Number]
+    }
+  },
+  reputation: {
+    xp:              { type: Number, default: 0 },
+    rank:            { type: String, default: 'Newcomer' },
+    eventsCompleted: { type: Number, default: 0 },
+    badges: {
+      type: [badgeSchema],
+      default: [],
+      validate: {
+        validator: function(arr) { return arr.length <= 50; },
+        message: 'Badge array exceeds maximum of 50 entries'
+      }
     }
   }
 }, { timestamps: true });

@@ -1,0 +1,41 @@
+const express = require('express');
+const router = express.Router();
+const User = require('../models/User');
+const { BADGES } = require('../services/badgeCatalog');
+const { protect } = require('../middleware/auth');
+
+// @route   GET /api/reputation/catalog
+// @desc    Get full badge catalog
+// @access  Public
+router.get('/catalog', (req, res) => {
+  res.status(200).json({ badges: BADGES });
+});
+
+// @route   GET /api/reputation/:volunteerId
+// @desc    Get volunteer reputation profile
+// @access  Private (any authenticated role)
+router.get('/:volunteerId', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.volunteerId).select(
+      'role reputation profile.fullName profile.profilePic profile.skills'
+    );
+
+    if (!user || user.role !== 'volunteer') {
+      return res.status(404).json({ message: 'Volunteer not found' });
+    }
+
+    const { xp, rank, eventsCompleted, badges } = user.reputation;
+    const response = {
+      xp, rank, eventsCompleted, badges,
+      fullName: user.profile.fullName,
+      profilePic: user.profile.profilePic,
+      skills: user.profile.skills,
+    };
+
+    res.status(200).json(response);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+module.exports = router;

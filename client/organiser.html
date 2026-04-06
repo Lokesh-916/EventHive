@@ -8,8 +8,111 @@
   <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/styles/output.css">
+
+  <style>
+    /* ── Rank label colour classes (mirrors profile.html) ── */
+    .rank-newcomer    { background-color:#f1f5f9; color:#475569; border:1px solid #cbd5e1; }
+    .rank-rising-star { background-color:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; }
+    .rank-reliable    { background-color:#e6f4f4; color:#439093; border:1px solid #439093; }
+    .rank-veteran     { background-color:#ede9fe; color:#7c3aed; border:1px solid #c4b5fd; }
+    .rank-elite       { background-color:#fffbeb; color:#b45309; border:1px solid #fcd34d; }
+    .rank-legend      { background:linear-gradient(135deg,#fff1f2,#fffbeb); color:#be123c; border:1px solid #fda4af; }
+
+    .rank-chip {
+      display: inline-block;
+      padding: 0.15rem 0.55rem;
+      border-radius: 9999px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* ── Inline badge icons in table ── */
+    .rep-badge-icon {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      vertical-align: middle;
+    }
+
+    /* ── Reputation cell — clickable ── */
+    .rep-cell {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .rep-cell:hover .rank-chip { opacity: 0.85; }
+
+    /* ── Reputation detail modal ── */
+    #rep-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(6px);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    #rep-modal-backdrop.open { display: flex; }
+
+    #rep-modal {
+      background: #0f1923;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 1.5rem;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.7);
+      width: 90%;
+      max-width: 480px;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 1.75rem;
+      position: relative;
+      color: #fff;
+    }
+    #rep-modal::-webkit-scrollbar { width: 4px; }
+    #rep-modal::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+    #rep-modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    #rep-modal-close:hover { background: rgba(255,255,255,0.1); }
+
+    /* Badge rows inside modal */
+    .modal-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .modal-badge-row:last-child { border-bottom: none; }
+    .modal-badge-icon { width: 28px; height: 28px; flex-shrink: 0; }
+    .modal-badge-icon.unearned { opacity: 0.3; filter: grayscale(100%); }
+    .modal-badge-name { font-size: 0.8rem; font-weight: 700; color: #fff; }
+    .modal-badge-desc { font-size: 0.7rem; color: rgba(255,255,255,0.5); margin-top: 0.1rem; }
+  </style>
 </head>
 <body class="bg-[#0A0F14] text-white font-['Inter'] min-h-screen relative overflow-x-hidden">
+
+  <!-- Hidden SVG sprite — JS injects badge <symbol> elements here -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute;overflow:hidden;">
+    <defs id="badge-sprite"></defs>
+  </svg>
 
   <!-- Consistent Background Image -->
   <div class="fixed inset-0 z-[-1]">
@@ -127,6 +230,7 @@
               <th class="px-4 py-4">Status</th>
               <th class="px-4 py-4">Assigned Event</th>
               <th class="px-4 py-4">Role</th>
+              <th class="px-4 py-4">Reputation</th>
               <th class="px-4 py-4">Action</th>
             </tr>
           </thead>
@@ -161,12 +265,190 @@
     <p>&copy; 2026 EventHive. All rights reserved.</p>
   </footer>
 
+  <!-- ── Reputation Detail Modal ── -->
+  <div id="rep-modal-backdrop" role="dialog" aria-modal="true" aria-label="Volunteer reputation detail">
+    <div id="rep-modal">
+      <button id="rep-modal-close" aria-label="Close">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+
+      <!-- Header: name + rank -->
+      <div class="mb-4 pr-8">
+        <h2 id="rep-modal-name" class="text-xl font-bold text-white mb-1">—</h2>
+        <span id="rep-modal-rank" class="rank-chip rank-newcomer">Newcomer</span>
+      </div>
+
+      <!-- Stats row -->
+      <div class="flex gap-6 mb-5 text-sm">
+        <div>
+          <div class="text-white/40 text-xs uppercase tracking-wider mb-0.5">XP</div>
+          <div id="rep-modal-xp" class="font-bold text-white">0</div>
+        </div>
+        <div>
+          <div class="text-white/40 text-xs uppercase tracking-wider mb-0.5">Events</div>
+          <div id="rep-modal-events" class="font-bold text-white">0</div>
+        </div>
+      </div>
+
+      <!-- Badges list -->
+      <div class="text-xs uppercase tracking-wider text-white/40 mb-3">Badges</div>
+      <div id="rep-modal-badges">
+        <!-- rows injected by JS -->
+      </div>
+    </div>
+  </div>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      /* ── Rank helpers ── */
+      var RANK_CLASS = {
+        'Newcomer':    'rank-newcomer',
+        'Rising Star': 'rank-rising-star',
+        'Reliable':    'rank-reliable',
+        'Veteran':     'rank-veteran',
+        'Elite':       'rank-elite',
+        'Legend':      'rank-legend',
+      };
+
+      /* ── Badge catalog (loaded once on page init) ── */
+      var badgeCatalog = [];
+
+      function injectSvgSprite(catalog) {
+        var sprite = document.getElementById('badge-sprite');
+        if (!sprite) return;
+        var html = '';
+        for (var i = 0; i < catalog.length; i++) {
+          var b = catalog[i];
+          html += '<symbol id="badge-' + b.id + '" viewBox="0 0 32 32">' + b.svgPath + '</symbol>';
+        }
+        sprite.innerHTML = html;
+      }
+
+      function loadBadgeCatalog() {
+        return fetch('/api/reputation/catalog')
+          .then(function (res) { return res.ok ? res.json() : Promise.reject(res.status); })
+          .then(function (data) {
+            badgeCatalog = data.badges || data;
+            injectSvgSprite(badgeCatalog);
+          })
+          .catch(function (err) { console.warn('Could not load badge catalog:', err); });
+      }
+
+      /* ── Fetch reputation for a single volunteer ── */
+      function fetchReputation(volunteerId) {
+        var token = localStorage.getItem('token');
+        var headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+        return fetch('/api/reputation/' + volunteerId, { headers: headers })
+          .then(function (res) { return res.ok ? res.json() : null; })
+          .catch(function () { return null; });
+      }
+
+      /* ── Build the reputation cell HTML ── */
+      function buildRepCell(rep, volunteerId) {
+        if (!rep) {
+          return '<span class="text-white/30 text-xs">—</span>';
+        }
+        var rank = rep.rank || 'Newcomer';
+        var rankClass = RANK_CLASS[rank] || 'rank-newcomer';
+        var earnedBadges = rep.badges || [];
+
+        // Up to 3 badge icons
+        var badgeIcons = '';
+        var shown = 0;
+        for (var i = 0; i < earnedBadges.length && shown < 3; i++) {
+          var bid = earnedBadges[i].badgeId;
+          badgeIcons += '<svg class="rep-badge-icon" aria-label="' + bid + '">'
+            + '<use href="#badge-' + bid + '"></use></svg>';
+          shown++;
+        }
+
+        return '<div class="rep-cell" data-volunteer-id="' + volunteerId + '">'
+          + '<span class="rank-chip ' + rankClass + '">' + rank + '</span>'
+          + badgeIcons
+          + '</div>';
+      }
+
+      /* ── Modal open/close ── */
+      var modalBackdrop = document.getElementById('rep-modal-backdrop');
+      var modalClose = document.getElementById('rep-modal-close');
+
+      function openRepModal(rep, catalog) {
+        var rank = rep.rank || 'Newcomer';
+        var rankClass = RANK_CLASS[rank] || 'rank-newcomer';
+
+        document.getElementById('rep-modal-name').textContent = rep.fullName || 'Volunteer';
+        var rankEl = document.getElementById('rep-modal-rank');
+        rankEl.textContent = rank;
+        // Reset rank classes
+        Object.values(RANK_CLASS).forEach(function (c) { rankEl.classList.remove(c); });
+        rankEl.classList.add(rankClass);
+
+        document.getElementById('rep-modal-xp').textContent = (rep.xp || 0) + ' XP';
+        document.getElementById('rep-modal-events').textContent = (rep.eventsCompleted || 0) + ' completed';
+
+        // Render badge list
+        var earnedIds = {};
+        (rep.badges || []).forEach(function (b) { earnedIds[b.badgeId] = true; });
+
+        var badgesContainer = document.getElementById('rep-modal-badges');
+        badgesContainer.innerHTML = '';
+
+        var list = catalog.length ? catalog : (rep.badges || []).map(function (b) {
+          return { id: b.badgeId, name: b.badgeId, description: '' };
+        });
+
+        list.forEach(function (badge) {
+          var isEarned = !!earnedIds[badge.id];
+          var row = document.createElement('div');
+          row.className = 'modal-badge-row';
+
+          var svgEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          svgEl.setAttribute('class', 'modal-badge-icon' + (isEarned ? '' : ' unearned'));
+          svgEl.setAttribute('aria-label', badge.name || badge.id);
+          var useEl = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+          useEl.setAttribute('href', '#badge-' + badge.id);
+          svgEl.appendChild(useEl);
+
+          var info = document.createElement('div');
+          var nameEl = document.createElement('div');
+          nameEl.className = 'modal-badge-name';
+          nameEl.textContent = badge.name || badge.id;
+          var descEl = document.createElement('div');
+          descEl.className = 'modal-badge-desc';
+          descEl.textContent = badge.criterionLabel || badge.description || '';
+          info.appendChild(nameEl);
+          info.appendChild(descEl);
+
+          row.appendChild(svgEl);
+          row.appendChild(info);
+          badgesContainer.appendChild(row);
+        });
+
+        modalBackdrop.classList.add('open');
+      }
+
+      if (modalClose) {
+        modalClose.addEventListener('click', function () {
+          modalBackdrop.classList.remove('open');
+        });
+      }
+      if (modalBackdrop) {
+        modalBackdrop.addEventListener('click', function (e) {
+          if (e.target === modalBackdrop) modalBackdrop.classList.remove('open');
+        });
+      }
+
+      /* ── Volunteer data + table logic ── */
       let volunteers = [
         { name: "Arjun Kumar", email: "arjun@email.com", status: "Available", event: "-", role: "-" },
         { name: "Meena Raj", email: "meena@email.com", status: "Available", event: "-", role: "-" }
       ];
+
+      // Cache for reputation data keyed by volunteer index
+      var repCache = {};
 
       const assignForm = document.getElementById("assignForm");
       const selectVolunteer = document.getElementById("selectVolunteer");
@@ -185,6 +467,11 @@
 
           let statusClass = volunteer.status === "Available" ? "text-green-400" : "text-blue-400";
 
+          // Build reputation cell — use cached data if available
+          var repHtml = repCache[index]
+            ? buildRepCell(repCache[index], volunteer._id || String(index))
+            : '<span class="text-white/30 text-xs italic">loading…</span>';
+
           table.innerHTML += `
             <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
               <td class="px-4 py-4 font-bold text-white">${volunteer.name}</td>
@@ -192,11 +479,46 @@
               <td class="px-4 py-4 font-bold ${statusClass}">${volunteer.status}</td>
               <td class="px-4 py-4 opacity-70">${volunteer.event}</td>
               <td class="px-4 py-4 opacity-70">${volunteer.role}</td>
+              <td class="px-4 py-4" id="rep-cell-${index}">${repHtml}</td>
               <td class="px-4 py-4">
                 <button class="px-3 py-1 bg-red-500/20 hover:bg-red-500/40 text-red-400 border border-red-500/30 rounded text-xs" onclick="removeAssignment(${index})">Remove</button>
               </td>
             </tr>
           `;
+        });
+
+        // Attach click handlers to rep cells
+        volunteers.forEach(function (volunteer, index) {
+          var cell = document.getElementById('rep-cell-' + index);
+          if (!cell) return;
+          cell.addEventListener('click', function () {
+            var rep = repCache[index];
+            if (!rep) return;
+            openRepModal(rep, badgeCatalog);
+          });
+        });
+      }
+
+      /* ── Fetch reputation for all volunteers ── */
+      function fetchAllReputations() {
+        volunteers.forEach(function (volunteer, index) {
+          // Only fetch if volunteer has a real _id from the API
+          if (!volunteer._id) return;
+          fetchReputation(volunteer._id).then(function (data) {
+            if (!data) return;
+            var rep = data.reputation || data;
+            if (data.fullName && !rep.fullName) rep.fullName = data.fullName;
+            repCache[index] = rep;
+            // Update just this cell without re-rendering the whole table
+            var cell = document.getElementById('rep-cell-' + index);
+            if (cell) {
+              cell.innerHTML = buildRepCell(rep, volunteer._id);
+              cell.style.cursor = 'pointer';
+              cell.addEventListener('click', function () {
+                openRepModal(rep, badgeCatalog);
+              });
+            }
+          });
         });
       }
 
@@ -228,8 +550,12 @@
         loadVolunteers();
       };
 
-      loadVolunteers();
-      
+      // Load badge catalog first, then render table
+      loadBadgeCatalog().then(function () {
+        loadVolunteers();
+        fetchAllReputations();
+      });
+
       document.getElementById('logoutBtn').addEventListener('click', (e) => {
         e.preventDefault();
         localStorage.removeItem('token');
