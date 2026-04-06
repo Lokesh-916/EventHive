@@ -118,4 +118,56 @@ router.get('/profile', protect, async (req, res) => {
   }
 });
 
+// @route   PUT /api/auth/profile
+// @desc    Update user profile
+// @access  Private
+router.put('/profile', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ success: false, error: 'User not found' });
+
+    const { username, profile } = req.body;
+
+    // Update username if provided and not taken
+    if (username && username !== user.username) {
+      const existing = await User.findOne({ username });
+      if (existing) return res.status(400).json({ success: false, error: 'Username already taken' });
+      user.username = username;
+    }
+
+    // Build a flat $set map using dot-notation so nested fields
+    // (e.g. profile.location.city) are merged rather than replaced.
+    if (profile && typeof profile === 'object') {
+      const setMap = {};
+
+      function flatten(obj, prefix) {
+        Object.keys(obj).forEach(key => {
+          const val  = obj[key];
+          const path = prefix ? `${prefix}.${key}` : key;
+          // Recurse into plain objects (but NOT arrays or null)
+          if (val !== null && typeof val === 'object' && !Array.isArray(val) && !(val instanceof Date)) {
+            flatten(val, path);
+          } else {
+            setMap[`profile.${path}`] = val;
+          }
+        });
+      }
+
+      flatten(profile, '');
+
+      const updated = await User.findByIdAndUpdate(
+        req.user.id,
+        { $set: { ...setMap, ...(username ? { username } : {}) } },
+        { new: true, runValidators: true }
+      );
+      return res.status(200).json({ success: true, data: updated });
+    }
+
+    await user.save();
+    res.status(200).json({ success: true, data: user });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = router;
