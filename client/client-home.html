@@ -14,6 +14,10 @@
       --bg-overlay: rgba(255,255,255,0.72);
       --section-bg: rgba(255,255,255,0.6);
       --card-bg: rgba(255,255,255,0.5);
+    /* ====== THEME VARIABLES ====== */
+    :root {
+      --bg-overlay: rgba(255,255,255,0.72);
+      --section-bg: rgba(255,255,255,0.6);
       --card-border: rgba(0,0,0,0.08);
       --text-primary: #1a1a2e;
       --text-secondary: rgba(20,20,40,0.6);
@@ -28,6 +32,12 @@
       --dropdown-hover: rgba(0,0,0,0.05);
       --shadow: 0 8px 32px rgba(0,0,0,0.1);
       --footer-text: rgba(20,20,40,0.4);
+      --shadow: 0 8px 32px rgba(0,0,0,0.1);
+      --dropdown-bg: rgba(255,255,255,0.92);
+      --dropdown-border: rgba(0,0,0,0.1);
+      --dropdown-hover: rgba(0,0,0,0.05);
+      --footer-text: rgba(20,20,40,0.4);
+      --input-bg: rgba(255,255,255,0.5);
     }
     [data-theme="dark"] {
       --bg-overlay: rgba(10,15,20,0.80);
@@ -37,6 +47,10 @@
       --text-primary: #ffffff;
       --text-secondary: rgba(255,255,255,0.6);
       --text-muted: rgba(255,255,255,0.35);
+      --card-border: rgba(255,255,255,0.08);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255,255,255,0.6);
+      --text-muted: rgba(255,255,255,0.4);
       --nav-bg: rgba(15,15,35,0.65);
       --nav-border: rgba(255,255,255,0.12);
       --article-bg: rgba(255,255,255,0.05);
@@ -50,12 +64,20 @@
     }
     * { box-sizing: border-box; }
     body { font-family: 'Inter', sans-serif; min-height: 100vh; color: var(--text-primary); margin: 0; overflow-x: hidden; }
+      --shadow: 0 20px 50px rgba(0,0,0,0.6);
+      --dropdown-bg: rgba(20,25,35,0.96);
+      --dropdown-border: rgba(255,255,255,0.12);
+      --dropdown-hover: rgba(255,255,255,0.08);
+      --footer-text: rgba(255,255,255,0.4);
+      --input-bg: rgba(255,255,255,0.06);
+    }
+
     /* Modal backdrop */
     .modal-backdrop { backdrop-filter: blur(12px); background: rgba(0,0,0,0.7); }
     /* Status badges */
     .badge-pending   { background: rgba(234,179,8,0.2);   color:#facc15; border:1px solid rgba(234,179,8,0.3); }
     .badge-accepted  { background: rgba(59,130,246,0.2);  color:#60a5fa; border:1px solid rgba(59,130,246,0.3); }
-    .badge-rejected  { background: rgba(239,68,68,0.2);   color:#f87171; border:1px solid rgba(239,68,68,0.3); }
+    .badge-rejected  { background: rgba(239,68,68,0.2);   color:#f87171; border:1px solid rgba(234,179,8,0.3); }
     .badge-completed { background: rgba(16,185,129,0.2);  color:#34d399; border:1px solid rgba(16,185,129,0.3); }
     input:focus, select:focus, textarea:focus { outline: none; border-color: rgba(59,130,246,0.5); }
     /* Profile dropdown */
@@ -83,12 +105,60 @@
   </style>
 </head>
 <body class="font-['Inter'] min-h-screen relative overflow-x-hidden">
+    /* Profile Dropdown */
+    .profile-wrapper { position: relative; }
+    .profile-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 2px solid var(--card-border); cursor: pointer;
+      background: var(--article-bg);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .profile-avatar:hover { border-color: var(--text-primary); box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
+    .profile-avatar svg, .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-dropdown {
+      position: absolute; top: calc(100% + 12px); right: 0; min-width: 200px;
+      background: var(--dropdown-bg); border: 1px solid var(--dropdown-border);
+      border-radius: 1rem; box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+      backdrop-filter: blur(20px); padding: 0.5rem;
+      opacity: 0; pointer-events: none; transform: translateY(-8px);
+      transition: opacity 0.2s ease, transform 0.2s ease; z-index: 100;
+    }
+    .profile-dropdown.open { opacity: 1; pointer-events: all; transform: translateY(0); }
+    .dropdown-header { padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--dropdown-border); margin-bottom: 0.4rem; }
+    .dropdown-header p { margin: 0; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); }
+    .dropdown-header span { font-size: 0.65rem; color: var(--text-muted); }
+    .dropdown-item {
+      display: flex; align-items: center; gap: 0.65rem;
+      padding: 0.6rem 0.85rem; border-radius: 0.6rem;
+      font-size: 0.8rem; color: var(--text-primary); cursor: pointer;
+      transition: background 0.2s; text-decoration: none; user-select: none;
+    }
+    .dropdown-item:hover { background: var(--dropdown-hover); }
+    .dropdown-item svg { flex-shrink: 0; opacity: 0.6; }
+    .dropdown-item.danger { color: #e53e3e; }
+    .theme-toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.5rem 0.85rem; border-radius: 0.6rem; cursor: pointer; transition: background 0.2s;
+    }
+    .theme-toggle-row:hover { background: var(--dropdown-hover); }
+    .theme-toggle-label { display: flex; align-items: center; gap: 0.65rem; font-size: 0.8rem; color: var(--text-primary); }
+    .theme-toggle-label svg { opacity: 0.6; }
+    .toggle-switch { position: relative; width: 36px; height: 20px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; border-radius: 20px; background: rgba(0,0,0,0.15); transition: background 0.3s; cursor: pointer; }
+    .toggle-slider:before { content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--text-primary); top: 3px; left: 3px; transition: transform 0.3s; }
+    input:checked + .toggle-slider { background: rgba(0,0,0,0.35); }
+    input:checked + .toggle-slider:before { transform: translateX(16px); }
+  </style>
+</head>
+<body class="font-['Inter'] min-h-screen relative overflow-x-hidden" style="color:var(--text-primary);">
 
   <!-- Background -->
   <div class="fixed inset-0 z-[-2]">
     <img id="bgImage" src="public/images/dark.avif" alt="Background" class="w-full h-full object-cover">
   </div>
-  <div class="fixed inset-0 z-[-1]" style="background:var(--bg-overlay);transition:background .4s;"></div>
+  <div class="bg-overlay" style="position:fixed;inset:0;z-index:-1;background:var(--bg-overlay);transition:background 0.4s ease;"></div>
 
   <!-- NAVBAR -->
   <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center backdrop-blur-[18px] rounded-[50px] z-50 border shadow-[0_18px_40px_rgba(0,0,0,0.5)]" style="background:var(--nav-bg);border-color:var(--nav-border);">
@@ -105,6 +175,11 @@
       <button onclick="window.location.href='/home'" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all" style="color:var(--text-primary);">Events</button>
       <div class="profile-wrapper">
         <div class="profile-avatar" id="profileAvatarBtn">
+    </ul>
+    <div class="flex gap-4 items-center">
+      <button onclick="window.location.href='/home'" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all" style="color:var(--text-primary);">Events Home</button>
+      <li class="profile-wrapper" style="list-style:none;">
+        <div class="profile-avatar" id="profileAvatarBtn" title="Account options">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);">
             <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/>
           </svg>
@@ -124,6 +199,36 @@
           </div>
         </div>
       </div>
+          <div class="dropdown-header">
+            <p id="dropdownName">Client</p>
+            <span id="dropdownRole">Client</span>
+          </div>
+          <div class="theme-toggle-row">
+            <div class="theme-toggle-label">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+              </svg>
+              Dark Mode
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="themeToggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <a class="dropdown-item" href="/support">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Support
+          </a>
+          <div class="dropdown-item danger" id="logoutBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            Logout
+          </div>
+        </div>
+      </li>
     </div>
   </nav>
 
@@ -566,11 +671,45 @@
       }
     });
 
-    // ── Logout ───────────────────────────────────────────────────
-    document.getElementById('logout-btn').addEventListener('click', () => {
-      localStorage.removeItem('token');
-      window.location.href = '/';
+    // ── Profile Avatar Dropdown ──
+    const avatarBtn = document.getElementById('profileAvatarBtn');
+    const dropdown  = document.getElementById('profileDropdown');
+    avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('open'); });
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target) && e.target !== avatarBtn) dropdown.classList.remove('open');
     });
+
+    // ── Load client name into dropdown ──
+    (async function() {
+      if (!token) return;
+      try {
+        const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok) return;
+        const data = await res.json();
+        const u = data.data;
+        const name = u.profile?.clientName || u.username;
+        if (name) document.getElementById('dropdownName').textContent = name;
+        const pic = u.profile?.profilePic;
+        if (pic) {
+          const img = document.createElement('img');
+          img.src = pic; img.alt = 'Profile';
+          img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+          avatarBtn.innerHTML = ''; avatarBtn.appendChild(img);
+        }
+      } catch(e) {}
+    })();
+
+    // ── Theme toggle ──
+    const bgImage = document.getElementById('bgImage');
+    const themeToggle = document.getElementById('themeToggle');
+    function applyTheme(dark) {
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
+      themeToggle.checked = dark;
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    applyTheme(localStorage.getItem('theme') !== 'light');
+    themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
 
     // ── Init ─────────────────────────────────────────────────────
     loadOrganizers();

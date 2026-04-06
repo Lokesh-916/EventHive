@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
@@ -596,38 +596,28 @@
         const events = data.data || [];
         if (!events.length) { empty.classList.remove('hidden'); return; }
 
-        const INITIAL_SHOW = 5;
-        function renderEvents(showAll) {
-          const visible = showAll ? events : events.slice(0, INITIAL_SHOW);
-          list.innerHTML = visible.map(ev => {
-            const start = ev.schedule?.start ? new Date(ev.schedule.start).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '—';
-            const statusColor = ev.status === 'ongoing' ? 'text-green-400 border-green-500/30 bg-green-500/10'
-              : ev.status === 'completed' ? 'text-white/40 border-white/10 bg-white/5'
-              : 'text-blue-400 border-blue-500/30 bg-blue-500/10';
-            return `
-              <div class="rounded-[1.5rem] p-6 flex flex-col sm:flex-row sm:items-center gap-5 transition-colors border" style="background:var(--article-bg);border-color:var(--article-border);">
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-3 mb-1">
-                    <h3 class="font-bold text-base" style="color:var(--text-primary);">${ev.title}</h3>
-                    <span class="px-2 py-0.5 rounded-full text-xs font-bold border ${statusColor}">${ev.status || 'published'}</span>
-                  </div>
-                  <p class="text-xs" style="color:var(--text-muted);">${start}${ev.location?.city ? ' · ' + ev.location.city : ''}</p>
+        list.innerHTML = events.map(ev => {
+          const start = ev.schedule?.start ? new Date(ev.schedule.start).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '—';
+          const statusColor = ev.status === 'ongoing' ? 'text-green-400 border-green-500/30 bg-green-500/10'
+            : ev.status === 'completed' ? 'text-white/40 border-white/10 bg-white/5'
+            : 'text-blue-400 border-blue-500/30 bg-blue-500/10';
+          const isPast = ev.schedule?.end && new Date(ev.schedule.end) < new Date();
+          const overviewBtn = isPast ? '' : `<a href="/event-overview?id=${ev._id}" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 rounded-xl transition-all text-purple-400">Overview</a>`;
+          
+          return `
+            <div class="rounded-[1.5rem] p-6 flex flex-col sm:flex-row sm:items-center gap-5 transition-colors border" style="background:var(--article-bg);border-color:var(--article-border);">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-3 mb-1">
+                  <h3 class="font-bold text-base" style="color:var(--text-primary);">${ev.title}</h3>
+                  <span class="px-2 py-0.5 rounded-full text-xs font-bold border ${statusColor}">${ev.status || 'published'}</span>
                 </div>
-                <a href="/event-info?id=${ev._id}" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all" style="color:var(--text-primary);">View</a>
-                <a href="/organiser?eventId=${ev._id}" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-xl transition-all text-blue-400">Manage</a>
-              </div>`;
-          }).join('');
-
-          if (events.length > INITIAL_SHOW) {
-            const remaining = events.length - INITIAL_SHOW;
-            list.innerHTML += showAll
-              ? `<button onclick="renderEventsToggle(false)" class="w-full py-3 text-xs uppercase tracking-widest font-bold opacity-50 hover:opacity-80 transition-opacity" style="color:var(--text-primary);">Show less ↑</button>`
-              : `<button onclick="renderEventsToggle(true)" class="w-full py-3 text-xs uppercase tracking-widest font-bold opacity-50 hover:opacity-80 transition-opacity" style="color:var(--text-primary);">Show ${remaining} more ↓</button>`;
-          }
-        }
-
-        window.renderEventsToggle = (showAll) => renderEvents(showAll);
-        renderEvents(false);
+                <p class="text-xs" style="color:var(--text-muted);">${start}${ev.location?.city ? ' · ' + ev.location.city : ''}</p>
+              </div>
+              <a href="/event-info?id=${ev._id}" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all" style="color:var(--text-primary);">View</a>
+              <a href="/organiser?eventId=${ev._id}" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-xl transition-all text-blue-400">Manage</a>
+              ${overviewBtn}
+            </div>`;
+        }).join('');
       } catch (e) { empty.classList.remove('hidden'); }
     }
 

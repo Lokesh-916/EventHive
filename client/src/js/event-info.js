@@ -68,6 +68,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- Set page title ---
     document.title = `${ev.title} – EventHive`;
     document.getElementById('pageTitle').textContent = `${ev.title} – EventHive`;
+    const overviewLink = document.getElementById('overview-link');
+    if (overviewLink) overviewLink.href = `/event-overview?id=${eventId}`;
 
     // --- Banner ---
     const bannerHtml = ev.banner

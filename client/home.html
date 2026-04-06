@@ -766,7 +766,7 @@
       return { ongoing, upcoming, past };
     }
 
-    function buildCard(ev) {
+    function buildCard(ev, type) {
       const eventId = ev._id;
       const title = ev.title || 'Untitled Event';
       const tagline = ev.tagline || ev.description || '';
@@ -781,6 +781,10 @@
       const tagChips = tags.map(t => `<span class="event-tag-chip">${t.replace(/^#/, '')}</span>`).join('');
       const metaText = [dateStr, city].filter(Boolean).join(' · ');
 
+      const birdsEyeBtn = type !== 'past'
+        ? `<span onclick="event.preventDefault();event.stopPropagation();window.location.href='/event-overview?id=${eventId}'" style="display:inline-block;margin-top:0.5rem;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:0.25rem 0.7rem;border-radius:9999px;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.3);color:#c084fc;cursor:pointer;">Bird's Eye View</span>`
+        : '';
+
       return `
         <a class="event-card" href="/event-info?id=${eventId}">
           ${imgHtml}
@@ -788,6 +792,7 @@
           <p>${tagline.slice(0, 80)}${tagline.length > 80 ? '…' : ''}</p>
           ${metaText ? `<p style="font-size:0.7rem;opacity:0.5;margin-top:0.35rem;">${metaText}</p>` : ''}
           ${tagChips ? `<div class="event-meta">${tagChips}</div>` : ''}
+          ${birdsEyeBtn}
         </a>`;
     }
 
@@ -800,7 +805,7 @@
 
       // Show max 4 events
       const displayEvents = events.slice(0, 4);
-      grid.innerHTML = displayEvents.map(buildCard).join('');
+      grid.innerHTML = displayEvents.map(ev => buildCard(ev, type)).join('');
 
       // Add "See All" option if there are more than 4
       if (events.length > 4) {
