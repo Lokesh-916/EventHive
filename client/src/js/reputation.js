@@ -357,17 +357,22 @@ function loadReputationSection(volunteerId) {
       '<div class="badge-scroll" id="badge-grid"></div>',
     ].join('');
 
-    // Append after hero (second position) in profileMain
+    // Insert after the Personal Information section (vol-personal)
     var main = document.getElementById('profileMain');
     if (main) {
-      // Insert after the first child (hero section)
-      var firstSection = main.querySelector('.profile-section');
-      if (firstSection && firstSection.nextSibling) {
-        main.insertBefore(section, firstSection.nextSibling);
-      } else if (firstSection) {
-        main.insertBefore(section, firstSection.nextSibling);
-      } else {
+      var personalSection = main.querySelector('#vol-personal');
+      if (personalSection && personalSection.nextSibling) {
+        main.insertBefore(section, personalSection.nextSibling);
+      } else if (personalSection) {
         main.appendChild(section);
+      } else {
+        // fallback: insert after first section
+        var firstSection = main.querySelector('.profile-section');
+        if (firstSection && firstSection.nextSibling) {
+          main.insertBefore(section, firstSection.nextSibling);
+        } else {
+          main.appendChild(section);
+        }
       }
     }
 
