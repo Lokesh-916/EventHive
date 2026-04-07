@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +8,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/styles/output.css">
-
+  <script>
+    (function() {
+      const t = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
   <style>
     /* ====== THEME VARIABLES ====== */
     :root {
@@ -519,13 +524,16 @@
     }
   </style>
 </head>
-<body>
+<body style="background:#0a0f14;">
 
   <!-- Background -->
   <div class="fixed inset-0 z-[-2]">
-    <img id="bgImage" src="public/images/light.jpeg" alt="Background" class="w-full h-full object-cover">
+    <img id="bgImage" src="public/images/dark.avif" alt="Background" class="w-full h-full object-cover">
   </div>
   <div class="bg-overlay"></div>
+  <script>
+    document.getElementById('bgImage').src = (localStorage.getItem('theme') === 'light') ? 'public/images/light.jpeg' : 'public/images/dark.avif';
+  </script>
 
   <!-- NAVBAR -->
   <nav class="navbar">
@@ -645,7 +653,7 @@
     function showUnauth(role) {
       const isIn = role !== 'not-logged-in';
       const labels = { organizer:'Organizer', client:'Client' };
-      document.body.innerHTML = `<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0f14;font-family:Inter,sans-serif;padding:2rem;"><div style="max-width:480px;width:100%;text-align:center;"><div style="width:72px;height:72px;border-radius:50%;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;"><svg xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;color:#f87171;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg></div><h1 style="font-family:Satisfy,cursive;font-size:2rem;color:#fff;margin-bottom:.75rem;">Access Restricted</h1><p style="color:rgba(255,255,255,.5);font-size:.9rem;margin-bottom:.5rem;">${isIn ? `You're logged in as a <strong style="color:rgba(255,255,255,.8);">${labels[role]||role}</strong>, but this page is for <strong style="color:rgba(255,255,255,.8);">Volunteers</strong> only.` : `You need to log in as a <strong style="color:rgba(255,255,255,.8);">Volunteer</strong> to access this page.`}</p><p style="color:rgba(255,255,255,.3);font-size:.75rem;margin-bottom:2rem;">${isIn ? 'Please log out and sign in with your volunteer account.' : 'Please log in with your volunteer account to continue.'}</p><div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">${isIn ? `<button onclick="localStorage.removeItem('token');window.location.href='/register';" style="padding:.75rem 1.5rem;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">Log Out</button>` : ''}<button onclick="window.location.href='/register';" style="padding:.75rem 1.5rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">${isIn ? 'Switch Account' : 'Log In'}</button><button onclick="window.location.href='/';" style="padding:.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">Go Home</button></div></div></div>`;
+      document.body.innerHTML = `<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0f14;font-family:Inter,sans-serif;padding:2rem;"><div style="max-width:480px;width:100%;text-align:center;"><div style="width:72px;height:72px;border-radius:50%;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;"><svg xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;color:#f87171;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg></div><h1 style="font-family:Satisfy,cursive;font-size:2rem;color:#fff;margin-bottom:.75rem;">Access Restricted</h1><p style="color:rgba(255,255,255,.5);font-size:.9rem;margin-bottom:.5rem;">${isIn ? `You're logged in as a <strong style="color:rgba(255,255,255,.8);">${labels[role]||role}</strong>, but this page is for <strong style="color:rgba(255,255,255,.8);">Volunteers</strong> only.` : `You need to log in as a <strong style="color:rgba(255,255,255,.8);">Volunteer</strong> to access this page.`}</p><p style="color:rgba(255,255,255,.3);font-size:.75rem;margin-bottom:2rem;">${isIn ? 'Please log out and sign in with your volunteer account.' : 'Please log in with your volunteer account to continue.'}</p><div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">${isIn ? `<button onclick="localStorage.removeItem('token');window.location.href='/register';" style="padding:.75rem 1.5rem;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">Log Out</button>` : ''}<button onclick="window.location.href='/register';" style="padding:.75rem 1.5rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">${isIn ? 'Switch Account' : 'Log In'}</button><button onclick="window.location.href='/';" style="padding:.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">? Back</button><button onclick="window.location.href='/'" style="padding:.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">Home</button></div></div></div>`;
     }
 
     // ====== SMOOTH SCROLL WITH HIGHLIGHT ======
@@ -676,7 +684,7 @@
     }
 
     // Init theme
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    const savedTheme = localStorage.getItem('theme') || 'dark';
     applyTheme(savedTheme === 'dark');
 
     themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
@@ -47,7 +47,7 @@
       --input-bg: rgba(255,255,255,0.06);
     }
 
-    /* ── Profile Avatar & Dropdown ── */
+    /* -- Profile Avatar & Dropdown -- */
     .profile-wrapper { position: relative; }
 
     .profile-avatar {
@@ -227,19 +227,19 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div class="rounded-[1.5rem] p-6 hover:-translate-y-1 transition-transform border" style="background:var(--article-bg);border-color:var(--article-border);">
           <h3 class="text-sm uppercase tracking-widest mb-2" style="color:var(--text-muted);">Active Events</h3>
-          <p id="stat-active" class="text-4xl font-bold" style="color:var(--text-primary);">—</p>
+          <p id="stat-active" class="text-4xl font-bold" style="color:var(--text-primary);">�</p>
         </div>
         <div class="rounded-[1.5rem] p-6 hover:-translate-y-1 transition-transform border" style="background:var(--article-bg);border-color:var(--article-border);">
           <h3 class="text-sm uppercase tracking-widest mb-2" style="color:var(--text-muted);">Total Volunteers</h3>
-          <p id="stat-volunteers" class="text-4xl font-bold" style="color:var(--text-primary);">—</p>
+          <p id="stat-volunteers" class="text-4xl font-bold" style="color:var(--text-primary);">�</p>
         </div>
         <div class="rounded-[1.5rem] p-6 hover:-translate-y-1 transition-transform border" style="background:var(--article-bg);border-color:var(--article-border);">
           <h3 class="text-sm uppercase tracking-widest mb-2" style="color:var(--text-muted);">Upcoming Events</h3>
-          <p id="stat-upcoming" class="text-4xl font-bold" style="color:var(--text-primary);">—</p>
+          <p id="stat-upcoming" class="text-4xl font-bold" style="color:var(--text-primary);">�</p>
         </div>
         <div class="rounded-[1.5rem] p-6 hover:-translate-y-1 transition-transform border" style="background:var(--article-bg);border-color:var(--article-border);">
           <h3 class="text-sm uppercase tracking-widest mb-2" style="color:var(--text-muted);">Volunteer Requests</h3>
-          <p id="stat-requests" class="text-4xl font-bold text-yellow-400">—</p>
+          <p id="stat-requests" class="text-4xl font-bold text-yellow-400">�</p>
         </div>
       </div>
     </section>
@@ -293,7 +293,7 @@
   </footer>
 
   <script>
-    // ── Auth guard ──
+    // -- Auth guard --
     (async function checkAuth() {
       const token = localStorage.getItem('token');
       if (!token) return showUnauthorized('not-logged-in');
@@ -335,9 +335,13 @@
                 style="padding:0.75rem 1.5rem;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
                 ${isLoggedIn ? 'Switch Account' : 'Log In'}
               </button>
+              <button onclick="history.back();"
+                style="padding:0.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
+                ← Back
+              </button>
               <button onclick="window.location.href='/';"
                 style="padding:0.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
-                Go Home
+                Home
               </button>
             </div>
           </div>
@@ -348,7 +352,7 @@
       const navLogo = document.getElementById('navLogo');
       if (navLogo) navLogo.onclick = () => window.location.href = '/organiser-home';
 
-      // ── Theme toggle ──
+      // -- Theme toggle --
       const bgImage = document.getElementById('bgImage');
       const themeToggle = document.getElementById('themeToggle');
       function applyTheme(dark) {
@@ -360,7 +364,7 @@
       applyTheme(localStorage.getItem('theme') !== 'light');
       themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
 
-      // ── Profile Avatar Dropdown ──
+      // -- Profile Avatar Dropdown --
       const avatarBtn   = document.getElementById('profileAvatarBtn');
       const dropdown    = document.getElementById('profileDropdown');
 
@@ -374,14 +378,14 @@
         }
       });
 
-      // ── Dropdown Logout ──
+      // -- Dropdown Logout --
       document.getElementById('dropdownLogoutBtn').addEventListener('click', () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = '/';
       });
 
-      // ── Load organizer profile into dropdown ──
+      // -- Load organizer profile into dropdown --
       (async function loadProfile() {
         try {
           const cached = JSON.parse(localStorage.getItem('user') || '{}');
@@ -469,7 +473,7 @@
           tbody.innerHTML = events.map(ev => {
             const start = ev.schedule?.start
               ? new Date(ev.schedule.start).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-              : '—';
+              : '�';
             const isLive = ev.status === 'ongoing';
             const isUpcoming = ev.status === 'upcoming' || (ev.schedule?.start && new Date(ev.schedule.start) > now);
             const statusLabel = isLive ? 'Live' : isUpcoming ? 'Upcoming' : (ev.status || 'Published');

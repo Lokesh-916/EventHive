@@ -34,6 +34,14 @@ app.use(helmet({
 }));
 app.use(morgan('dev'));
 
+// Ensure HTML files are served with UTF-8 charset
+app.use((req, res, next) => {
+  if (req.path.endsWith('.html') || !req.path.includes('.')) {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  }
+  next();
+});
+
 // Rate limiting for auth
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
