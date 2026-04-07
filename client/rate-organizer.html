@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rate Organizer - EventHive</title>
+  <meta name="description" content="Rate your event organizer on EventHive after your event.">
+  <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
+  <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/styles/output.css">
+  <style>
+    /* ====== THEME VARIABLES ====== */
+    :root {
+      --bg-overlay: rgba(255,255,255,0.72);
+      --section-bg: rgba(255,255,255,0.6);
+      --card-border: rgba(0,0,0,0.08);
+      --text-primary: #1a1a2e;
+      --text-secondary: rgba(20,20,40,0.6);
+      --text-muted: rgba(20,20,40,0.4);
+      --nav-bg: rgba(255,255,255,0.65);
+      --nav-border: rgba(0,0,0,0.08);
+      --article-bg: rgba(255,255,255,0.5);
+      --article-border: rgba(0,0,0,0.06);
+      --shadow: 0 8px 32px rgba(0,0,0,0.1);
+      --dropdown-bg: rgba(255,255,255,0.92);
+      --dropdown-border: rgba(0,0,0,0.1);
+      --dropdown-hover: rgba(0,0,0,0.05);
+      --footer-text: rgba(20,20,40,0.4);
+      --input-bg: rgba(255,255,255,0.5);
+    }
+    [data-theme="dark"] {
+      --bg-overlay: rgba(10,15,20,0.80);
+      --section-bg: rgba(10,15,20,0.85);
+      --card-border: rgba(255,255,255,0.08);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255,255,255,0.6);
+      --text-muted: rgba(255,255,255,0.4);
+      --nav-bg: rgba(15,15,35,0.65);
+      --nav-border: rgba(255,255,255,0.12);
+      --article-bg: rgba(255,255,255,0.05);
+      --article-border: rgba(255,255,255,0.08);
+      --shadow: 0 20px 50px rgba(0,0,0,0.6);
+      --dropdown-bg: rgba(20,25,35,0.96);
+      --dropdown-border: rgba(255,255,255,0.12);
+      --dropdown-hover: rgba(255,255,255,0.08);
+      --footer-text: rgba(255,255,255,0.4);
+      --input-bg: rgba(255,255,255,0.06);
+    }
+
+    /* Modal backdrop */
+    .modal-backdrop { backdrop-filter: blur(12px); background: rgba(0,0,0,0.7); }
+
+    /* Profile Dropdown */
+    .profile-wrapper { position: relative; }
+    .profile-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 2px solid var(--card-border); cursor: pointer;
+      background: var(--article-bg);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .profile-avatar:hover { border-color: var(--text-primary); box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
+    .profile-avatar svg, .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-dropdown {
+      position: absolute; top: calc(100% + 12px); right: 0; min-width: 200px;
+      background: var(--dropdown-bg); border: 1px solid var(--dropdown-border);
+      border-radius: 1rem; box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+      backdrop-filter: blur(20px); padding: 0.5rem;
+      opacity: 0; pointer-events: none; transform: translateY(-8px);
+      transition: opacity 0.2s ease, transform 0.2s ease; z-index: 100;
+    }
+    .profile-dropdown.open { opacity: 1; pointer-events: all; transform: translateY(0); }
+    .dropdown-header { padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--dropdown-border); margin-bottom: 0.4rem; }
+    .dropdown-header p { margin: 0; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); }
+    .dropdown-header span { font-size: 0.65rem; color: var(--text-muted); }
+    .dropdown-item {
+      display: flex; align-items: center; gap: 0.65rem;
+      padding: 0.6rem 0.85rem; border-radius: 0.6rem;
+      font-size: 0.8rem; color: var(--text-primary); cursor: pointer;
+      transition: background 0.2s; text-decoration: none; user-select: none;
+    }
+    .dropdown-item:hover { background: var(--dropdown-hover); }
+    .dropdown-item svg { flex-shrink: 0; opacity: 0.6; }
+    .dropdown-item.danger { color: #e53e3e; }
+    .theme-toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.5rem 0.85rem; border-radius: 0.6rem; cursor: pointer; transition: background 0.2s;
+    }
+    .theme-toggle-row:hover { background: var(--dropdown-hover); }
+    .theme-toggle-label { display: flex; align-items: center; gap: 0.65rem; font-size: 0.8rem; color: var(--text-primary); }
+    .theme-toggle-label svg { opacity: 0.6; }
+    .toggle-switch { position: relative; width: 36px; height: 20px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; border-radius: 20px; background: rgba(0,0,0,0.15); transition: background 0.3s; cursor: pointer; }
+    .toggle-slider:before { content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--text-primary); top: 3px; left: 3px; transition: transform 0.3s; }
+    input:checked + .toggle-slider { background: rgba(0,0,0,0.35); }
+    input:checked + .toggle-slider:before { transform: translateX(16px); }
+
+    /* Star Rating */
+    .stars { display: flex; gap: 8px; justify-content: center; }
+    .star-btn {
+      font-size: 2.8rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: rgba(255,255,255,0.2);
+      transition: color 0.15s, transform 0.15s;
+      line-height: 1;
+    }
+    .star-btn:hover, .star-btn.active { color: #f59e0b; transform: scale(1.15); }
+    .star-btn.hovered { color: #fbbf24; }
+
+    /* Confetti */
+    .confetti-piece {
+      position: fixed;
+      width: 10px; height: 10px;
+      top: -20px;
+      animation: confettiFall 2.5s ease-in forwards;
+      border-radius: 2px;
+    }
+    @keyframes confettiFall {
+      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* Textarea */
+    textarea:focus { outline: none; border-color: rgba(59,130,246,0.5); background: rgba(255,255,255,0.08); }
+  </style>
+</head>
+<body class="font-['Inter'] min-h-screen relative overflow-x-hidden" style="color:var(--text-primary);">
+
+  <!-- Background -->
+  <div class="fixed inset-0 z-[-2]">
+    <img id="bgImage" src="public/images/dark.avif" alt="Background" class="w-full h-full object-cover">
+  </div>
+  <div class="bg-overlay" style="position:fixed;inset:0;z-index:-1;background:var(--bg-overlay);transition:background 0.4s ease;"></div>
+
+  <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center backdrop-blur-[18px] rounded-[50px] z-50 border shadow-[0_18px_40px_rgba(0,0,0,0.5)]" style="background:var(--nav-bg);border-color:var(--nav-border);">
+    <div class="font-bold text-2xl font-['Satisfy'] cursor-pointer" style="color:var(--text-primary);" onclick="window.location.href='/home'">
+      Event<span>Hive</span>
+    </div>
+    <div class="flex gap-4 items-center">
+      <li class="profile-wrapper" style="list-style:none;">
+        <div class="profile-avatar" id="profileAvatarBtn" title="Account options">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);">
+            <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="dropdown-header">
+            <p id="dropdownName">User</p>
+            <span id="dropdownRole">Guest</span>
+          </div>
+          <div class="theme-toggle-row">
+            <div class="theme-toggle-label">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+              </svg>
+              Dark Mode
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="themeToggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <a class="dropdown-item" id="homeLink" href="/home">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Home
+          </a>
+          <div class="dropdown-item danger" id="logoutBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            Logout
+          </div>
+        </div>
+      </li>
+    </div>
+  </nav>
+
+  <main class="w-[90%] max-w-2xl mx-auto my-20 relative z-10 pb-20">
+
+    <!-- Loading state -->
+    <div id="loadingState" class="text-center py-20 text-white/50 italic">Loading organizer info...</div>
+
+    <!-- Rating Card -->
+    <div id="ratingCard" class="hidden bg-[#0A0F14]/85 backdrop-blur-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2.5rem] p-10">
+
+      <!-- Organizer info header -->
+      <div id="organizerHeader" class="flex items-center gap-5 mb-8 pb-8 border-b border-white/10">
+        <div id="orgAvatar" class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-2xl flex-shrink-0">?</div>
+        <div>
+          <h2 id="orgName" class="text-xl font-bold text-white">—</h2>
+          <p id="orgEmail" class="text-white/50 text-sm mt-0.5">—</p>
+          <div class="flex gap-3 mt-2">
+            <span id="orgCurrentRating" class="text-yellow-400 text-sm font-bold">—</span>
+            <span id="orgEventsCount" class="text-white/40 text-sm">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event / Offer being rated -->
+      <div id="offerInfo" class="bg-white/5 border border-white/10 rounded-[1rem] px-5 py-4 mb-8">
+        <p class="text-xs uppercase tracking-widest text-white/40 font-bold mb-1">Rating for booking</p>
+        <p id="offerTitle" class="text-white font-semibold">—</p>
+        <p id="offerDate" class="text-white/50 text-xs mt-0.5">—</p>
+      </div>
+
+      <!-- Already Rated State -->
+      <div id="alreadyRatedMsg" class="hidden text-center py-6">
+        <p class="text-2xl mb-2"><svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mx-auto text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></p>
+        <p class="text-white font-bold text-lg">You've already rated this booking</p>
+        <p class="text-white/50 text-sm mt-1">Thank you for your feedback!</p>
+        <button onclick="window.location.href='/client-home'" class="mt-6 px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white rounded-xl text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-all">
+          Back to Home
+        </button>
+      </div>
+
+      <!-- Rating Form -->
+      <form id="ratingForm">
+        <h3 class="text-center text-sm uppercase tracking-widest text-white/50 font-bold mb-6">How was your experience?</h3>
+
+        <!-- Stars -->
+        <div class="stars mb-3" id="starContainer">
+          <button type="button" class="star-btn" data-star="1">★</button>
+          <button type="button" class="star-btn" data-star="2">★</button>
+          <button type="button" class="star-btn" data-star="3">★</button>
+          <button type="button" class="star-btn" data-star="4">★</button>
+          <button type="button" class="star-btn" data-star="5">★</button>
+        </div>
+        <p id="starLabel" class="text-center text-white/40 text-sm mb-8 h-5 transition-all">Click to select a rating</p>
+
+        <!-- Review -->
+        <div class="mb-8">
+          <label class="block text-xs uppercase tracking-widest text-white/50 font-bold mb-3">Your Review <span class="normal-case text-white/30">(optional)</span></label>
+          <textarea id="reviewText" rows="4" placeholder="Tell others about your experience with this organizer..."
+            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 resize-none transition-all"></textarea>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" id="submitBtn" disabled
+          class="w-full py-4 font-bold uppercase tracking-wider text-sm bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white rounded-xl hover:opacity-90 transition-all shadow-lg disabled:opacity-30 disabled:cursor-not-allowed">
+          Submit Rating
+        </button>
+        <p id="errorMsg" class="text-red-400 text-sm text-center mt-4 hidden"></p>
+      </form>
+
+      <!-- Success State (hidden initially) -->
+      <div id="successState" class="hidden text-center py-4">
+        <p class="text-5xl mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></p>
+        <h3 class="text-2xl font-bold font-['Satisfy'] text-white mb-2">Thank you!</h3>
+        <p class="text-white/60 text-sm mb-6">Your rating has been submitted and will help other clients find great organizers.</p>
+        <div id="newRatingDisplay" class="bg-white/5 border border-white/10 rounded-[1rem] px-6 py-4 mb-6 inline-block">
+          <p class="text-xs uppercase tracking-widest text-white/40 font-bold mb-1">New organizer rating</p>
+          <p id="newRatingValue" class="text-3xl font-bold text-yellow-400">—</p>
+        </div>
+        <br>
+        <button onclick="window.location.href='/client-home'" class="px-8 py-3 bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white rounded-xl text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-all shadow-lg">
+          Back to Home
+        </button>
+      </div>
+    </div>
+
+    <!-- Error state (no valid offer) -->
+    <div id="errorState" class="hidden text-center py-20 bg-[#0A0F14]/85 backdrop-blur-[32px] border border-white/10 rounded-[2.5rem] p-10">
+      <p class="text-5xl mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></p>
+      <h3 class="text-xl font-bold text-white mb-2">Cannot rate this organizer</h3>
+      <p class="text-white/50 text-sm mb-6" id="errorStateMsg">You don't have a completed booking with this organizer.</p>
+      <button onclick="window.location.href='/client-home'" class="px-6 py-3 bg-white/10 border border-white/20 rounded-xl text-sm font-bold uppercase tracking-wider hover:bg-white/20 transition-all">
+        Back to Home
+      </button>
+    </div>
+
+  </main>
+
+  <footer class="mt-auto py-8 text-center text-white/40 text-sm">
+    <p>&copy; 2026 EventHive. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const STAR_LABELS = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+    let selectedScore = 0;
+    let organizerId = null;
+    let offerId = null;
+
+    // Parse URL params
+    const params = new URLSearchParams(window.location.search);
+    organizerId = params.get('organizerId');
+    offerId = params.get('offerId');
+
+    const token = localStorage.getItem('token');
+
+    async function init() {
+      if (!organizerId || !offerId || !token) {
+        showError('Missing organizer or booking information. Please navigate from your bookings.');
+        return;
+      }
+
+      // Load organizer info
+      try {
+        const [orgRes, offerRes] = await Promise.all([
+          fetch(`/api/organizers/${organizerId}`),
+          fetch(`/api/offers/my-offers`, { headers: { Authorization: `Bearer ${token}` } })
+        ]);
+
+        if (!orgRes.ok) { showError('Organizer not found.'); return; }
+
+        const org = await orgRes.json();
+        const offersData = await offerRes.json();
+
+        // Find the specific offer
+        const offer = (offersData.data || []).find(o => o._id === offerId);
+
+        if (!offer) { showError('Booking not found.'); return; }
+        if (offer.status !== 'completed') { showError('You can only rate after the event is completed by the organizer.'); return; }
+
+        // Populate organizer header
+        const initials = (org.username || org.profile?.orgName || 'O')[0].toUpperCase();
+        document.getElementById('orgAvatar').textContent = initials;
+        document.getElementById('orgName').textContent = org.profile?.orgName || org.username || 'Organizer';
+        document.getElementById('orgEmail').textContent = org.email || '';
+        document.getElementById('orgCurrentRating').textContent = `★ ${org.ratingAvg > 0 ? org.ratingAvg.toFixed(1) : 'No ratings yet'}`;
+        document.getElementById('orgEventsCount').textContent = `${org.eventsHosted || 0} events hosted`;
+
+        // Populate offer info
+        document.getElementById('offerTitle').textContent = offer.title || 'Untitled Event';
+        document.getElementById('offerDate').textContent = offer.eventDate
+          ? new Date(offer.eventDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+          : 'Date not specified';
+
+        // Update page title
+        document.title = `Rate ${org.profile?.orgName || org.username} - EventHive`;
+
+        // Show card
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('ratingCard').classList.remove('hidden');
+
+        // If already rated, show message
+        if (offer.isRated) {
+          document.getElementById('ratingForm').classList.add('hidden');
+          document.getElementById('alreadyRatedMsg').classList.remove('hidden');
+        }
+
+      } catch (err) {
+        console.error(err);
+        showError('Something went wrong. Please try again.');
+      }
+    }
+
+    function showError(msg) {
+      document.getElementById('loadingState').classList.add('hidden');
+      document.getElementById('errorState').classList.remove('hidden');
+      document.getElementById('errorStateMsg').textContent = msg;
+    }
+
+    // --- Star interaction ---
+    const starBtns = document.querySelectorAll('.star-btn');
+    const starLabel = document.getElementById('starLabel');
+    const submitBtn = document.getElementById('submitBtn');
+
+    starBtns.forEach(btn => {
+      btn.addEventListener('mouseenter', () => {
+        const hoverScore = parseInt(btn.dataset.star);
+        starBtns.forEach(b => {
+          b.classList.toggle('hovered', parseInt(b.dataset.star) <= hoverScore);
+          b.classList.remove('active');
+        });
+        starLabel.textContent = STAR_LABELS[hoverScore];
+      });
+
+      btn.addEventListener('mouseleave', () => {
+        starBtns.forEach(b => {
+          b.classList.remove('hovered');
+          b.classList.toggle('active', parseInt(b.dataset.star) <= selectedScore);
+        });
+        starLabel.textContent = selectedScore ? STAR_LABELS[selectedScore] : 'Click to select a rating';
+      });
+
+      btn.addEventListener('click', () => {
+        selectedScore = parseInt(btn.dataset.star);
+        starBtns.forEach(b => {
+          b.classList.toggle('active', parseInt(b.dataset.star) <= selectedScore);
+        });
+        starLabel.textContent = STAR_LABELS[selectedScore];
+        submitBtn.disabled = false;
+      });
+    });
+
+    // --- Form submission ---
+    document.getElementById('ratingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const review = document.getElementById('reviewText').value.trim();
+      const errMsg = document.getElementById('errorMsg');
+      errMsg.classList.add('hidden');
+
+      if (!selectedScore) { errMsg.textContent = 'Please select a star rating.'; errMsg.classList.remove('hidden'); return; }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+
+      try {
+        const res = await fetch(`/api/organizers/${organizerId}/rate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ offerId, score: selectedScore, review })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          // Show success
+          document.getElementById('ratingForm').classList.add('hidden');
+          document.getElementById('successState').classList.remove('hidden');
+          document.getElementById('newRatingValue').textContent = `${data.ratingAvg} ★`;
+          launchConfetti();
+        } else {
+          errMsg.textContent = data.error || 'Submission failed. Please try again.';
+          errMsg.classList.remove('hidden');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Rating';
+        }
+      } catch (err) {
+        errMsg.textContent = 'Network error. Please try again.';
+        errMsg.classList.remove('hidden');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Rating';
+      }
+    });
+
+    // --- Confetti ---
+    function launchConfetti() {
+      const colors = ['#3b82f6', '#06b6d4', '#f59e0b', '#10b981', '#8b5cf6', '#ec4899'];
+      for (let i = 0; i < 60; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + 'vw';
+        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = Math.random() * 1.5 + 's';
+        piece.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+        piece.style.width = (6 + Math.random() * 8) + 'px';
+        piece.style.height = (6 + Math.random() * 8) + 'px';
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), 3500);
+      }
+    }
+
+    // ── Theme toggle ──
+    const bgImage = document.getElementById('bgImage');
+    const themeToggle = document.getElementById('themeToggle');
+    function applyTheme(dark) {
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      if (bgImage) bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
+      if (themeToggle) themeToggle.checked = dark;
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    applyTheme(localStorage.getItem('theme') !== 'light');
+    if (themeToggle) themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
+
+    // ── Profile Dropdown ──
+    const avatarBtn = document.getElementById('profileAvatarBtn');
+    const dropdown = document.getElementById('profileDropdown');
+    avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('open'); });
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target) && e.target !== avatarBtn) dropdown.classList.remove('open');
+    });
+
+    // ── Logout ──
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('token'); localStorage.removeItem('user');
+      window.location.href = '/';
+    });
+
+    // ── Load user profile ──
+    async function loadUserProfile() {
+      if (!token) return;
+      try {
+        const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok) return;
+        const data = await res.json();
+        const u = data.data;
+        const displayName = u.profile?.fullName || u.profile?.orgName || u.profile?.clientName || u.username;
+        if (displayName) document.getElementById('dropdownName').textContent = displayName;
+        const roleLabel = u.role ? u.role.charAt(0).toUpperCase() + u.role.slice(1) : 'User';
+        document.getElementById('dropdownRole').textContent = roleLabel;
+
+        const homeLink = document.getElementById('homeLink');
+        if (u.role === 'organizer') homeLink.href = '/organiser-home';
+        else if (u.role === 'client') homeLink.href = '/client-home';
+        else homeLink.href = '/home';
+
+        const pic = u.profile?.profilePic;
+        if (pic) {
+          const img = document.createElement('img');
+          img.src = pic; img.alt = 'Profile';
+          img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+          avatarBtn.innerHTML = ''; avatarBtn.appendChild(img);
+        }
+      } catch(e) {}
+    }
+    loadUserProfile();
+
+    init();
+  </script>
+</body>
+</html>

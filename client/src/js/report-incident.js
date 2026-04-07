@@ -172,6 +172,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Checkboxes
         const impact = Array.from(document.querySelectorAll('input[name="impact"]:checked')).map(cb => cb.value);
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('eventId');
+
         // Prep FormData for API
         const apiData = new FormData();
         apiData.append('category', data.category);
@@ -179,6 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
         apiData.append('description', data.description);
         apiData.append('severity', data.severity);
         apiData.append('timestamp', data.timestamp);
+        if (eventId) apiData.append('eventId', eventId);
         impact.forEach(imp => apiData.append('impact', imp));
         
         const fileInput = document.getElementById('evidence');

@@ -46,9 +46,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    // --- Check if user already applied ---
+    const token = localStorage.getItem('token');
+    let existingApplication = null;
+    if (token) {
+        try {
+            const appRes = await fetch('/api/applications/my-applications', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (appRes.ok) {
+                const appData = await appRes.json();
+                const myApps = appData.data || [];
+                existingApplication = myApps.find(a => {
+                    const appEventId = a.eventId?._id || a.eventId;
+                    return String(appEventId) === String(eventId);
+                }) || null;
+            }
+        } catch (e) { /* ignore */ }
+    }
+
     // --- Set page title ---
     document.title = `${ev.title} – EventHive`;
     document.getElementById('pageTitle').textContent = `${ev.title} – EventHive`;
+    const overviewLink = document.getElementById('overview-link');
+    if (overviewLink) overviewLink.href = `/event-overview?id=${eventId}`;
 
     // --- Banner ---
     const bannerHtml = ev.banner
@@ -264,12 +285,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                         ${!isPast ? `
                         <div class="text-center mt-8">
-                            <button id="btn-enroll" class="btn-enroll">
+                            ${existingApplication
+                                ? `<div class="inline-flex flex-col items-center gap-2">
+                                    <div class="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-green-500/30 bg-green-500/10 text-green-400 text-sm font-semibold">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Already Enrolled
+                                    </div>
+                                    <p class="text-xs text-white/40">You applied as <span class="text-white/60 font-semibold">${esc(existingApplication.roleName || existingApplication.roleId || 'Volunteer')}</span> · Status: <span class="font-semibold ${existingApplication.status === 'approved' ? 'text-green-400' : existingApplication.status === 'rejected' ? 'text-red-400' : 'text-yellow-400'}">${existingApplication.status ? existingApplication.status.charAt(0).toUpperCase() + existingApplication.status.slice(1) : 'Pending'}</span></p>
+                                   </div>`
+                                : `<button id="btn-enroll" class="btn-enroll">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                                 </svg>
                                 Enroll as Volunteer
-                            </button>
+                            </button>`}
                         </div>
                         ` : `
                         <div class="text-center mt-8">
@@ -363,7 +394,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>` : ''}
 
                     <!-- Mobile Enroll Button -->
-                    ${roles.length > 0 ? `
+                    ${roles.length > 0 && !existingApplication ? `
                     <div class="lg:hidden text-center">
                         <button id="btn-enroll-mobile" class="btn-enroll w-full">Enroll as Volunteer</button>
                     </div>` : ''}
@@ -444,7 +475,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnConfirm.addEventListener('click', async () => {
             if (!selectedRole) return;
 
-            // Try to submit application to backend
             const token = localStorage.getItem('token');
             const roleName = document.querySelector(`[data-role-id="${selectedRole}"] .role-title-text`)?.textContent || selectedRole;
 
@@ -458,8 +488,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                         },
                         body: JSON.stringify({ eventId: eventId, roleId: selectedRole, roleName })
                     });
-                    // We show success regardless of server response shape
-                } catch (e) { /* silently continue */ }
+                    const data = await res.json();
+                    if (!res.ok) {
+                        const errMsg = data.error || 'Failed to enroll. Please try again.';
+                        enrollHint.textContent = errMsg;
+                        enrollHint.style.color = '#f87171';
+                        return;
+                    }
+                } catch (e) {
+                    enrollHint.textContent = 'Network error. Please try again.';
+                    enrollHint.style.color = '#f87171';
+                    return;
+                }
+            } else {
+                enrollHint.textContent = 'Please log in to enroll.';
+                enrollHint.style.color = '#f87171';
+                return;
             }
 
             const modalContent = modal.querySelector('.modal-content');

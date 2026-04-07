@@ -3,6 +3,8 @@
  * Inserts realistic fake events (ongoing / upcoming / past) into MongoDB.
  * Run with: node server/seed.js
  */
+const dns = require('node:dns');
+dns.setServers(['1.1.1.1', '8.8.8.8']);
 
 const mongoose = require('mongoose');
 const dotenv   = require('dotenv');

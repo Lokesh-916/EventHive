@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,27 +8,148 @@
   <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/styles/output.css">
+  <style>
+    /* ====== THEME VARIABLES ====== */
+    :root {
+      --bg-overlay: rgba(255,255,255,0.72);
+      --section-bg: rgba(255,255,255,0.6);
+      --card-border: rgba(0,0,0,0.08);
+      --text-primary: #1a1a2e;
+      --text-secondary: rgba(20,20,40,0.6);
+      --text-muted: rgba(20,20,40,0.4);
+      --nav-bg: rgba(255,255,255,0.65);
+      --nav-border: rgba(0,0,0,0.08);
+      --article-bg: rgba(255,255,255,0.5);
+      --article-border: rgba(0,0,0,0.06);
+      --shadow: 0 8px 32px rgba(0,0,0,0.1);
+      --dropdown-bg: rgba(255,255,255,0.92);
+      --dropdown-border: rgba(0,0,0,0.1);
+      --dropdown-hover: rgba(0,0,0,0.05);
+      --footer-text: rgba(20,20,40,0.4);
+      --input-bg: rgba(255,255,255,0.5);
+    }
+    [data-theme="dark"] {
+      --bg-overlay: rgba(10,15,20,0.80);
+      --section-bg: rgba(10,15,20,0.85);
+      --card-border: rgba(255,255,255,0.08);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255,255,255,0.6);
+      --text-muted: rgba(255,255,255,0.4);
+      --nav-bg: rgba(15,15,35,0.65);
+      --nav-border: rgba(255,255,255,0.12);
+      --article-bg: rgba(255,255,255,0.05);
+      --article-border: rgba(255,255,255,0.08);
+      --shadow: 0 20px 50px rgba(0,0,0,0.6);
+      --dropdown-bg: rgba(20,25,35,0.96);
+      --dropdown-border: rgba(255,255,255,0.12);
+      --dropdown-hover: rgba(255,255,255,0.08);
+      --footer-text: rgba(255,255,255,0.4);
+      --input-bg: rgba(255,255,255,0.06);
+    }
+
+    .profile-wrapper { position: relative; }
+    .profile-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 2px solid var(--card-border); cursor: pointer;
+      background: var(--article-bg);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .profile-avatar:hover { border-color: var(--text-primary); box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
+    .profile-avatar svg, .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-dropdown {
+      position: absolute; top: calc(100% + 12px); right: 0; min-width: 200px;
+      background: var(--dropdown-bg); border: 1px solid var(--dropdown-border);
+      border-radius: 1rem; box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+      backdrop-filter: blur(20px); padding: 0.5rem;
+      opacity: 0; pointer-events: none; transform: translateY(-8px);
+      transition: opacity 0.2s ease, transform 0.2s ease; z-index: 100;
+    }
+    .profile-dropdown.open { opacity: 1; pointer-events: all; transform: translateY(0); }
+    .dropdown-header { padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--dropdown-border); margin-bottom: 0.4rem; }
+    .dropdown-header p { margin: 0; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); }
+    .dropdown-header span { font-size: 0.65rem; color: var(--text-muted); }
+    .dropdown-item {
+      display: flex; align-items: center; gap: 0.65rem;
+      padding: 0.6rem 0.85rem; border-radius: 0.6rem;
+      font-size: 0.8rem; color: var(--text-primary); cursor: pointer;
+      transition: background 0.2s; text-decoration: none; user-select: none;
+    }
+    .dropdown-item:hover { background: var(--dropdown-hover); }
+    .dropdown-item svg { flex-shrink: 0; opacity: 0.6; }
+    .dropdown-item.danger { color: #e53e3e; }
+    .theme-toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.5rem 0.85rem; border-radius: 0.6rem; cursor: pointer; transition: background 0.2s;
+    }
+    .theme-toggle-row:hover { background: var(--dropdown-hover); }
+    .theme-toggle-label { display: flex; align-items: center; gap: 0.65rem; font-size: 0.8rem; color: var(--text-primary); }
+    .theme-toggle-label svg { opacity: 0.6; }
+    .toggle-switch { position: relative; width: 36px; height: 20px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; border-radius: 20px; background: rgba(0,0,0,0.15); transition: background 0.3s; cursor: pointer; }
+    .toggle-slider:before { content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--text-primary); top: 3px; left: 3px; transition: transform 0.3s; }
+    input:checked + .toggle-slider { background: rgba(0,0,0,0.35); }
+    input:checked + .toggle-slider:before { transform: translateX(16px); }
+  </style>
 </head>
-<body class="bg-[#0A0F14] text-white font-['Inter'] min-h-screen relative overflow-x-hidden">
+<body class="font-['Inter'] min-h-screen relative overflow-x-hidden" style="color:var(--text-primary);">
 
   <!-- Consistent Background Image -->
-  <div class="fixed inset-0 z-[-1]">
-    <img src="https://images.unsplash.com/photo-1686425374911-e0d752e09806?q=80&w=1493&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Background" class="w-full h-full object-cover">
+  <div class="fixed inset-0 z-[-2]">
+    <img id="bgImage" src="public/images/dark.avif" alt="Background" class="w-full h-full object-cover">
   </div>
+  <div class="bg-overlay" style="position:fixed;inset:0;z-index:-1;background:var(--bg-overlay);transition:background 0.4s ease;"></div>
 
   <!-- NAVBAR -->
-  <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center bg-[#0f0f23]/65 border border-white/15 shadow-[0_18px_40px_rgba(0,0,0,0.5)] backdrop-blur-[18px] rounded-[50px] z-50">
-    <div class="font-bold text-2xl font-['Satisfy'] tracking-widest text-[#ffffff] cursor-pointer" onclick="window.location.href='/organiser-home'">
+  <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center backdrop-blur-[18px] rounded-[50px] z-50 border shadow-[0_18px_40px_rgba(0,0,0,0.5)]" style="background:var(--nav-bg);border-color:var(--nav-border);">
+    <div class="font-bold text-2xl font-['Satisfy'] cursor-pointer" style="color:var(--text-primary);" onclick="window.location.href='/organiser-home'">
       Event<span>Hive</span>
     </div>
     <ul class="flex gap-6 list-none m-0 p-0">
-      <li><a href="#hero" class="relative text-white text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity">Home<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-      <li><a href="/create-event" class="relative text-white text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity">Create Event<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-      <li><a href="#offers" class="relative text-white text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity">Offers<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+      <li><a href="/organiser" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Dashboard<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+      <li><a href="/create-event" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Create Event<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+      <li><a href="#offers" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Offers<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+      <li><a href="#volunteers" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Volunteers<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
     </ul>
-    <div class="flex gap-4">
-      <button onclick="window.location.href='/organiser'" class="px-5 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all">Profile</button>
-      <button id="logoutBtn" class="px-5 py-2 text-xs uppercase tracking-widest font-bold bg-gradient-to-r from-blue-500 to-cyan-500 hover:opacity-90 rounded-full transition-all shadow-lg">Logout</button>
+    <div class="flex gap-4 items-center">
+      <li class="profile-wrapper" style="list-style:none;">
+        <div class="profile-avatar" id="profileAvatarBtn" title="Account options">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);">
+            <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="dropdown-header">
+            <p id="dropdownName">Organizer</p>
+            <span id="dropdownRole">Organizer</span>
+          </div>
+          <div class="theme-toggle-row">
+            <div class="theme-toggle-label">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+              </svg>
+              Dark Mode
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="themeToggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <a class="dropdown-item" href="/organiser">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+            Dashboard
+          </a>
+          <div class="dropdown-item danger" id="logoutBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            Logout
+          </div>
+        </div>
+      </li>
     </div>
   </nav>
 
@@ -37,52 +158,52 @@
     <!-- HERO SECTION -->
     <section id="hero" class="flex flex-col md:flex-row items-center gap-10">
       <div class="flex-1">
-        <h1 class="text-4xl md:text-6xl font-['Satisfy'] text-white mb-4">Welcome, Organizer</h1>
-        <p class="text-lg text-white/70 mb-8 max-w-xl">Create unforgettable experiences, match with clients, and manage your events in one powerful hub.</p>
+        <h1 class="text-4xl md:text-6xl font-['Satisfy'] mb-4" style="color:var(--text-primary);">Welcome, Organizer</h1>
+        <p class="text-lg mb-8 max-w-xl" style="color:var(--text-secondary);">Create unforgettable experiences, match with clients, and manage your events in one powerful hub.</p>
 
         <div class="flex gap-4 mb-10">
-          <button onclick="window.location.href='/create-event'" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg hover:shadow-[0_0_20px_rgba(0,198,255,0.4)] transition-all transform hover:-translate-y-1">Start New Event</button>
+          <button onclick="window.location.href='/create-event'" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 rounded-lg hover:shadow-[0_4px_16px_rgba(0,0,0,0.5)] transition-all transform hover:-translate-y-1" style="color:var(--text-primary);">Start New Event</button>
           <button onclick="document.getElementById('offers').scrollIntoView({behavior: 'smooth'})" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 transition-all transform hover:-translate-y-1">View Client Offers</button>
         </div>
 
         <div class="flex gap-8">
           <div>
-            <span class="block text-3xl font-bold text-white mb-1">32</span>
-            <span class="text-xs uppercase tracking-wider text-white/50 font-bold">Active Organizers</span>
+            <span class="block text-3xl font-bold mb-1" style="color:var(--text-primary);">32</span>
+            <span class="text-xs uppercase tracking-wider font-bold" style="color:var(--text-muted);">Active Organizers</span>
           </div>
           <div>
-            <span class="block text-3xl font-bold text-white mb-1">58</span>
-            <span class="text-xs uppercase tracking-wider text-white/50 font-bold">Live Offers</span>
+            <span class="block text-3xl font-bold mb-1" style="color:var(--text-primary);">58</span>
+            <span class="text-xs uppercase tracking-wider font-bold" style="color:var(--text-muted);">Live Offers</span>
           </div>
           <div>
-            <span class="block text-3xl font-bold text-white mb-1">210+</span>
-            <span class="text-xs uppercase tracking-wider text-white/50 font-bold">Events Delivered</span>
+            <span class="block text-3xl font-bold mb-1" style="color:var(--text-primary);">210+</span>
+            <span class="text-xs uppercase tracking-wider font-bold" style="color:var(--text-muted);">Events Delivered</span>
           </div>
         </div>
       </div>
 
-      <div class="bg-[#0A0F14]/85 backdrop-blur-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2rem] p-8 md:w-[350px]">
-        <h3 class="text-sm uppercase tracking-widest font-bold text-white/50 mb-6">Quick Snapshot</h3>
+      <div class="backdrop-blur-[32px] rounded-[2rem] p-8 md:w-[350px] border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+        <h3 class="text-sm uppercase tracking-widest font-bold mb-6" style="color:var(--text-muted);">Quick Snapshot</h3>
         <ul class="space-y-4">
           <li class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">📅</div>
+            <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
             <div>
-              <p class="text-sm font-bold text-white">Next event</p>
-              <p class="text-xs text-white/60">Tech Summit 2026 - in 5 days</p>
+              <p class="text-sm font-bold" style="color:var(--text-primary);">Pending offers</p>
+              <p id="snap-offers" class="text-xs" style="color:var(--text-secondary);">Loading…</p>
             </div>
           </li>
           <li class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center font-bold">💼</div>
+            <div class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>
             <div>
-              <p class="text-sm font-bold text-white">New client offers</p>
-              <p class="text-xs text-white/60">3 waiting</p>
+              <p class="text-sm font-bold" style="color:var(--text-primary);">Events hosted</p>
+              <p id="snap-hosted" class="text-xs" style="color:var(--text-secondary);">Loading…</p>
             </div>
           </li>
           <li class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center font-bold">✅</div>
+            <div class="w-10 h-10 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
             <div>
-              <p class="text-sm font-bold text-white">Pending tasks</p>
-              <p class="text-xs text-white/60">7 remaining</p>
+              <p class="text-sm font-bold" style="color:var(--text-primary);">Your rating</p>
+              <p id="snap-rating" class="text-xs" style="color:var(--text-secondary);">Loading…</p>
             </div>
           </li>
         </ul>
@@ -90,83 +211,537 @@
     </section>
 
     <!-- CLIENT OFFERS SECTION -->
-    <section id="offers" class="bg-[#0A0F14]/85 backdrop-blur-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2.5rem] p-10">
+    <section id="offers" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
       <div class="mb-10 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy'] text-white">Client Offers for You</h2>
-        <p class="text-white/60 text-sm mt-2">Clients looking for organizers like you. Review details and accept.</p>
+        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Client Offers for You</h2>
+        <p class="text-sm mt-2" style="color:var(--text-secondary);">Clients looking for organizers like you. Accept, reject, or mark as completed once the event is done.</p>
       </div>
 
-      <div id="offersList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-center italic text-white/40 pb-10">
-        <!-- JS dynamically populates this, we'll put empty state for now -->
-        No offers available currently.
-      </div>
+      <div id="offersList" class="flex flex-col gap-4"></div>
+      <div id="offers-loading" class="text-center py-8 italic text-sm" style="color:var(--text-muted);">Loading offers…</div>
+      <div id="offers-empty" class="hidden text-center py-10 italic" style="color:var(--text-muted);">No pending offers right now. Check back later.</div>
     </section>
 
     <!-- MY EVENTS SECTION -->
-    <section id="my-events" class="bg-[#0A0F14]/85 backdrop-blur-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2.5rem] p-10">
+    <section id="my-events" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
       <div class="mb-10 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy'] text-white">Your Created Events</h2>
-        <p class="text-white/60 text-sm mt-2">Track the events you’ve planned with current status and matched offers.</p>
+        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Your Created Events</h2>
+        <p class="text-sm mt-2" style="color:var(--text-secondary);">Track the events you’ve planned with current status and matched offers.</p>
       </div>
 
+      <div id="activeOffersList" class="flex flex-col gap-6"></div>
+      <div id="active-empty" class="hidden text-center py-10 italic" style="color:var(--text-muted);">You don't have any active events currently. Accept offers to see them here!</div>
+
+      <!-- Directly created events -->
+      <div id="my-events-list" class="flex flex-col gap-6 mt-6"></div>
+      <div id="my-events-empty" class="hidden text-center py-6 italic text-sm" style="color:var(--text-muted);">No directly created events yet. <a href="/create-event" class="text-blue-400 hover:underline">Create one →</a></div>
+    </section>
+
+    <!-- VOLUNTEER MANAGEMENT -->
+    <section id="volunteers" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border reveal" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+      <div class="mb-8 border-b pb-4" style="border-color:var(--card-border);">
+        <h2 class="text-3xl font-bold font-['Satisfy'] mb-2" style="color:var(--text-primary);">Volunteer Management</h2>
+        <p class="text-sm" style="color:var(--text-secondary);">Approve, assign roles and manage volunteers here.</p>
+      </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm whitespace-nowrap">
-          <thead class="uppercase tracking-wider text-xs font-bold text-white/50 border-b border-white/10">
+          <thead class="uppercase tracking-wider text-xs font-bold border-b" style="color:var(--text-muted);border-color:var(--card-border);">
             <tr>
-              <th class="px-4 py-4">Event</th>
-              <th class="px-4 py-4">Type</th>
-              <th class="px-4 py-4">Date</th>
-              <th class="px-4 py-4">Budget</th>
+              <th class="px-4 py-4">Name</th>
+              <th class="px-4 py-4">Email</th>
+              <th class="px-4 py-4">Applied Event</th>
+              <th class="px-4 py-4">Role</th>
+              <th class="px-4 py-4">Reputation</th>
               <th class="px-4 py-4">Status</th>
+              <th class="px-4 py-4">Action</th>
             </tr>
           </thead>
-          <tbody id="myEventsTable" class="text-white/80">
-            <!-- Example Row -->
-            <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
-               <td class="px-4 py-4 font-bold text-white">Tech Meetup</td>
-               <td class="px-4 py-4 opacity-70">Conference</td>
-               <td class="px-4 py-4 opacity-70">15 Feb 2026</td>
-               <td class="px-4 py-4 font-bold text-green-400">$12,000</td>
-               <td class="px-4 py-4"><span class="px-3 py-1 bg-green-500/20 text-green-400 border border-green-500/30 rounded-full text-xs font-bold">Live</span></td>
-            </tr>
+          <tbody id="volunteerTable" style="color:var(--text-secondary);">
+            <!-- Populated via JS -->
           </tbody>
         </table>
       </div>
     </section>
 
     <!-- WHY EVENTHIVE / INFO SECTION -->
-    <section class="bg-gradient-to-r justify-center from-blue-900/40 to-[#0A0F14]/80 backdrop-blur-[32px] border border-blue-500/20 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2.5rem] p-10">
+    <section class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
       <div class="mb-10 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy'] text-white">Why Organize with EventHive?</h2>
+        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Why Organize with EventHive?</h2>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="bg-white/5 p-6 rounded-[1.5rem] border border-white/10 hover:bg-white/10 transition-colors">
-          <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center">🎯</div>Smart Matching</h3>
-          <p class="text-sm text-white/60 leading-relaxed">Get offers only from clients whose budgets, cities, and dates match your preferences.</p>
+        <div class="p-6 rounded-[1.5rem] border hover:opacity-90 transition-colors" style="background:var(--article-bg);border-color:var(--article-border);">
+          <h3 class="text-lg font-bold mb-3 flex items-center gap-2" style="color:var(--text-primary);"><div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>Smart Matching</h3>
+          <p class="text-sm leading-relaxed" style="color:var(--text-secondary);">Get offers only from clients whose budgets, cities, and dates match your preferences.</p>
         </div>
-        <div class="bg-white/5 p-6 rounded-[1.5rem] border border-white/10 hover:bg-white/10 transition-colors">
-          <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center">🎛️</div>Centralized Management</h3>
-          <p class="text-sm text-white/60 leading-relaxed">Track your events, client negotiations, and volunteer assignments from one clean dashboard.</p>
+        <div class="p-6 rounded-[1.5rem] border hover:opacity-90 transition-colors" style="background:var(--article-bg);border-color:var(--article-border);">
+          <h3 class="text-lg font-bold mb-3 flex items-center gap-2" style="color:var(--text-primary);"><div class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg></div>Centralized Management</h3>
+          <p class="text-sm leading-relaxed" style="color:var(--text-secondary);">Track your events, client negotiations, and volunteer assignments from one clean dashboard.</p>
         </div>
-        <div class="bg-white/5 p-6 rounded-[1.5rem] border border-white/10 hover:bg-white/10 transition-colors">
-          <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-yellow-500/20 text-yellow-500 flex items-center justify-center">⭐</div>Reputation & Ratings</h3>
-          <p class="text-sm text-white/60 leading-relaxed">Build your profile, earn ratings from clients, and unlock more premium event opportunities.</p>
+        <div class="p-6 rounded-[1.5rem] border hover:opacity-90 transition-colors" style="background:var(--article-bg);border-color:var(--article-border);">
+          <h3 class="text-lg font-bold mb-3 flex items-center gap-2" style="color:var(--text-primary);"><div class="w-8 h-8 rounded-full bg-yellow-500/20 text-yellow-500 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>Reputation & Ratings</h3>
+          <p class="text-sm leading-relaxed" style="color:var(--text-secondary);">Build your profile, earn ratings from clients, and unlock more premium event opportunities.</p>
         </div>
       </div>
     </section>
 
   </main>
 
-  <footer class="mt-auto py-8 text-center text-white/40 text-sm">
+  <footer class="mt-auto py-8 text-center text-sm" style="color:var(--footer-text);">
     <p>&copy; 2026 EventHive. All rights reserved.</p>
   </footer>
 
   <script>
+    const token = localStorage.getItem('token');
+
+    // ── Auth guard: must be logged in as organizer ──
+    (async function checkAuth() {
+      if (!token) return showUnauthorized('not-logged-in');
+      try {
+        const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok) return showUnauthorized('not-logged-in');
+        const data = await res.json();
+        if (data.data?.role !== 'organizer') return showUnauthorized(data.data?.role || 'unknown');
+      } catch { showUnauthorized('not-logged-in'); }
+    })();
+
+    function showUnauthorized(role) {
+      const roleLabels = { volunteer: 'Volunteer', client: 'Client', 'not-logged-in': null };
+      const isLoggedIn = role !== 'not-logged-in';
+      document.body.innerHTML = `
+        <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0f14;font-family:'Inter',sans-serif;padding:2rem;">
+          <div style="max-width:480px;width:100%;text-align:center;">
+            <div style="width:72px;height:72px;border-radius:50%;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;color:#f87171;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+              </svg>
+            </div>
+            <h1 style="font-family:'Satisfy',cursive;font-size:2rem;color:#fff;margin-bottom:0.75rem;">Access Restricted</h1>
+            <p style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:0.5rem;">
+              ${isLoggedIn
+                ? `You're logged in as a <strong style="color:rgba(255,255,255,0.8);">${roleLabels[role] || role}</strong>, but this page is for <strong style="color:rgba(255,255,255,0.8);">Organizers</strong> only.`
+                : `You need to be logged in as an <strong style="color:rgba(255,255,255,0.8);">Organizer</strong> to access this page.`}
+            </p>
+            <p style="color:rgba(255,255,255,0.3);font-size:0.75rem;margin-bottom:2rem;">
+              ${isLoggedIn ? 'Please log out and sign in with your organizer account.' : 'Please log in with your organizer account to continue.'}
+            </p>
+            <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;">
+              ${isLoggedIn ? `
+              <button onclick="localStorage.removeItem('token');window.location.href='/register';"
+                style="padding:0.75rem 1.5rem;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
+                Log Out
+              </button>` : ''}
+              <button onclick="window.location.href='/register';"
+                style="padding:0.75rem 1.5rem;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
+                ${isLoggedIn ? 'Switch Account' : 'Log In'}
+              </button>
+              <button onclick="history.back();"
+                style="padding:0.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
+                ← Back
+              </button>
+              <button onclick="window.location.href='/';"
+                style="padding:0.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
+                Home
+              </button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // ── Profile Avatar Dropdown ──
+    const avatarBtn = document.getElementById('profileAvatarBtn');
+    const dropdown  = document.getElementById('profileDropdown');
+    avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('open'); });
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target) && e.target !== avatarBtn) dropdown.classList.remove('open');
+    });
+    // ── Theme toggle ──
+    const bgImage = document.getElementById('bgImage');
+    const themeToggle = document.getElementById('themeToggle');
+    function applyTheme(dark) {
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
+      themeToggle.checked = dark;
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    applyTheme(localStorage.getItem('theme') !== 'light');
+    themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
+
+    // ── Load organizer name into dropdown ──
+    (async function() {
+      try {
+        const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok) return;
+        const data = await res.json();
+        const u = data.data;
+        const name = u.profile?.orgName || u.username;
+        if (name) document.getElementById('dropdownName').textContent = name;
+        const pic = u.profile?.profilePic;
+        if (pic) {
+          const img = document.createElement('img');
+          img.src = pic; img.alt = 'Profile';
+          img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+          avatarBtn.innerHTML = ''; avatarBtn.appendChild(img);
+        }
+      } catch(e) {}
+    })();
+
+    // ── Load organizer profile for snapshot ────────────────────
+    async function loadSnapshot() {
+      if (!token) return;
+      try {
+        const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok) return;
+        const data = await res.json();
+        const user = data.data;
+        document.getElementById('snap-hosted').textContent = `${user.eventsHosted || 0} completed`;
+        document.getElementById('snap-rating').textContent = user.ratingAvg > 0 ? `${user.ratingAvg.toFixed(1)} ★ (${user.ratings?.length || 0} reviews)` : 'No ratings yet';
+      } catch (e) { console.error(e); }
+    }
+
+    // ── Load Incoming Offers ───────────────────────────────────
+    async function loadOffers() {
+      const list = document.getElementById('offersList');
+      const loading = document.getElementById('offers-loading');
+      const empty = document.getElementById('offers-empty');
+
+      if (!token) { loading.classList.add('hidden'); empty.classList.remove('hidden'); return; }
+      try {
+        const res = await fetch('/api/offers/incoming', { headers: { Authorization: `Bearer ${token}` } });
+        loading.classList.add('hidden');
+        if (!res.ok) { empty.classList.remove('hidden'); return; }
+        const data = await res.json();
+        const offers = data.data || [];
+
+        const pendingOffers = offers.filter(o => o.status === 'pending');
+        const activeOffers = offers.filter(o => o.status === 'accepted' || o.status === 'completed');
+
+        document.getElementById('snap-offers').textContent = pendingOffers.length > 0 ? `${pendingOffers.length} waiting` : 'None right now';
+
+        if (!pendingOffers.length) { empty.classList.remove('hidden'); }
+        else {
+          list.innerHTML = pendingOffers.map(offer => {
+            const clientName = offer.clientId?.profile?.clientName || offer.clientId?.username || 'Client';
+            const date = offer.eventDate ? new Date(offer.eventDate).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }) : 'No date';
+            
+            let budgetStr = '';
+            if (offer.budgetMin || offer.budgetMax) {
+              budgetStr = `<span>₹${offer.budgetMin || 0} – ₹${offer.budgetMax || 'Any'}</span>`;
+            } else if (offer.budget) {
+              budgetStr = `<span>${offer.budget}</span>`;
+            }
+
+            return `
+              <div class="rounded-[1.5rem] p-6 flex flex-col sm:flex-row sm:items-center gap-5 transition-colors border" style="background:var(--article-bg);border-color:var(--article-border);" id="offer-${offer._id}">
+                <div class="flex-1 min-w-0">
+                  <h3 class="font-bold text-base mb-1" style="color:var(--text-primary);">${offer.title}</h3>
+                  <p class="text-sm" style="color:var(--text-muted);">From: <span style="color:var(--text-secondary);">${clientName}</span></p>
+                  <div class="flex flex-wrap gap-4 mt-2 text-xs" style="color:var(--text-muted);">
+                    ${budgetStr}
+                    <span>${date}</span>
+                    ${offer.city ? `<span>${offer.city}</span>` : ''}
+                  </div>
+                  ${offer.description ? `<p class="text-xs mt-2 line-clamp-2" style="color:var(--text-muted);">${offer.description}</p>` : ''}
+                </div>
+                <div class="flex gap-2 flex-shrink-0 flex-col">
+                  <button onclick="acceptOffer('${offer._id}')" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:opacity-90 rounded-xl transition-all shadow-lg" style="color:var(--text-primary);">Accept</button>
+                  <button onclick="rejectOffer('${offer._id}')" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-all">Reject</button>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        const activeList = document.getElementById('activeOffersList');
+        const activeEmpty = document.getElementById('active-empty');
+        if (!activeOffers.length) { activeEmpty.classList.remove('hidden'); activeList.innerHTML = ''; }
+        else {
+          activeEmpty.classList.add('hidden');
+          activeList.innerHTML = activeOffers.map(offer => {
+            const clientName = offer.clientId?.profile?.clientName || offer.clientId?.username || 'Client';
+            const date = offer.eventDate ? new Date(offer.eventDate).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }) : 'No date';
+            const isCompleted = offer.status === 'completed';
+            
+            let expensesHtml = '';
+            const expenseList = (offer.expenses || []).map(exp => {
+              const expDate = new Date(exp.date).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+              if (exp.isDeleted) {
+                return `<li class="flex justify-between items-center line-through text-sm px-2 py-1" style="color:var(--text-muted);"><span>${exp.description}</span><span>₹${exp.amount}</span></li>`;
+              }
+              const delBtn = !isCompleted ? `<button onclick="deleteExpense('${offer._id}','${exp._id}')" class="text-red-400 hover:text-red-300 ml-3 text-xs uppercase tracking-widest font-bold">Del</button>` : '';
+              return `<li class="flex justify-between items-center text-sm px-2 py-1 border-b last:border-0 hover:opacity-90" style="color:var(--text-secondary);border-color:var(--card-border);"><span>${expDate} - ${exp.description}</span><div class="flex items-center"><span class="font-bold text-red-300">₹${exp.amount}</span>${delBtn}</div></li>`;
+            }).join('');
+            
+            const totalValid = (offer.expenses || []).filter(e => !e.isDeleted).reduce((sum, e) => sum + e.amount, 0);
+
+            let addExpHtml = '';
+            if (!isCompleted) {
+              addExpHtml = `
+                <div class="mt-4 flex gap-2">
+                  <input id="exp-desc-${offer._id}" type="text" placeholder="Expense description" class="flex-1 rounded-xl px-4 py-2 text-xs border" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
+                  <input id="exp-amt-${offer._id}" type="number" placeholder="Amt" class="w-24 rounded-xl px-4 py-2 text-xs border" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
+                  <button id="exp-btn-${offer._id}" onclick="addExpense('${offer._id}')" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all">Add</button>
+                </div>
+              `;
+            }
+
+            expensesHtml = `
+              <div class="mt-6 rounded-xl p-5 border" style="background:var(--section-bg);border-color:var(--card-border);">
+                <div class="flex justify-between items-center mb-3">
+                  <h4 class="text-sm uppercase tracking-widest font-bold" style="color:var(--text-muted);">Tracked Expenses</h4>
+                  <span class="text-sm font-bold text-red-400">Total: ₹${totalValid}</span>
+                </div>
+                <ul class="flex flex-col gap-1 max-h-40 overflow-y-auto pr-2">
+                  ${expenseList || '<li class="text-xs italic" style="color:var(--text-muted);">No expenses logged yet.</li>'}
+                </ul>
+                ${addExpHtml}
+              </div>
+            `;
+
+            return `
+              <div class="bg-gradient-to-br from-blue-900/10 to-[#0d1117] border border-blue-500/20 rounded-[2rem] p-8 shadow-[0_10px_30px_rgba(0,0,0,0.4)]">
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-5 border-b border-white/10 pb-5">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-2">
+                      <h3 class="font-bold text-xl" style="color:var(--text-primary);">${offer.title}</h3>
+                      ${isCompleted ? `<span class="px-3 py-1 bg-green-500/20 text-green-400 border border-green-500/30 rounded-full text-xs font-bold">Completed</span>` : `<span class="px-3 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-xs font-bold">Active</span>`}
+                    </div>
+                    <p class="text-sm" style="color:var(--text-muted);">Client: <span style="color:var(--text-secondary);">${clientName}</span>, Date: <span style="color:var(--text-secondary);">${date}</span></p>
+                  </div>
+                  ${!isCompleted ? `<button onclick="completeOffer('${offer._id}')" class="flex-shrink-0 px-6 py-3 text-xs uppercase tracking-widest font-bold bg-green-500/20 hover:bg-green-500/30 text-green-400 border border-green-500/30 rounded-xl transition-all flex items-center gap-2">✓ Mark Event Completed</button>` : ''}
+                </div>
+                ${expensesHtml}
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        loading.classList.add('hidden');
+        empty.classList.remove('hidden');
+      }
+    }
+
+    async function patchOffer(id, action) {
+      try {
+        const res = await fetch(`/api/offers/${id}/${action}`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        return await res.json();
+      } catch (e) { return { success: false }; }
+    }
+
+    async function acceptOffer(id) {
+      const data = await patchOffer(id, 'accept');
+      if (data.success) {
+        loadOffers();
+        loadSnapshot();
+      } else { alert(data.error || 'Failed to accept offer'); }
+    }
+
+    async function rejectOffer(id) {
+      const data = await patchOffer(id, 'reject');
+      if (data.success) {
+        document.getElementById(`offer-${id}`)?.remove();
+      } else { alert(data.error || 'Failed to reject offer'); }
+    }
+
+    async function completeOffer(id) {
+      const data = await patchOffer(id, 'complete');
+      if (data.success) {
+        loadOffers();
+        loadSnapshot();
+      } else { alert(data.error || 'Failed to mark complete'); }
+    }
+
+    async function addExpense(id) {
+      const descEl = document.getElementById(`exp-desc-${id}`);
+      const amtEl = document.getElementById(`exp-amt-${id}`);
+      const description = descEl.value;
+      const amount = amtEl.value;
+      if (!description || !amount) return alert('Enter description and amount');
+
+      const btn = document.getElementById(`exp-btn-${id}`);
+      btn.disabled = true;
+      btn.textContent = '...';
+
+      try {
+        const res = await fetch(`/api/offers/${id}/expenses`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ description, amount })
+        });
+        const result = await res.json();
+        if(result.success) loadOffers();
+        else { alert(result.error); btn.disabled = false; btn.textContent = 'Add'; }
+      } catch(e) { alert('Error adding expense'); btn.disabled = false; btn.textContent = 'Add'; }
+    }
+
+    async function deleteExpense(offerId, expenseId) {
+      if (!confirm('Are you sure you want to delete this expense?')) return;
+      try {
+        const res = await fetch(`/api/offers/${offerId}/expenses/${expenseId}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const result = await res.json();
+        if(result.success) loadOffers();
+        else alert(result.error);
+      } catch(e) { alert('Error deleting expense'); }
+    }
+
+    async function loadMyEvents() {
+      const list = document.getElementById('my-events-list');
+      const empty = document.getElementById('my-events-empty');
+      if (!token) { empty.classList.remove('hidden'); return; }
+      try {
+        const res = await fetch('/api/events/my', { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok) { empty.classList.remove('hidden'); return; }
+        const data = await res.json();
+        const events = data.data || [];
+        if (!events.length) { empty.classList.remove('hidden'); return; }
+
+        list.innerHTML = events.map(ev => {
+          const start = ev.schedule?.start ? new Date(ev.schedule.start).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '—';
+          const statusColor = ev.status === 'ongoing' ? 'text-green-400 border-green-500/30 bg-green-500/10'
+            : ev.status === 'completed' ? 'text-white/40 border-white/10 bg-white/5'
+            : 'text-blue-400 border-blue-500/30 bg-blue-500/10';
+          const isPast = ev.schedule?.end && new Date(ev.schedule.end) < new Date();
+          const overviewBtn = isPast ? '' : `<a href="/event-overview?id=${ev._id}" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 rounded-xl transition-all text-purple-400">Overview</a>`;
+          
+          return `
+            <div class="rounded-[1.5rem] p-6 flex flex-col sm:flex-row sm:items-center gap-5 transition-colors border" style="background:var(--article-bg);border-color:var(--article-border);">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-3 mb-1">
+                  <h3 class="font-bold text-base" style="color:var(--text-primary);">${ev.title}</h3>
+                  <span class="px-2 py-0.5 rounded-full text-xs font-bold border ${statusColor}">${ev.status || 'published'}</span>
+                </div>
+                <p class="text-xs" style="color:var(--text-muted);">${start}${ev.location?.city ? ' · ' + ev.location.city : ''}</p>
+              </div>
+              <a href="/event-info?id=${ev._id}" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all" style="color:var(--text-primary);">View</a>
+              <a href="/organiser?eventId=${ev._id}" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-xl transition-all text-blue-400">Manage</a>
+              ${overviewBtn}
+            </div>`;
+        }).join('');
+      } catch (e) { empty.classList.remove('hidden'); }
+    }
+
     document.getElementById('logoutBtn').addEventListener('click', (e) => {
       e.preventDefault();
       localStorage.removeItem('token');
       window.location.href = '/';
     });
+
+    // ── Volunteer Management ──────────────────────────────────
+    async function fetchReputation(userId) {
+      try {
+        const res = await fetch(`/api/reputation/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok) return null;
+        const d = await res.json();
+        return d.success ? d.data : null;
+      } catch { return null; }
+    }
+
+    function buildRepCell(rep) {
+      if (!rep) return '<span class="opacity-40 text-xs">—</span>';
+      const rank   = rep.rank   || rep.tier   || '—';
+      const badges = rep.badges || [];
+      const badgeHtml = badges.slice(0, 3).map(b =>
+        `<span title="${b.name || b}" style="font-size:1rem;">${b.icon || '🏅'}</span>`
+      ).join('');
+      return `<span class="text-xs font-bold text-yellow-400">${rank}</span>${badgeHtml ? ' ' + badgeHtml : ''}`;
+    }
+
+    async function loadApplications() {
+      const table = document.getElementById('volunteerTable');
+      if (!table || !token) return;
+      table.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center italic" style="color:var(--text-muted);">Loading…</td></tr>`;
+      try {
+        const evRes = await fetch('/api/events/my', { headers: { Authorization: `Bearer ${token}` } });
+        if (!evRes.ok) throw new Error('Failed to fetch events');
+        const events = (await evRes.json()).data || [];
+
+        const appArrays = await Promise.all(events.map(ev =>
+          fetch(`/api/applications/event/${ev._id}`, { headers: { Authorization: `Bearer ${token}` } })
+            .then(r => r.ok ? r.json() : { data: [] })
+            .then(d => (d.data || []).map(app => ({ ...app, _eventTitle: ev.title || 'Untitled' })))
+            .catch(() => [])
+        ));
+        const applications = appArrays.flat();
+
+        if (!applications.length) {
+          table.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center italic" style="color:var(--text-muted);">No applications yet.</td></tr>`;
+          return;
+        }
+
+        table.innerHTML = '';
+        for (const app of applications) {
+          const vol        = app.volunteerId;
+          const name       = vol?.profile?.fullName || vol?.username || '—';
+          const email      = vol?.email || '—';
+          const volunteerId = (typeof vol === 'object' && vol !== null) ? (vol._id || '') : (vol || '');
+          // Resolve role title: prefer stored roleName, then look up from populated event roles, fallback to roleId
+          const eventRoles = app.eventId?.volunteerRoles || [];
+          const matchedRole = eventRoles.find(r => r.roleId === app.roleId);
+          const roleTitle  = app.roleName || matchedRole?.title || app.roleId || '—';
+          const status     = app.status || 'pending';
+          const statusClass = status === 'approved' ? 'text-green-400' : status === 'rejected' ? 'text-red-400' : 'text-yellow-400';
+          const actionBtn  = status === 'pending'
+            ? `<button onclick="approveApp('${app._id}', this)" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/40 text-green-400 border border-green-500/30 rounded text-xs mr-1">Approve</button>`
+            : '';
+          const profileLink = volunteerId
+            ? `<a href="/profile?id=${volunteerId}" class="px-3 py-1 bg-white/10 hover:bg-white/20 border border-white/20 rounded text-xs" style="color:var(--text-primary);">View Profile</a>`
+            : '';
+
+          const tr = document.createElement('tr');
+          tr.className = 'border-b hover:opacity-90 transition-colors';
+          tr.style.cssText = 'border-color:var(--card-border);';
+          tr.innerHTML = `
+            <td class="px-4 py-4 font-bold" style="color:var(--text-primary);">${name}</td>
+            <td class="px-4 py-4" style="color:var(--text-secondary);">${email}</td>
+            <td class="px-4 py-4" style="color:var(--text-secondary);">${app._eventTitle}</td>
+            <td class="px-4 py-4" style="color:var(--text-secondary);">${roleTitle}</td>
+            <td class="px-4 py-4" id="rep-${app._id}"><span class="opacity-40 text-xs">…</span></td>
+            <td class="px-4 py-4 font-bold ${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</td>
+            <td class="px-4 py-4">${actionBtn}${profileLink}</td>
+          `;
+          table.appendChild(tr);
+
+          if (volunteerId) {
+            fetchReputation(volunteerId).then(rep => {
+              const cell = document.getElementById(`rep-${app._id}`);
+              if (cell) cell.innerHTML = buildRepCell(rep);
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load applications:', err);
+        table.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-red-400 italic">Failed to load applications.</td></tr>`;
+      }
+    }
+
+    window.approveApp = async function(appId, btn) {
+      try {
+        btn.disabled = true; btn.textContent = '…';
+        const res = await fetch(`/api/applications/${appId}/approve`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('Failed');
+        const row = btn.closest('tr');
+        const statusCell = row.querySelectorAll('td')[5];
+        statusCell.className = 'px-4 py-4 font-bold text-green-400';
+        statusCell.textContent = 'Approved';
+        btn.remove();
+      } catch {
+        btn.disabled = false; btn.textContent = 'Approve';
+        alert('Failed to approve application.');
+      }
+    };
+
+    loadSnapshot();
+    loadOffers();
+    loadMyEvents();
+    loadApplications();
   </script>
 </body>
 </html>

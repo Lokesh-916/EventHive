@@ -30,6 +30,18 @@ router.post('/', protect, authorize('organizer'), upload.single('banner'), async
   }
 });
 
+// @route   GET /api/events/my
+// @desc    Get events created by the logged-in organizer
+// @access  Private (Organizer)
+router.get('/my', protect, authorize('organizer'), async (req, res) => {
+  try {
+    const events = await Event.find({ organizerId: req.user.id }).sort({ createdAt: -1 });
+    res.status(200).json({ success: true, count: events.length, data: events });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // @route   GET /api/events
 // @desc    Get all events
 // @access  Public
@@ -37,6 +49,70 @@ router.get('/', async (req, res) => {
   try {
     const events = await Event.find().populate('organizerId', 'username profile.orgName profile.organization');
     res.status(200).json({ success: true, count: events.length, data: events });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// @route   GET /api/events/:id/overview
+// @desc    Get event overview with volunteer assignments
+// @access  Public (role-based UI rendering handled on client)
+router.get('/:id/overview', async (req, res) => {
+  try {
+    const Application = require('../models/Application');
+    const event = await Event.findById(req.params.id)
+      .populate('organizerId', 'username email profile.orgName profile.organization profile.profilePic');
+    if (!event) return res.status(404).json({ success: false, error: 'Event not found' });
+
+    const applications = await Application.find({ eventId: req.params.id })
+      .populate('volunteerId', 'username email profile.fullName profile.skills profile.profilePic profile.bio');
+
+    res.status(200).json({
+      success: true,
+      data: {
+        event,
+        applications
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// @route   PATCH /api/events/:id/status
+// @desc    Update event status (organizer only)
+// @access  Private (Organizer)
+router.patch('/:id/status', protect, authorize('organizer'), async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).json({ success: false, error: 'Event not found' });
+    if (event.organizerId.toString() !== req.user.id) {
+      return res.status(403).json({ success: false, error: 'Not authorized' });
+    }
+    event.status = req.body.status;
+    await event.save();
+    res.status(200).json({ success: true, data: event });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// @route   PATCH /api/events/:id/role-notes
+// @desc    Update volunteer role notes (organizer only)
+// @access  Private (Organizer)
+router.patch('/:id/role-notes', protect, authorize('organizer'), async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).json({ success: false, error: 'Event not found' });
+    if (event.organizerId.toString() !== req.user.id) {
+      return res.status(403).json({ success: false, error: 'Not authorized' });
+    }
+    const { roleId, notes } = req.body;
+    const role = event.volunteerRoles.find(r => r.roleId === roleId);
+    if (!role) return res.status(404).json({ success: false, error: 'Role not found' });
+    role.notes = notes;
+    await event.save();
+    res.status(200).json({ success: true, data: event });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

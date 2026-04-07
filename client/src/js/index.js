@@ -248,6 +248,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    const video3 = document.getElementById("feature-video-3");
+    const btn3 = document.getElementById("feature-btn-3");
+    const playIcon3 = document.getElementById("icon-play-3");
+    const pauseIcon3 = document.getElementById("icon-pause-3");
+
+    btn3.addEventListener("click", () => {
+        if (video3.paused) {
+            video3.play();
+            playIcon3.classList.add("hidden");
+            pauseIcon3.classList.remove("hidden");
+        } else {
+            video3.pause();
+            playIcon3.classList.remove("hidden");
+            pauseIcon3.classList.add("hidden");
+        }
+    });
 
     // Testimonials Carousel Logic
     const testimonials = [
@@ -475,7 +491,11 @@ if (loginForm) {
                 // Redirect logic based on role
                 if (result.user.role === 'volunteer') {
                     window.location.href = '/home';
-                } else if (result.user.role === 'organizer') {
+                }
+                 if (result.user.role === 'client') {
+                    window.location.href = '/client-home';
+                 }
+                 else if (result.user.role === 'organizer') {
                     window.location.href = '/organiser-home';
                 } else {
                     window.location.href = '/home'; // Default fallback, client could go here too

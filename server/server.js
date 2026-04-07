@@ -1,6 +1,7 @@
 const dns = require('node:dns');
 dns.setServers(['1.1.1.1', '8.8.8.8']);
 
+
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -33,6 +34,14 @@ app.use(helmet({
 }));
 app.use(morgan('dev'));
 
+// Ensure HTML files are served with UTF-8 charset
+app.use((req, res, next) => {
+  if (req.path.endsWith('.html') || !req.path.includes('.')) {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  }
+  next();
+});
+
 // Rate limiting for auth
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -45,12 +54,14 @@ const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
 const applicationRoutes = require('./routes/applications');
 const incidentRoutes = require('./routes/incidents');
-
+const organizerRoutes = require('./routes/organizer');
+const offerRoutes = require('./routes/offers');
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/incidents', incidentRoutes);
-app.use('/api/reputation', require('./routes/reputation'));
+app.use('/api', organizerRoutes);
+app.use('/api/offers', offerRoutes);
 
 // Static file setup for uploads and client
 app.use('/uploads', express.static(path.join(__dirname, '../client/public/uploads')));
@@ -93,8 +104,24 @@ app.get('/organiser', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/organiser.html'));
 });
 
-app.get('/profile', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/profile.html'));
+app.get('/client-home', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/client-home.html'));
+});
+
+app.get('/rate-organizer', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/rate-organizer.html'));
+});
+
+app.get('/organiser-profile', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/organiser-profile.html'));
+});
+
+app.get('/all-events', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/all-events.html'));
+});
+
+app.get('/event-overview', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/event-overview.html'));
 });
 
 // Generic 404 handler for API vs Front-end

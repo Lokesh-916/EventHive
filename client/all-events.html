@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,12 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/styles/output.css">
-  <script>
-    (function() {
-      const t = localStorage.getItem('theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', t);
-    })();
-  </script>
+
   <style>
     /* ====== THEME VARIABLES ====== */
     :root {
@@ -70,11 +65,27 @@
     }
 
     /* Background */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+    }
+    .bg-layer img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+    }
     .bg-overlay {
       position: fixed;
       inset: 0;
       z-index: -1;
       background: var(--bg-overlay);
+      /* NO backdrop-filter blur – keeps image crisp */
       transition: background 0.4s ease;
     }
 
@@ -365,82 +376,85 @@
       margin-top: 0.4rem;
     }
 
-    /* GRID */
-    .events-grid {
-      display: grid;
-      grid-template-columns: repeat(1, 1fr);
-      gap: 1.25rem;
+    /* LIST VIEW */
+    .events-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
     }
 
-    @media (min-width: 640px) { .events-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (min-width: 1024px) { .events-grid { grid-template-columns: repeat(4, 1fr); } }
-
-    /* CARD */
-    .event-card {
+    .event-list-item {
+      display: flex;
+      flex-direction: column;
       background: var(--article-bg);
       border: 1px solid var(--article-border);
       border-radius: 1.5rem;
-      padding: 1rem;
+      padding: 1.5rem;
       transition: background 0.2s ease, border-color 0.2s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
       cursor: pointer;
       text-decoration: none;
-      display: block;
       color: inherit;
     }
 
-    .event-card:hover {
+    @media (min-width: 640px) {
+      .event-list-item {
+        flex-direction: row;
+        align-items: center;
+      }
+    }
+
+    .event-list-item:hover {
       background: var(--article-hover);
       border-color: var(--article-border-hover);
-      transform: translateY(-8px) scale(1.02);
+      transform: translateY(-8px) scale(1.01);
       box-shadow: 0 20px 40px rgba(0,0,0,0.12);
     }
-    [data-theme="dark"] .event-card:hover {
+    [data-theme="dark"] .event-list-item:hover {
       box-shadow: 0 20px 40px rgba(0,0,0,0.5);
     }
 
-    .event-card img {
+    .event-list-item img, .event-list-item .event-card-img-placeholder {
       width: 100%;
-      height: 10rem;
+      height: 12rem;
       object-fit: cover;
       border-radius: 1rem;
       margin-bottom: 1rem;
+      flex-shrink: 0;
     }
 
-    .event-card-img-placeholder {
-      width: 100%;
-      height: 10rem;
-      border-radius: 1rem;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, rgba(0,0,0,0.05), rgba(0,0,0,0.12));
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    @media (min-width: 640px) {
+      .event-list-item img, .event-list-item .event-card-img-placeholder {
+        width: 240px;
+        height: 160px;
+        margin-bottom: 0;
+        margin-right: 1.5rem;
+      }
     }
 
-    .event-card-img-placeholder svg {
-      width: 2.5rem;
-      height: 2.5rem;
-      opacity: 0.3;
+    .event-list-item .content {
+      flex: 1;
+      min-width: 0;
     }
 
-    .event-card h3 {
-      font-size: 1rem;
+    .event-list-item h3 {
+      font-size: 1.25rem;
       font-weight: 700;
       color: var(--text-primary);
-      margin: 0 0 0.25rem;
+      margin: 0 0 0.4rem;
     }
 
-    .event-card p {
-      font-size: 0.8rem;
+    .event-list-item p {
+      font-size: 0.9rem;
       color: var(--text-secondary);
       margin: 0;
+      line-height: 1.5;
     }
 
-    .event-card .event-meta {
+    .event-list-item .event-meta {
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
-      margin-top: 0.5rem;
+      margin-top: 0.8rem;
     }
 
     .event-tag-chip {
@@ -488,7 +502,7 @@
     }
 
     .skeleton-card {
-      height: 220px;
+      height: 160px;
       border-radius: 1.5rem;
     }
 
@@ -524,16 +538,13 @@
     }
   </style>
 </head>
-<body style="background:#0a0f14;">
+<body>
 
   <!-- Background -->
-  <div class="fixed inset-0 z-[-2]">
-    <img id="bgImage" src="public/images/dark.avif" alt="Background" class="w-full h-full object-cover">
+  <div class="bg-layer">
+    <img id="bgImage" src="public/images/light.jpeg" alt="Background">
   </div>
   <div class="bg-overlay"></div>
-  <script>
-    document.getElementById('bgImage').src = (localStorage.getItem('theme') === 'light') ? 'public/images/light.jpeg' : 'public/images/dark.avif';
-  </script>
 
   <!-- NAVBAR -->
   <nav class="navbar">
@@ -572,14 +583,7 @@
             </label>
           </div>
 
-          <a class="dropdown-item" href="/profile">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
-            </svg>
-            My Profile
-          </a>
-
-          <div class="dropdown-item danger" id="logoutBtn">
+          <div class="dropdown-item" id="logoutBtn">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
             </svg>
@@ -593,44 +597,13 @@
   <!-- MAIN CONTENT -->
   <main>
 
-    <!-- ONGOING EVENTS -->
-    <section id="ongoing" class="events-section">
+    <!-- ALL EVENTS SECTION -->
+    <section id="all-events-section" class="events-section w-full">
       <div class="section-header">
-        <div class="section-badge badge-green">Live now</div>
-        <h2 class="section-title">Ongoing Events</h2>
-        <p class="section-subtitle">Events happening right now.</p>
+        <h2 class="section-title" id="all-title">All Events</h2>
+        <p class="section-subtitle" id="all-subtitle">Browse through our complete catalog of events.</p>
       </div>
-      <div class="events-grid" id="ongoing-grid">
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-      </div>
-    </section>
-
-    <!-- UPCOMING EVENTS -->
-    <section id="upcoming" class="events-section">
-      <div class="section-header">
-        <div class="section-badge badge-blue">Coming soon</div>
-        <h2 class="section-title">Upcoming Events</h2>
-        <p class="section-subtitle">Plan ahead and stay excited.</p>
-      </div>
-      <div class="events-grid" id="upcoming-grid">
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-      </div>
-    </section>
-
-    <!-- PAST EVENTS -->
-    <section id="past" class="events-section">
-      <div class="section-header">
-        <div class="section-badge badge-gray">Previously</div>
-        <h2 class="section-title">Past Events</h2>
-        <p class="section-subtitle">Events you may have missed.</p>
-      </div>
-      <div class="events-grid" id="past-grid">
+      <div class="events-list" id="all-grid">
         <div class="skeleton skeleton-card"></div>
         <div class="skeleton skeleton-card"></div>
         <div class="skeleton skeleton-card"></div>
@@ -645,24 +618,6 @@
   </footer>
 
   <script>
-    // ====== AUTH GUARD: volunteer only ======
-    (async function checkAuth() {
-      const token = localStorage.getItem('token');
-      if (!token) return showUnauth('not-logged-in');
-      try {
-        const r = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
-        if (!r.ok) return showUnauth('not-logged-in');
-        const d = await r.json();
-        if (d.data?.role !== 'volunteer') return showUnauth(d.data?.role || 'unknown');
-      } catch { showUnauth('not-logged-in'); }
-    })();
-
-    function showUnauth(role) {
-      const isIn = role !== 'not-logged-in';
-      const labels = { organizer:'Organizer', client:'Client' };
-      document.body.innerHTML = `<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0f14;font-family:Inter,sans-serif;padding:2rem;"><div style="max-width:480px;width:100%;text-align:center;"><div style="width:72px;height:72px;border-radius:50%;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;"><svg xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;color:#f87171;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg></div><h1 style="font-family:Satisfy,cursive;font-size:2rem;color:#fff;margin-bottom:.75rem;">Access Restricted</h1><p style="color:rgba(255,255,255,.5);font-size:.9rem;margin-bottom:.5rem;">${isIn ? `You're logged in as a <strong style="color:rgba(255,255,255,.8);">${labels[role]||role}</strong>, but this page is for <strong style="color:rgba(255,255,255,.8);">Volunteers</strong> only.` : `You need to log in as a <strong style="color:rgba(255,255,255,.8);">Volunteer</strong> to access this page.`}</p><p style="color:rgba(255,255,255,.3);font-size:.75rem;margin-bottom:2rem;">${isIn ? 'Please log out and sign in with your volunteer account.' : 'Please log in with your volunteer account to continue.'}</p><div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">${isIn ? `<button onclick="localStorage.removeItem('token');window.location.href='/register';" style="padding:.75rem 1.5rem;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">Log Out</button>` : ''}<button onclick="window.location.href='/register';" style="padding:.75rem 1.5rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">${isIn ? 'Switch Account' : 'Log In'}</button><button onclick="window.location.href='/';" style="padding:.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">? Back</button><button onclick="window.location.href='/'" style="padding:.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">Home</button></div></div></div>`;
-    }
-
     // ====== SMOOTH SCROLL WITH HIGHLIGHT ======
     function scrollToSection(e, id) {
       e.preventDefault();
@@ -691,7 +646,7 @@
     }
 
     // Init theme
-    const savedTheme = localStorage.getItem('theme') || 'dark';
+    const savedTheme = localStorage.getItem('theme') || 'light';
     applyTheme(savedTheme === 'dark');
 
     themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
@@ -781,11 +736,11 @@
       return { ongoing, upcoming, past };
     }
 
-    function buildCard(ev, type) {
+    function buildListItem(ev) {
       const eventId = ev._id;
       const title = ev.title || 'Untitled Event';
       const tagline = ev.tagline || ev.description || '';
-      const tags = (ev.tags || []).slice(0, 3);
+      const tags = (ev.tags || []).slice(0, 4);
       const dateStr = ev.schedule?.start ? formatDate(ev.schedule.start) : '';
       const city = ev.location?.city || '';
 
@@ -796,66 +751,66 @@
       const tagChips = tags.map(t => `<span class="event-tag-chip">${t.replace(/^#/, '')}</span>`).join('');
       const metaText = [dateStr, city].filter(Boolean).join(' · ');
 
-      const birdsEyeBtn = type !== 'past'
-        ? `<span onclick="event.preventDefault();event.stopPropagation();window.location.href='/event-overview?id=${eventId}'" style="display:inline-block;margin-top:0.5rem;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:0.25rem 0.7rem;border-radius:9999px;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.3);color:#c084fc;cursor:pointer;">Bird's Eye View</span>`
-        : '';
-
       return `
-        <a class="event-card" href="/event-info?id=${eventId}">
+        <a class="event-list-item" href="/event-info?id=${eventId}">
           ${imgHtml}
-          <h3>${title}</h3>
-          <p>${tagline.slice(0, 80)}${tagline.length > 80 ? '…' : ''}</p>
-          ${metaText ? `<p style="font-size:0.7rem;opacity:0.5;margin-top:0.35rem;">${metaText}</p>` : ''}
-          ${tagChips ? `<div class="event-meta">${tagChips}</div>` : ''}
-          ${birdsEyeBtn}
+          <div class="content">
+            <h3>${title}</h3>
+            <p>${tagline.slice(0, 160)}${tagline.length > 160 ? '…' : ''}</p>
+            ${metaText ? `<p style="font-size:0.8rem;opacity:0.6;margin-top:0.4rem;font-weight:600;">🗓️ ${metaText}</p>` : ''}
+            ${tagChips ? `<div class="event-meta">${tagChips}</div>` : ''}
+          </div>
         </a>`;
     }
 
     function renderGrid(gridId, events, type) {
       const grid = document.getElementById(gridId);
       if (!events.length) {
-        grid.innerHTML = `<div class="empty-state">No events here yet.</div>`;
+        grid.innerHTML = `<div class="empty-state">No events available in this category.</div>`;
         return;
       }
 
-      // Show max 4 events
-      const displayEvents = events.slice(0, 4);
-      grid.innerHTML = displayEvents.map(ev => buildCard(ev, type)).join('');
-
-      // Add "See All" option if there are more than 4
-      if (events.length > 4) {
-        const existingSeeAll = grid.parentNode.querySelector('.see-all-container');
-        if (existingSeeAll) existingSeeAll.remove();
-        
-        const seeAllDiv = document.createElement('div');
-        seeAllDiv.className = 'see-all-container';
-        seeAllDiv.style.textAlign = 'center';
-        seeAllDiv.style.marginTop = '2.5rem';
-        seeAllDiv.innerHTML = `<a href="/all-events?type=${type}" style="display:inline-block; padding:0.8rem 2.5rem; background:var(--text-primary); color:var(--section-bg); border-radius:99px; text-decoration:none; font-weight:bold; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.05em; transition:transform 0.2s; box-shadow:var(--shadow);">See all ${type} events &rarr;</a>`;
-        
-        // Add hover effect via JS since it's inline logic
-        seeAllDiv.firstChild.onmouseover = function() { this.style.transform = 'translateY(-3px)'; };
-        seeAllDiv.firstChild.onmouseout = function() { this.style.transform = 'translateY(0)'; };
-        
-        grid.parentNode.appendChild(seeAllDiv);
-      }
+      // Show unlimited events on this page
+      grid.innerHTML = events.map(buildListItem).join('');
     }
 
     async function loadEvents() {
       try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const filterType = urlParams.get('type');
+
         const res = await fetch('/api/events');
         const data = await res.json();
         if (!data.success) throw new Error(data.error);
 
         const { ongoing, upcoming, past } = categorise(data.data);
-        renderGrid('ongoing-grid', ongoing, 'ongoing');
-        renderGrid('upcoming-grid', upcoming, 'upcoming');
-        renderGrid('past-grid', past, 'past');
+
+        let displayData = [];
+        const titleEl = document.getElementById('all-title');
+        
+        switch (filterType) {
+          case 'ongoing':
+            displayData = ongoing;
+            titleEl.textContent = 'All Ongoing Events';
+            break;
+          case 'upcoming':
+            displayData = upcoming;
+            titleEl.textContent = 'All Upcoming Events';
+            break;
+          case 'past':
+            displayData = past;
+            titleEl.textContent = 'All Past Events';
+            break;
+          default:
+            displayData = data.data; // Show all indiscriminately
+            break;
+        }
+
+        renderGrid('all-grid', displayData, filterType || 'all');
+        
       } catch (err) {
         console.error('Failed to load events:', err);
-        ['ongoing-grid', 'upcoming-grid', 'past-grid'].forEach(id => {
-          document.getElementById(id).innerHTML = `<div class="empty-state">Could not load events. Please try again.</div>`;
-        });
+        document.getElementById('all-grid').innerHTML = `<div class="empty-state">Could not load events. Please try again.</div>`;
       }
     }
 
