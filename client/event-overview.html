@@ -1,247 +1,590 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Event Overview — EventHive</title>
-  <meta name="description" content="Bird's eye view of your event — track volunteers, status, and progress at a glance.">
+  <meta name="description"
+    content="Bird's eye view of your event — track volunteers, status, and progress at a glance.">
   <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
   <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/styles/output.css">
   <style>
     :root {
-      --bg-overlay: rgba(255,255,255,0.72);
-      --section-bg: rgba(255,255,255,0.6);
-      --card-border: rgba(0,0,0,0.08);
+      --bg-overlay: rgba(255, 255, 255, 0.72);
+      --section-bg: rgba(255, 255, 255, 0.6);
+      --card-border: rgba(0, 0, 0, 0.08);
       --text-primary: #1a1a2e;
-      --text-secondary: rgba(20,20,40,0.6);
-      --text-muted: rgba(20,20,40,0.4);
-      --nav-bg: rgba(255,255,255,0.65);
-      --nav-border: rgba(0,0,0,0.08);
-      --article-bg: rgba(255,255,255,0.5);
-      --article-border: rgba(0,0,0,0.06);
-      --shadow: 0 8px 32px rgba(0,0,0,0.1);
-      --dropdown-bg: rgba(255,255,255,0.92);
-      --dropdown-border: rgba(0,0,0,0.1);
-      --dropdown-hover: rgba(0,0,0,0.05);
-      --footer-text: rgba(20,20,40,0.4);
-      --input-bg: rgba(255,255,255,0.5);
+      --text-secondary: rgba(20, 20, 40, 0.6);
+      --text-muted: rgba(20, 20, 40, 0.4);
+      --nav-bg: rgba(255, 255, 255, 0.65);
+      --nav-border: rgba(0, 0, 0, 0.08);
+      --article-bg: rgba(255, 255, 255, 0.5);
+      --article-border: rgba(0, 0, 0, 0.06);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      --dropdown-bg: rgba(255, 255, 255, 0.92);
+      --dropdown-border: rgba(0, 0, 0, 0.1);
+      --dropdown-hover: rgba(0, 0, 0, 0.05);
+      --footer-text: rgba(20, 20, 40, 0.4);
+      --input-bg: rgba(255, 255, 255, 0.5);
     }
+
     [data-theme="dark"] {
-      --bg-overlay: rgba(10,15,20,0.80);
-      --section-bg: rgba(10,15,20,0.85);
-      --card-border: rgba(255,255,255,0.08);
+      --bg-overlay: rgba(10, 15, 20, 0.80);
+      --section-bg: rgba(10, 15, 20, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
       --text-primary: #ffffff;
-      --text-secondary: rgba(255,255,255,0.6);
-      --text-muted: rgba(255,255,255,0.4);
-      --nav-bg: rgba(15,15,35,0.65);
-      --nav-border: rgba(255,255,255,0.12);
-      --article-bg: rgba(255,255,255,0.05);
-      --article-border: rgba(255,255,255,0.08);
-      --shadow: 0 20px 50px rgba(0,0,0,0.6);
-      --dropdown-bg: rgba(20,25,35,0.96);
-      --dropdown-border: rgba(255,255,255,0.12);
-      --dropdown-hover: rgba(255,255,255,0.08);
-      --footer-text: rgba(255,255,255,0.4);
-      --input-bg: rgba(255,255,255,0.06);
+      --text-secondary: rgba(255, 255, 255, 0.6);
+      --text-muted: rgba(255, 255, 255, 0.4);
+      --nav-bg: rgba(15, 15, 35, 0.65);
+      --nav-border: rgba(255, 255, 255, 0.12);
+      --article-bg: rgba(255, 255, 255, 0.05);
+      --article-border: rgba(255, 255, 255, 0.08);
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      --dropdown-bg: rgba(20, 25, 35, 0.96);
+      --dropdown-border: rgba(255, 255, 255, 0.12);
+      --dropdown-hover: rgba(255, 255, 255, 0.08);
+      --footer-text: rgba(255, 255, 255, 0.4);
+      --input-bg: rgba(255, 255, 255, 0.06);
     }
 
     /* Profile */
-    .profile-wrapper { position: relative; }
+    .profile-wrapper {
+      position: relative;
+    }
+
     .profile-avatar {
-      width: 40px; height: 40px; border-radius: 50%;
-      border: 2px solid var(--card-border); cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--card-border);
+      cursor: pointer;
       background: var(--article-bg);
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
-    .profile-avatar:hover { border-color: var(--text-primary); box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
-    .profile-avatar svg, .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .profile-avatar:hover {
+      border-color: var(--text-primary);
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .profile-avatar svg,
+    .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
     .profile-dropdown {
-      position: absolute; top: calc(100% + 12px); right: 0; min-width: 200px;
-      background: var(--dropdown-bg); border: 1px solid var(--dropdown-border);
-      border-radius: 1rem; box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-      backdrop-filter: blur(20px); padding: 0.5rem;
-      opacity: 0; pointer-events: none; transform: translateY(-8px);
-      transition: opacity 0.2s ease, transform 0.2s ease; z-index: 100;
+      position: absolute;
+      top: calc(100% + 12px);
+      right: 0;
+      min-width: 200px;
+      background: var(--dropdown-bg);
+      border: 1px solid var(--dropdown-border);
+      border-radius: 1rem;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(20px);
+      padding: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 100;
     }
-    .profile-dropdown.open { opacity: 1; pointer-events: all; transform: translateY(0); }
-    .dropdown-header { padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--dropdown-border); margin-bottom: 0.4rem; }
-    .dropdown-header p { margin: 0; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); }
-    .dropdown-header span { font-size: 0.65rem; color: var(--text-muted); }
+
+    .profile-dropdown.open {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0);
+    }
+
+    .dropdown-header {
+      padding: 0.6rem 0.85rem;
+      border-bottom: 1px solid var(--dropdown-border);
+      margin-bottom: 0.4rem;
+    }
+
+    .dropdown-header p {
+      margin: 0;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .dropdown-header span {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
     .dropdown-item {
-      display: flex; align-items: center; gap: 0.65rem;
-      padding: 0.6rem 0.85rem; border-radius: 0.6rem;
-      font-size: 0.8rem; color: var(--text-primary); cursor: pointer;
-      transition: background 0.2s; text-decoration: none; user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.6rem 0.85rem;
+      border-radius: 0.6rem;
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+      user-select: none;
     }
-    .dropdown-item:hover { background: var(--dropdown-hover); }
-    .dropdown-item svg { flex-shrink: 0; opacity: 0.6; }
-    .dropdown-item.danger { color: #e53e3e; }
+
+    .dropdown-item:hover {
+      background: var(--dropdown-hover);
+    }
+
+    .dropdown-item svg {
+      flex-shrink: 0;
+      opacity: 0.6;
+    }
+
+    .dropdown-item.danger {
+      color: #e53e3e;
+    }
+
     .theme-toggle-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.5rem 0.85rem; border-radius: 0.6rem; cursor: pointer; transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.85rem;
+      border-radius: 0.6rem;
+      cursor: pointer;
+      transition: background 0.2s;
     }
-    .theme-toggle-row:hover { background: var(--dropdown-hover); }
-    .theme-toggle-label { display: flex; align-items: center; gap: 0.65rem; font-size: 0.8rem; color: var(--text-primary); }
-    .theme-toggle-label svg { opacity: 0.6; }
-    .toggle-switch { position: relative; width: 36px; height: 20px; }
-    .toggle-switch input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider { position: absolute; inset: 0; border-radius: 20px; background: rgba(0,0,0,0.15); transition: background 0.3s; cursor: pointer; }
-    .toggle-slider:before { content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--text-primary); top: 3px; left: 3px; transition: transform 0.3s; }
-    input:checked + .toggle-slider { background: rgba(0,0,0,0.35); }
-    input:checked + .toggle-slider:before { transform: translateX(16px); }
+
+    .theme-toggle-row:hover {
+      background: var(--dropdown-hover);
+    }
+
+    .theme-toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 0.8rem;
+      color: var(--text-primary);
+    }
+
+    .theme-toggle-label svg {
+      opacity: 0.6;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 36px;
+      height: 20px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.15);
+      transition: background 0.3s;
+      cursor: pointer;
+    }
+
+    .toggle-slider:before {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--text-primary);
+      top: 3px;
+      left: 3px;
+      transition: transform 0.3s;
+    }
+
+    input:checked+.toggle-slider {
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    input:checked+.toggle-slider:before {
+      transform: translateX(16px);
+    }
 
     /* Timeline */
-    .timeline { display: flex; align-items: center; gap: 0; width: 100%; }
-    .timeline-step {
-      flex: 1; display: flex; flex-direction: column; align-items: center; position: relative;
+    .timeline {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      width: 100%;
     }
+
+    .timeline-step {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
     .timeline-step::before {
       content: '';
-      position: absolute; top: 18px; left: -50%; right: 50%;
-      height: 3px; background: var(--card-border); z-index: 0;
+      position: absolute;
+      top: 18px;
+      left: -50%;
+      right: 50%;
+      height: 3px;
+      background: var(--card-border);
+      z-index: 0;
     }
-    .timeline-step:first-child::before { display: none; }
-    .timeline-step.active::before { background: linear-gradient(90deg, #3b82f6, #06b6d4); }
-    .timeline-step.completed::before { background: #10b981; }
+
+    .timeline-step:first-child::before {
+      display: none;
+    }
+
+    .timeline-step.active::before {
+      background: linear-gradient(90deg, #3b82f6, #06b6d4);
+    }
+
+    .timeline-step.completed::before {
+      background: #10b981;
+    }
+
     .timeline-dot {
-      width: 36px; height: 36px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.8rem; font-weight: 700; z-index: 1;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      z-index: 1;
       border: 2px solid var(--card-border);
-      background: var(--article-bg); color: var(--text-muted);
+      background: var(--article-bg);
+      color: var(--text-muted);
       transition: all 0.3s;
     }
+
     .timeline-step.active .timeline-dot {
-      border-color: #3b82f6; background: rgba(59,130,246,0.2); color: #60a5fa;
-      box-shadow: 0 0 20px rgba(59,130,246,0.3);
+      border-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
     }
+
     .timeline-step.completed .timeline-dot {
-      border-color: #10b981; background: rgba(16,185,129,0.2); color: #34d399;
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
     }
+
     .timeline-label {
-      margin-top: 0.5rem; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em;
-      font-weight: 700; color: var(--text-muted);
+      margin-top: 0.5rem;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      color: var(--text-muted);
     }
-    .timeline-step.active .timeline-label { color: #60a5fa; }
-    .timeline-step.completed .timeline-label { color: #34d399; }
+
+    .timeline-step.active .timeline-label {
+      color: #60a5fa;
+    }
+
+    .timeline-step.completed .timeline-label {
+      color: #34d399;
+    }
 
     /* Role card */
     .role-card {
-      background: var(--article-bg); border: 1px solid var(--article-border);
-      border-radius: 1.25rem; padding: 1.5rem;
+      background: var(--article-bg);
+      border: 1px solid var(--article-border);
+      border-radius: 1.25rem;
+      padding: 1.5rem;
       transition: background 0.2s, transform 0.3s, box-shadow 0.2s;
     }
-    .role-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+
+    .role-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow);
+    }
 
     /* Volunteer chip */
     .vol-chip {
-      display: flex; align-items: center; gap: 0.75rem;
-      padding: 0.65rem 0.85rem; border-radius: 0.85rem;
-      background: var(--section-bg); border: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 0.85rem;
+      border-radius: 0.85rem;
+      background: var(--section-bg);
+      border: 1px solid var(--card-border);
       transition: background 0.2s;
     }
-    .vol-chip:hover { background: var(--dropdown-hover); }
+
+    .vol-chip:hover {
+      background: var(--dropdown-hover);
+    }
+
     .vol-avatar {
-      width: 34px; height: 34px; border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
       background: linear-gradient(135deg, #6366f1, #06b6d4);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.7rem; font-weight: 700; color: #fff; flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
       overflow: hidden;
     }
-    .vol-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+    .vol-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
 
     /* Status badges */
     .status-badge {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      padding: 0.35rem 0.9rem; border-radius: 9999px;
-      font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.9rem;
+      border-radius: 9999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }
-    .status-draft { background: rgba(107,114,128,0.15); color: #9ca3af; border: 1px solid rgba(107,114,128,0.3); }
-    .status-published { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
-    .status-ongoing { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
-    .status-completed { background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.3); }
-    .status-cancelled { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+
+    .status-draft {
+      background: rgba(107, 114, 128, 0.15);
+      color: #9ca3af;
+      border: 1px solid rgba(107, 114, 128, 0.3);
+    }
+
+    .status-published {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .status-ongoing {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-completed {
+      background: rgba(168, 85, 247, 0.15);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+
+    .status-cancelled {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
 
     /* Loading skeleton */
-    @keyframes shimmer { 0%{background-position:200% 0}100%{background-position:-200% 0} }
+    @keyframes shimmer {
+      0% {
+        background-position: 200% 0
+      }
+
+      100% {
+        background-position: -200% 0
+      }
+    }
+
     .skeleton {
       background: linear-gradient(90deg, var(--article-bg) 25%, var(--card-border) 50%, var(--article-bg) 75%);
-      background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 1rem;
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 1rem;
     }
 
     /* Organizer edit controls */
     .edit-mode-btn {
-      padding: 0.5rem 1.2rem; font-size: 0.7rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.08em;
-      border: 1px solid var(--card-border); border-radius: 0.75rem;
-      cursor: pointer; transition: all 0.2s;
-      background: var(--article-bg); color: var(--text-primary);
+      padding: 0.5rem 1.2rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border: 1px solid var(--card-border);
+      border-radius: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--article-bg);
+      color: var(--text-primary);
     }
-    .edit-mode-btn:hover { background: var(--dropdown-hover); }
+
+    .edit-mode-btn:hover {
+      background: var(--dropdown-hover);
+    }
+
     .edit-mode-btn.primary {
-      background: rgba(59,130,246,0.2); border-color: rgba(59,130,246,0.3); color: #60a5fa;
+      background: rgba(59, 130, 246, 0.2);
+      border-color: rgba(59, 130, 246, 0.3);
+      color: #60a5fa;
     }
-    .edit-mode-btn.primary:hover { background: rgba(59,130,246,0.35); }
+
+    .edit-mode-btn.primary:hover {
+      background: rgba(59, 130, 246, 0.35);
+    }
+
     .edit-mode-btn.success {
-      background: rgba(16,185,129,0.2); border-color: rgba(16,185,129,0.3); color: #34d399;
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #34d399;
     }
-    .edit-mode-btn.success:hover { background: rgba(16,185,129,0.35); }
+
+    .edit-mode-btn.success:hover {
+      background: rgba(16, 185, 129, 0.35);
+    }
+
     .edit-mode-btn.danger {
-      background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.3); color: #f87171;
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #f87171;
     }
-    .edit-mode-btn.danger:hover { background: rgba(239,68,68,0.35); }
+
+    .edit-mode-btn.danger:hover {
+      background: rgba(239, 68, 68, 0.35);
+    }
 
     /* Role notes input */
     .notes-input {
-      width: 100%; padding: 0.6rem 0.85rem; font-size: 0.8rem;
-      border: 1px solid var(--card-border); border-radius: 0.75rem;
-      background: var(--input-bg); color: var(--text-primary);
-      resize: vertical; min-height: 60px; font-family: 'Inter', sans-serif;
+      width: 100%;
+      padding: 0.6rem 0.85rem;
+      font-size: 0.8rem;
+      border: 1px solid var(--card-border);
+      border-radius: 0.75rem;
+      background: var(--input-bg);
+      color: var(--text-primary);
+      resize: vertical;
+      min-height: 60px;
+      font-family: 'Inter', sans-serif;
       transition: border-color 0.2s;
     }
-    .notes-input:focus { outline: none; border-color: rgba(59,130,246,0.5); }
+
+    .notes-input:focus {
+      outline: none;
+      border-color: rgba(59, 130, 246, 0.5);
+    }
 
     /* Section entrance */
-    @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
-    .fade-up { animation: fadeUp 0.5s ease-out both; }
-    .fade-up-1 { animation-delay: 0.05s; }
-    .fade-up-2 { animation-delay: 0.15s; }
-    .fade-up-3 { animation-delay: 0.25s; }
-    .fade-up-4 { animation-delay: 0.35s; }
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-up {
+      animation: fadeUp 0.5s ease-out both;
+    }
+
+    .fade-up-1 {
+      animation-delay: 0.05s;
+    }
+
+    .fade-up-2 {
+      animation-delay: 0.15s;
+    }
+
+    .fade-up-3 {
+      animation-delay: 0.25s;
+    }
+
+    .fade-up-4 {
+      animation-delay: 0.35s;
+    }
 
     /* Breadcrumb */
-    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--text-muted); }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
-    .breadcrumb a:hover { color: var(--text-primary); }
-    .breadcrumb svg { width: 12px; height: 12px; opacity: 0.4; }
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .breadcrumb a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .breadcrumb a:hover {
+      color: var(--text-primary);
+    }
+
+    .breadcrumb svg {
+      width: 12px;
+      height: 12px;
+      opacity: 0.4;
+    }
   </style>
 </head>
+
 <body class="font-['Inter'] min-h-screen relative overflow-x-hidden" style="color:var(--text-primary);">
 
   <!-- Background -->
   <div class="fixed inset-0 z-[-2]">
     <img id="bgImage" src="public/images/dark.avif" alt="Background" class="w-full h-full object-cover">
   </div>
-  <div class="bg-overlay" style="position:fixed;inset:0;z-index:-1;background:var(--bg-overlay);transition:background 0.4s ease;"></div>
+  <div class="bg-overlay"
+    style="position:fixed;inset:0;z-index:-1;background:var(--bg-overlay);transition:background 0.4s ease;"></div>
 
   <!-- NAVBAR -->
-  <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center backdrop-blur-[18px] rounded-[50px] z-50 border shadow-[0_18px_40px_rgba(0,0,0,0.5)]" style="background:var(--nav-bg);border-color:var(--nav-border);">
+  <nav
+    class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center backdrop-blur-[18px] rounded-[50px] z-50 border shadow-[0_18px_40px_rgba(0,0,0,0.5)]"
+    style="background:var(--nav-bg);border-color:var(--nav-border);">
     <div class="font-bold text-2xl font-['Satisfy'] cursor-pointer" style="color:var(--text-primary);" id="navLogo">
       Event<span>Hive</span>
     </div>
     <ul class="flex gap-6 list-none m-0 p-0">
-      <li><a href="#overview" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Overview<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-      <li><a href="#roles" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Roles<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-      <li><a href="#volunteers" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Volunteers<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+      <li><a href="#overview"
+          class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity"
+          style="color:var(--text-primary);">Overview<span
+            class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a>
+      </li>
+      <li><a href="#roles"
+          class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity"
+          style="color:var(--text-primary);">Roles<span
+            class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a>
+      </li>
+      <li><a href="#volunteers"
+          class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity"
+          style="color:var(--text-primary);">Volunteers<span
+            class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a>
+      </li>
     </ul>
     <div class="flex gap-4 items-center">
       <li class="profile-wrapper" style="list-style:none;">
         <div class="profile-avatar" id="profileAvatarBtn" title="Account options">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);">
-            <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+            style="color:var(--text-muted);">
+            <path fill-rule="evenodd"
+              d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
+              clip-rule="evenodd" />
           </svg>
         </div>
         <div class="profile-dropdown" id="profileDropdown">
@@ -251,10 +594,15 @@
           </div>
           <div class="theme-toggle-row">
             <div class="theme-toggle-label">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
               </svg>
               Dark Mode
             </div>
@@ -264,12 +612,19 @@
             </label>
           </div>
           <a class="dropdown-item" id="homeLink" href="/home">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
             Home
           </a>
           <div class="dropdown-item danger" id="logoutBtn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
             </svg>
             Logout
           </div>
@@ -283,7 +638,9 @@
     <!-- Breadcrumb -->
     <div class="breadcrumb fade-up fade-up-1" id="breadcrumb">
       <a href="/home">Home</a>
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+      </svg>
       <span id="breadcrumb-title" style="color:var(--text-primary);">Event Overview</span>
     </div>
 
@@ -298,7 +655,8 @@
     <div id="error-state" class="hidden text-center py-20">
       <p class="text-4xl mb-4">😕</p>
       <h2 class="text-xl font-bold mb-2" style="color:var(--text-primary);">Event Not Found</h2>
-      <p class="text-sm mb-6" style="color:var(--text-muted);">The event you're looking for doesn't exist or has been removed.</p>
+      <p class="text-sm mb-6" style="color:var(--text-muted);">The event you're looking for doesn't exist or has been
+        removed.</p>
       <a href="/home" class="edit-mode-btn primary">Back to Home</a>
     </div>
 
@@ -306,19 +664,27 @@
     <div id="main-content" class="hidden flex flex-col gap-10">
 
       <!-- HERO / Overview Section -->
-      <section id="overview" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-1" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+      <section id="overview" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-1"
+        style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
         <div class="flex flex-col lg:flex-row gap-8">
           <!-- Event Banner -->
-          <div id="event-banner-wrap" class="lg:w-[320px] flex-shrink-0 rounded-[1.5rem] overflow-hidden" style="background:var(--article-bg);border:1px solid var(--article-border);">
-            <div id="event-banner" class="w-full h-[200px] lg:h-full flex items-center justify-center" style="color:var(--text-muted);">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <div id="event-banner-wrap" class="lg:w-[320px] flex-shrink-0 rounded-[1.5rem] overflow-hidden"
+            style="background:var(--article-bg);border:1px solid var(--article-border);">
+            <div id="event-banner" class="w-full h-[200px] lg:h-full flex items-center justify-center"
+              style="color:var(--text-muted);">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 opacity-30" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
             </div>
           </div>
 
           <!-- Event Info -->
           <div class="flex-1">
             <div class="flex flex-wrap items-center gap-3 mb-3">
-              <h1 id="event-title" class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">—</h1>
+              <h1 id="event-title" class="text-3xl md:text-4xl font-bold font-['Satisfy']"
+                style="color:var(--text-primary);">—</h1>
               <span id="event-status-badge" class="status-badge status-draft">Draft</span>
             </div>
             <p id="event-tagline" class="text-sm mb-4" style="color:var(--text-secondary);"></p>
@@ -326,20 +692,26 @@
 
             <!-- Meta Grid -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div class="rounded-xl p-3 border" style="background:var(--article-bg);border-color:var(--article-border);">
+              <div class="rounded-xl p-3 border"
+                style="background:var(--article-bg);border-color:var(--article-border);">
                 <p class="text-xs uppercase tracking-widest font-bold mb-1" style="color:var(--text-muted);">Date</p>
                 <p id="event-date" class="text-sm font-bold" style="color:var(--text-primary);">—</p>
               </div>
-              <div class="rounded-xl p-3 border" style="background:var(--article-bg);border-color:var(--article-border);">
-                <p class="text-xs uppercase tracking-widest font-bold mb-1" style="color:var(--text-muted);">Location</p>
+              <div class="rounded-xl p-3 border"
+                style="background:var(--article-bg);border-color:var(--article-border);">
+                <p class="text-xs uppercase tracking-widest font-bold mb-1" style="color:var(--text-muted);">Location
+                </p>
                 <p id="event-location" class="text-sm font-bold" style="color:var(--text-primary);">—</p>
               </div>
-              <div class="rounded-xl p-3 border" style="background:var(--article-bg);border-color:var(--article-border);">
+              <div class="rounded-xl p-3 border"
+                style="background:var(--article-bg);border-color:var(--article-border);">
                 <p class="text-xs uppercase tracking-widest font-bold mb-1" style="color:var(--text-muted);">Type</p>
                 <p id="event-type" class="text-sm font-bold" style="color:var(--text-primary);">—</p>
               </div>
-              <div class="rounded-xl p-3 border" style="background:var(--article-bg);border-color:var(--article-border);">
-                <p class="text-xs uppercase tracking-widest font-bold mb-1" style="color:var(--text-muted);">Organizer</p>
+              <div class="rounded-xl p-3 border"
+                style="background:var(--article-bg);border-color:var(--article-border);">
+                <p class="text-xs uppercase tracking-widest font-bold mb-1" style="color:var(--text-muted);">Organizer
+                </p>
                 <p id="event-organizer" class="text-sm font-bold" style="color:var(--text-primary);">—</p>
               </div>
             </div>
@@ -354,18 +726,24 @@
                   <option value="completed">Completed</option>
                   <option value="cancelled">Cancelled</option>
                 </select>
-                <button id="update-status-btn" class="edit-mode-btn primary" onclick="updateEventStatus()">Update Status</button>
+                <button id="update-status-btn" class="edit-mode-btn primary" onclick="updateEventStatus()">Update
+                  Status</button>
                 <a id="edit-event-btn" class="edit-mode-btn" href="#">Edit Event</a>
                 <a id="manage-event-btn" class="edit-mode-btn" href="#">Manage Dashboard</a>
               </div>
-              
+
               <a id="report-incident-btn" class="edit-mode-btn danger flex items-center gap-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
                 Report Issue
               </a>
 
               <div id="viewer-badge" class="hidden">
-                <span class="text-xs uppercase tracking-widest font-bold px-3 py-1 rounded-full border" style="background:var(--article-bg);border-color:var(--article-border);color:var(--text-muted);">
+                <span class="text-xs uppercase tracking-widest font-bold px-3 py-1 rounded-full border"
+                  style="background:var(--article-bg);border-color:var(--article-border);color:var(--text-muted);">
                   👁 View Only
                 </span>
               </div>
@@ -375,20 +753,24 @@
       </section>
 
       <!-- MANAGE SCHEDULE -->
-      <section id="schedule" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-1" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+      <section id="schedule" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-1"
+        style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
         <div class="flex items-center justify-between mb-8">
-          <h2 class="text-2xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Manage Schedule</h2>
-          <button class="edit-mode-btn primary" onclick="saveTimetable()">Save Timetable</button>
+          <h2 id="schedule-section-title" class="text-2xl font-bold font-['Satisfy']"
+            style="color:var(--text-primary);">Schedule</h2>
+          <div id="schedule-save-container"></div>
         </div>
-        
+
         <div id="overview-schedule-container" class="space-y-8">
-           <!-- Dynamically filled -->
+          <!-- Dynamically filled -->
         </div>
       </section>
 
       <!-- PROGRESS TIMELINE -->
-      <section class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-2" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-        <h2 class="text-2xl font-bold font-['Satisfy'] mb-8 text-center" style="color:var(--text-primary);">Event Progress</h2>
+      <section class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-2"
+        style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+        <h2 class="text-2xl font-bold font-['Satisfy'] mb-8 text-center" style="color:var(--text-primary);">Event
+          Progress</h2>
         <div class="timeline" id="event-timeline">
           <div class="timeline-step" id="step-draft">
             <div class="timeline-dot">1</div>
@@ -409,19 +791,23 @@
         </div>
         <!-- Summary Stats -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-          <div class="text-center rounded-xl p-4 border" style="background:var(--article-bg);border-color:var(--article-border);">
+          <div class="text-center rounded-xl p-4 border"
+            style="background:var(--article-bg);border-color:var(--article-border);">
             <p id="stat-total-roles" class="text-2xl font-bold" style="color:var(--text-primary);">0</p>
             <p class="text-xs uppercase tracking-widest font-bold" style="color:var(--text-muted);">Roles</p>
           </div>
-          <div class="text-center rounded-xl p-4 border" style="background:var(--article-bg);border-color:var(--article-border);">
+          <div class="text-center rounded-xl p-4 border"
+            style="background:var(--article-bg);border-color:var(--article-border);">
             <p id="stat-needed" class="text-2xl font-bold" style="color:var(--text-primary);">0</p>
             <p class="text-xs uppercase tracking-widest font-bold" style="color:var(--text-muted);">Slots Needed</p>
           </div>
-          <div class="text-center rounded-xl p-4 border" style="background:var(--article-bg);border-color:var(--article-border);">
+          <div class="text-center rounded-xl p-4 border"
+            style="background:var(--article-bg);border-color:var(--article-border);">
             <p id="stat-approved" class="text-2xl font-bold text-green-400">0</p>
             <p class="text-xs uppercase tracking-widest font-bold" style="color:var(--text-muted);">Approved</p>
           </div>
-          <div class="text-center rounded-xl p-4 border" style="background:var(--article-bg);border-color:var(--article-border);">
+          <div class="text-center rounded-xl p-4 border"
+            style="background:var(--article-bg);border-color:var(--article-border);">
             <p id="stat-pending" class="text-2xl font-bold text-yellow-400">0</p>
             <p class="text-xs uppercase tracking-widest font-bold" style="color:var(--text-muted);">Pending</p>
           </div>
@@ -429,20 +815,28 @@
       </section>
 
       <!-- ROLES BREAKDOWN -->
-      <section id="roles" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-3" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-        <h2 class="text-2xl font-bold font-['Satisfy'] mb-2 text-center" style="color:var(--text-primary);">Volunteer Roles & Assignments</h2>
-        <p class="text-sm text-center mb-8" style="color:var(--text-secondary);">Each role shows the volunteers currently assigned from the database.</p>
+      <section id="roles" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-3"
+        style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+        <h2 class="text-2xl font-bold font-['Satisfy'] mb-2 text-center" style="color:var(--text-primary);">Volunteer
+          Roles & Assignments</h2>
+        <p class="text-sm text-center mb-8" style="color:var(--text-secondary);">Each role shows the volunteers
+          currently assigned from the database.</p>
         <div id="roles-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-        <div id="roles-empty" class="hidden text-center py-10 italic" style="color:var(--text-muted);">No volunteer roles defined for this event.</div>
+        <div id="roles-empty" class="hidden text-center py-10 italic" style="color:var(--text-muted);">No volunteer
+          roles defined for this event.</div>
       </section>
 
       <!-- ALL VOLUNTEERS TABLE -->
-      <section id="volunteers" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-4" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-        <h2 class="text-2xl font-bold font-['Satisfy'] mb-2 text-center" style="color:var(--text-primary);">All Volunteers</h2>
-        <p class="text-sm text-center mb-8" style="color:var(--text-secondary);">Complete list of all volunteer applications for this event.</p>
+      <section id="volunteers" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-4"
+        style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+        <h2 class="text-2xl font-bold font-['Satisfy'] mb-2 text-center" style="color:var(--text-primary);">All
+          Volunteers</h2>
+        <p class="text-sm text-center mb-8" style="color:var(--text-secondary);">Complete list of all volunteer
+          applications for this event.</p>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-sm whitespace-nowrap">
-            <thead class="uppercase tracking-wider text-xs font-bold border-b" style="color:var(--text-muted);border-color:var(--card-border);">
+            <thead class="uppercase tracking-wider text-xs font-bold border-b"
+              style="color:var(--text-muted);border-color:var(--card-border);">
               <tr>
                 <th class="px-4 py-4">Volunteer</th>
                 <th class="px-4 py-4">Role</th>
@@ -454,11 +848,192 @@
             <tbody id="volunteers-table" style="color:var(--text-secondary);"></tbody>
           </table>
         </div>
-        <div id="volunteers-empty" class="hidden text-center py-10 italic" style="color:var(--text-muted);">No volunteer applications for this event yet.</div>
+        <div id="volunteers-empty" class="hidden text-center py-10 italic" style="color:var(--text-muted);">No volunteer
+          applications for this event yet.</div>
       </section>
 
     </div>
   </main>
+
+  <style>
+    /* macOS App Bar */
+    .mac-bar-wrapper {
+      position: relative;
+      padding: 0;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    .mac-bar-scrollable {
+      display: flex;
+      gap: 1.5rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+      /* Firefox */
+      -ms-overflow-style: none;
+      /* IE/Edge */
+    }
+
+    .mac-bar-scrollable::-webkit-scrollbar {
+      display: none;
+      /* Chrome/Safari */
+    }
+
+    .mac-day-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 60px;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+      opacity: 0.5;
+      transform: scale(0.9);
+      border-bottom: 2px solid transparent;
+    }
+
+    .mac-day-tab:hover {
+      background: transparent;
+      color: var(--text-secondary);
+      opacity: 0.8;
+      transform: scale(0.95);
+    }
+
+    .mac-day-tab.active {
+      background: transparent;
+      border-color: transparent;
+      color: var(--text-primary);
+      box-shadow: none;
+      opacity: 1;
+      transform: scale(1.25);
+      border-bottom: 2px solid var(--text-primary);
+      margin: 0 12px;
+      padding-bottom: 0.5rem;
+    }
+
+    .mac-day-tab .day-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+
+    .mac-day-tab .day-number {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-top: -2px;
+    }
+
+    /* Glass Bubbles */
+    .schedule-content-wrapper {
+      position: relative;
+    }
+
+    .day-group-container {
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    .day-group-container.active-day {
+      position: relative;
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .day-group-container.inactive-day {
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+    }
+
+    .time-bubble {
+      padding: 0.45rem 1rem;
+      border-radius: 99px;
+      background: rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .title-bubble {
+      padding: 0.4rem 0.4rem 0.4rem 1.25rem;
+      border-radius: 99px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+      border: 1px solid var(--card-border);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+
+    .schedule-view-row:hover .title-bubble {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .description-bubble {
+      padding: 1rem 1.25rem;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+    }
+
+    .organizer-edit-row {
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(10px);
+    }
+
+    .time-badge {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 0.5rem 0.75rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      text-align: center;
+      min-width: 85px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .bubble-title {
+      letter-spacing: 0.01em;
+    }
+
+    .expand-icon-wrapper {
+      background: rgba(255, 255, 255, 0.05);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: background 0.3s ease;
+    }
+
+    .glass-bubble-item:hover .expand-icon-wrapper {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
 
   <footer class="mt-auto py-8 text-center text-sm" style="color:var(--footer-text);">
     <p>&copy; 2026 EventHive. All rights reserved.</p>
@@ -532,7 +1107,7 @@
           img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
           avatarBtn.innerHTML = ''; avatarBtn.appendChild(img);
         }
-      } catch(e) {}
+      } catch (e) { }
     }
 
     // ── Date formatting ──
@@ -543,7 +1118,7 @@
 
     // ── Status badge class ──
     function statusClass(s) {
-      const map = { draft:'status-draft', published:'status-published', ongoing:'status-ongoing', completed:'status-completed', cancelled:'status-cancelled' };
+      const map = { draft: 'status-draft', published: 'status-published', ongoing: 'status-ongoing', completed: 'status-completed', cancelled: 'status-cancelled' };
       return map[s] || 'status-draft';
     }
 
@@ -586,15 +1161,15 @@
 
         const volunteersHtml = approved.length
           ? approved.map(a => {
-              const vol = a.volunteerId || {};
-              const name = vol.profile?.fullName || vol.username || 'Unknown';
-              const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-              const pic = vol.profile?.profilePic;
-              const avatarInner = pic
-                ? `<img src="${pic}" alt="${name}">`
-                : initials;
-              const skills = (vol.profile?.skills || []).slice(0, 3).map(s => s.name || s).join(', ');
-              return `
+            const vol = a.volunteerId || {};
+            const name = vol.profile?.fullName || vol.username || 'Unknown';
+            const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+            const pic = vol.profile?.profilePic;
+            const avatarInner = pic
+              ? `<img src="${pic}" alt="${name}">`
+              : initials;
+            const skills = (vol.profile?.skills || []).slice(0, 3).map(s => s.name || s).join(', ');
+            return `
                 <div class="vol-chip">
                   <div class="vol-avatar">${avatarInner}</div>
                   <div class="flex-1 min-w-0">
@@ -603,7 +1178,7 @@
                   </div>
                   <span class="text-xs font-bold px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);">Active</span>
                 </div>`;
-            }).join('')
+          }).join('')
           : `<p class="text-xs italic py-2" style="color:var(--text-muted);">No volunteers assigned yet.</p>`;
 
         const pendingHtml = pending.length
@@ -669,7 +1244,7 @@
           withdrawn: { cls: 'text-gray-400', label: 'Withdrawn' }
         };
         const st = statusMap[app.status] || statusMap.pending;
-        const applied = app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('en-IN', { day:'numeric', month:'short' }) : '—';
+        const applied = app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—';
 
         return `
           <tr class="border-b hover:opacity-90 transition-colors" style="border-color:var(--card-border);">
@@ -716,7 +1291,7 @@
           alert(data.error || 'Failed to update status');
           btn.textContent = 'Update Status'; btn.disabled = false;
         }
-      } catch(e) {
+      } catch (e) {
         alert('Network error'); btn.textContent = 'Update Status'; btn.disabled = false;
       }
     }
@@ -736,7 +1311,7 @@
         } else {
           alert(data.error || 'Failed to save');
         }
-      } catch(e) { alert('Network error'); }
+      } catch (e) { alert('Network error'); }
     }
 
     // ── Main Load ──
@@ -813,7 +1388,16 @@
         renderVolunteersTable(applications, roles);
         renderTimetableEditor(event);
 
-      } catch(err) {
+        if (isOrganizer) {
+          document.getElementById('schedule-save-container').innerHTML = `
+            <button class="edit-mode-btn primary" onclick="saveTimetable()">Save Timetable</button>
+          `;
+          document.getElementById('schedule-section-title').textContent = 'Manage Schedule';
+        } else {
+          document.getElementById('schedule-section-title').textContent = 'Schedule';
+        }
+
+      } catch (err) {
         console.error(err);
         document.getElementById('loading-state').classList.add('hidden');
         document.getElementById('error-state').classList.remove('hidden');
@@ -826,7 +1410,7 @@
       const timetable = event.timetable || [];
       const start = new Date(event.schedule?.start);
       const end = new Date(event.schedule?.end);
-      
+
       if (isNaN(start.getTime()) || isNaN(end.getTime())) {
         container.innerHTML = '<p class="text-sm italic text-center" style="color:var(--text-muted);">Please set event dates to manage schedule.</p>';
         return;
@@ -836,41 +1420,99 @@
       const endDay = new Date(end.getFullYear(), end.getMonth(), end.getDate());
       const daysCount = Math.round((endDay - startDay) / (1000 * 60 * 60 * 24)) + 1;
 
-      container.innerHTML = '';
-      for (let i = 1; i <= daysCount; i++) {
-        const dayTimetable = timetable.filter(t => t.day === i);
-        const daySection = document.createElement('div');
-        daySection.className = 'day-section-overview';
-        daySection.innerHTML = `
-          <div class="flex items-center gap-3 mb-4">
-            <span class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold" style="color:var(--text-primary);">D${i}</span>
-            <h3 class="text-sm font-bold uppercase tracking-widest" style="color:var(--text-muted);">Day ${i}</h3>
-          </div>
-          <div id="day-editor-${i}" class="space-y-3 pl-4 border-l border-white/5 ml-4">
-             ${dayTimetable.map((item, idx) => createItemRowHtml(i, item)).join('')}
-             ${dayTimetable.length === 0 ? createItemRowHtml(i) : ''}
-          </div>
-          <button class="edit-mode-btn mt-4 ml-8" style="font-size:0.6rem;padding:0.4rem 0.8rem;" onclick="addItemRow(${i})">+ Add Activity</button>
-        `;
-        container.appendChild(daySection);
+      let activeDays = [];
+      if (isOrganizer) {
+        for (let i = 1; i <= daysCount; i++) activeDays.push(i);
+      } else {
+        activeDays = [...new Set(timetable.map(t => t.day))].sort((a, b) => a - b);
       }
+
+      if (activeDays.length === 0 && !isOrganizer) {
+        container.innerHTML = '<p class="text-sm italic text-center" style="color:var(--text-muted);">No schedule available yet.</p>';
+        return;
+      }
+
+      let html = `<div class="mac-bar-wrapper mb-8 flex justify-center">
+                    <div class="mac-bar-scrollable justify-center w-full" id="overview-day-tabs">`;
+      activeDays.forEach((i, idx) => {
+        html += `<button type="button" class="mac-day-tab ${idx === 0 ? 'active' : ''}" data-day="${i}" onclick="switchOverviewDay(${i})">
+                   <span class="day-label">Day</span>
+                   <span class="day-number">${i}</span>
+                 </button>`;
+      });
+      html += `   </div>
+                </div>
+                <div class="schedule-content-wrapper relative min-h-[150px]" id="overview-full-schedule">`;
+
+      activeDays.forEach((i, idx) => {
+        const dayTimetable = timetable.filter(t => t.day === i);
+        html += `
+          <div class="day-group-container ${idx === 0 ? 'active-day' : 'inactive-day'}" id="overview-day-group-${i}">
+            <div id="day-editor-${i}" class="space-y-4 max-w-2xl mx-auto">
+               ${dayTimetable.map((item) => createItemRowHtml(i, item)).join('')}
+               ${dayTimetable.length === 0 && isOrganizer ? createItemRowHtml(i) : ''}
+            </div>
+            ${isOrganizer ? `<div class="flex justify-center mt-6"><button type="button" class="edit-mode-btn primary" style="font-size:0.75rem;padding:0.6rem 1.25rem; border-radius: 9999px;" onclick="addItemRow(${i})">+ Add Activity</button></div>` : ''}
+          </div>
+        `;
+      });
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+
+    window.switchOverviewDay = (day) => {
+      document.querySelectorAll('#overview-day-tabs .mac-day-tab').forEach(t => {
+        t.classList.toggle('active', parseInt(t.dataset.day) === day);
+      });
+      document.querySelectorAll('#overview-full-schedule .day-group-container').forEach(g => {
+        const isTarget = g.id === `overview-day-group-${day}`;
+        g.classList.toggle('active-day', isTarget);
+        g.classList.toggle('inactive-day', !isTarget);
+      });
     }
 
     function createItemRowHtml(day, item = {}) {
+      if (!isOrganizer) {
+        return `
+          <div class="schedule-view-row group cursor-pointer w-full mb-3" onclick="this.classList.toggle('expanded')" data-day="${day}">
+              <div class="flex flex-wrap sm:flex-nowrap items-center gap-3">
+                  <div class="time-bubble">
+                      ${item.startTime || '--:--'} - ${item.endTime || '--:--'}
+                  </div>
+                  <div class="title-bubble flex-1 w-full sm:w-auto">
+                      <span class="truncate pr-2">${item.title || 'Untitled Activity'}</span>
+                      <div class="expand-icon-wrapper ring-1 ring-white/10 shrink-0">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-50 group-[.expanded]:rotate-180 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                          </svg>
+                      </div>
+                  </div>
+              </div>
+              <div class="bubble-body overflow-hidden max-h-0 transition-all duration-300 group-[.expanded]:max-h-64 mt-0 opacity-0 group-[.expanded]:mt-3 group-[.expanded]:opacity-100">
+                  <div class="description-bubble">
+                      <p class="text-xs md:text-sm leading-relaxed" style="color:var(--text-secondary);">${item.description || "No further details available for this activity."}</p>
+                  </div>
+              </div>
+          </div>
+        `;
+      }
       return `
-        <div class="schedule-edit-row flex flex-col md:flex-row gap-3 p-4 rounded-xl border border-white/5 bg-white/5 relative group" data-day="${day}">
-           <div class="flex gap-2">
-             <input type="time" class="notes-input" style="min-height:unset;width:100px;" value="${item.startTime || ''}" placeholder="Start">
-             <input type="time" class="notes-input" style="min-height:unset;width:100px;" value="${item.endTime || ''}" placeholder="End">
+        <div class="organizer-edit-row relative group p-5 mb-4" data-day="${day}">
+           <div class="flex flex-col md:flex-row gap-4 w-full pr-8">
+             <div class="flex flex-col gap-2 min-w-[140px]">
+               <input type="time" class="notes-input flex-1" style="min-height:unset;background:rgba(255,255,255,0.05);color:var(--text-primary);" value="${item.startTime || ''}" placeholder="Start">
+               <input type="time" class="notes-input flex-1" style="min-height:unset;background:rgba(255,255,255,0.05);color:var(--text-primary);" value="${item.endTime || ''}" placeholder="End">
+             </div>
+             <div class="flex-1 w-full flex flex-col gap-3">
+               <input type="text" class="notes-input font-bold" style="min-height:unset;background:rgba(255,255,255,0.05);color:var(--text-primary);" value="${item.title || ''}" placeholder="Activity Title (e.g., Keynote Speech)">
+               <textarea class="notes-input" style="min-height:60px;font-size:0.75rem;background:rgba(255,255,255,0.05);color:var(--text-secondary);" placeholder="Brief description of the activity...">${item.description || ''}</textarea>
+             </div>
            </div>
-           <div class="flex-1">
-             <input type="text" class="notes-input mb-2" style="min-height:unset;" value="${item.title || ''}" placeholder="Activity Title">
-             <textarea class="notes-input" style="min-height:40px;font-size:0.75rem;" placeholder="Description">${item.description || ''}</textarea>
-           </div>
-           <button class="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity absolute top-2 right-2" onclick="this.closest('.schedule-edit-row').remove()">&times;</button>
+           <button type="button" class="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity absolute top-4 right-4 bg-red-400/10 hover:bg-red-400/20 w-8 h-8 rounded-full flex items-center justify-center" onclick="this.closest('.organizer-edit-row').remove()">&times;</button>
         </div>
       `;
     }
+
 
     window.addItemRow = (day) => {
       const container = document.getElementById(`day-editor-${day}`);
@@ -908,7 +1550,7 @@
         } else {
           alert(data.error || 'Failed to save');
         }
-      } catch(e) { alert('Network error'); }
+      } catch (e) { alert('Network error'); }
     }
 
     // ── Init ──
@@ -918,4 +1560,5 @@
     })();
   </script>
 </body>
+
 </html>

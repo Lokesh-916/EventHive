@@ -206,29 +206,50 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     <!-- Event Schedule -->
                     ${ev.timetable && ev.timetable.length > 0 ? `
-                    <div class="glass-card p-6 md:p-8 animate-in delay-2">
-                        <h2 class="text-lg font-bold mb-6 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Event Schedule
-                        </h2>
-                        <div class="space-y-8">
-                            ${[...new Set(ev.timetable.map(t => t.day))].sort((a,b) => a-b).map(dayNum => `
-                                <div class="day-group">
-                                    <h3 class="text-sm font-bold uppercase tracking-widest text-white/40 mb-4 flex items-center gap-2">
-                                        <span class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] text-white">D${dayNum}</span>
-                                        Day ${dayNum}
-                                    </h3>
-                                    <div class="space-y-4 border-l-2 border-white/5 ml-3 pl-6">
+                    <div class="glass-card p-6 md:p-8 animate-in delay-2 schedule-section-wrapper">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-lg font-bold flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Event Schedule
+                            </h2>
+                        </div>
+                        
+                        <!-- macOS App Bar Style Day Navigation -->
+                        <div class="mac-bar-wrapper mb-8 flex justify-center">
+                            <div class="mac-bar-scrollable justify-center w-full" id="day-tabs">
+                                ${[...new Set(ev.timetable.map(t => t.day))].sort((a,b) => a-b).map((dayNum, idx) => `
+                                    <button class="mac-day-tab ${idx === 0 ? 'active' : ''}" data-day="${dayNum}" onclick="switchDay(${dayNum})">
+                                        <span class="day-label">Day</span>
+                                        <span class="day-number">${dayNum}</span>
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="schedule-content-wrapper relative min-h-[200px]" id="full-schedule">
+                            ${[...new Set(ev.timetable.map(t => t.day))].sort((a,b) => a-b).map((dayNum, idx) => `
+                                <div class="day-group-container ${idx === 0 ? 'active-day' : 'inactive-day'}" id="day-group-${dayNum}">
+                                    <div class="space-y-4">
                                         ${ev.timetable.filter(t => t.day === dayNum).map(item => `
-                                            <div class="relative">
-                                                <div class="absolute -left-[31px] top-1.5 w-2 h-2 rounded-full bg-white/20"></div>
-                                                <div class="flex flex-col md:flex-row md:items-start gap-1 md:gap-4">
-                                                    <span class="text-[10px] font-bold text-white/30 whitespace-nowrap mt-0.5">${esc(item.startTime || '')} - ${esc(item.endTime || '')}</span>
-                                                    <div>
-                                                        <h4 class="text-sm font-bold text-white/80">${esc(item.title)}</h4>
-                                                        <p class="text-xs text-white/40 mt-1">${esc(item.description || '')}</p>
+                                            <div class="schedule-view-row group cursor-pointer w-full mb-3" onclick="this.classList.toggle('expanded')">
+                                                <div class="flex flex-wrap sm:flex-nowrap items-center gap-3">
+                                                    <div class="time-bubble">
+                                                        ${esc(item.startTime || '--:--')} - ${esc(item.endTime || '--:--')}
+                                                    </div>
+                                                    <div class="title-bubble flex-1 w-full sm:w-auto">
+                                                        <span class="truncate pr-2">${esc(item.title || 'Untitled Activity')}</span>
+                                                        <div class="expand-icon-wrapper ring-1 ring-white/10 shrink-0">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-50 group-[.expanded]:rotate-180 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="bubble-body overflow-hidden max-h-0 transition-all duration-300 group-[.expanded]:max-h-64 mt-0 opacity-0 group-[.expanded]:mt-3 group-[.expanded]:opacity-100">
+                                                    <div class="description-bubble">
+                                                        <p class="text-xs md:text-sm leading-relaxed text-white/60">${esc(item.description || "No further details available for this activity.")}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -237,7 +258,191 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 </div>
                             `).join('')}
                         </div>
-                    </div>` : ''}
+                    </div>
+
+                    <style>
+                        /* macOS App Bar */
+                        .mac-bar-wrapper {
+                            position: relative;
+                            padding: 0;
+                            background: transparent;
+                            border: none;
+                            box-shadow: none;
+                        }
+                        
+                        .mac-bar-scrollable {
+                            display: flex;
+                            gap: 1.5rem;
+                            overflow-x: auto;
+                            scrollbar-width: none; /* Firefox */
+                            -ms-overflow-style: none; /* IE/Edge */
+                        }
+                        
+                        .mac-bar-scrollable::-webkit-scrollbar {
+                            display: none; /* Chrome/Safari */
+                        }
+
+                        .mac-day-tab {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                            min-width: 60px;
+                            padding: 0.25rem 0.5rem;
+                            border-radius: 0;
+                            background: transparent;
+                            border: none;
+                            color: rgba(255, 255, 255, 0.5);
+                            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+                            cursor: pointer;
+                            opacity: 0.5;
+                            transform: scale(0.9);
+                            border-bottom: 2px solid transparent;
+                        }
+
+                        .mac-day-tab:hover {
+                            background: transparent;
+                            color: rgba(255, 255, 255, 0.8);
+                            opacity: 0.8;
+                            transform: scale(0.95);
+                        }
+
+                        .mac-day-tab.active {
+                            background: transparent;
+                            border-color: transparent;
+                            color: white;
+                            box-shadow: none;
+                            opacity: 1;
+                            transform: scale(1.25);
+                            border-bottom: 2px solid white;
+                            margin: 0 12px;
+                            padding-bottom: 0.5rem;
+                        }
+
+                        .mac-day-tab .day-label {
+                            font-size: 0.65rem;
+                            text-transform: uppercase;
+                            letter-spacing: 0.05em;
+                            font-weight: 500;
+                            opacity: 0.8;
+                        }
+
+                        .mac-day-tab .day-number {
+                            font-size: 1.1rem;
+                            font-weight: 700;
+                            margin-top: -2px;
+                        }
+
+                        /* Glass Bubbles */
+                        .schedule-content-wrapper {
+                            position: relative;
+                        }
+
+                        .day-group-container {
+                            transition: opacity 0.4s ease, transform 0.4s ease;
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            pointer-events: none;
+                        }
+                        
+                        .day-group-container.active-day {
+                            position: relative;
+                            opacity: 1;
+                            transform: translateY(0);
+                            pointer-events: auto;
+                        }
+
+                        .day-group-container.inactive-day {
+                            opacity: 0;
+                            transform: translateY(10px);
+                            pointer-events: none;
+                        }
+
+                        .time-bubble {
+                            padding: 0.45rem 1rem;
+                            border-radius: 99px;
+                            background: rgba(0, 0, 0, 0.2);
+                            border: 1px solid rgba(255, 255, 255, 0.1);
+                            color: rgba(255, 255, 255, 0.6);
+                            font-size: 0.75rem;
+                            font-weight: 700;
+                            white-space: nowrap;
+                        }
+
+                        .title-bubble {
+                            padding: 0.4rem 0.4rem 0.4rem 1.25rem;
+                            border-radius: 99px;
+                            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+                            border: 1px solid rgba(255, 255, 255, 0.1);
+                            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+                            color: white;
+                            font-size: 0.85rem;
+                            font-weight: 700;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            transition: all 0.3s ease;
+                        }
+
+                        .schedule-view-row:hover .title-bubble {
+                            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+                            border-color: rgba(255, 255, 255, 0.2);
+                        }
+
+                        .description-bubble {
+                            padding: 1rem 1.25rem;
+                            border-radius: 20px;
+                            background: rgba(255, 255, 255, 0.03);
+                            border: 1px solid rgba(255, 255, 255, 0.08);
+                        }
+
+                        .time-badge {
+                            background: rgba(0, 0, 0, 0.2);
+                            padding: 0.5rem 0.75rem;
+                            border-radius: 12px;
+                            border: 1px solid rgba(255, 255, 255, 0.05);
+                            text-align: center;
+                            min-width: 85px;
+                            color: rgba(255, 255, 255, 0.9);
+                        }
+
+                        .bubble-title {
+                            letter-spacing: 0.01em;
+                        }
+
+                        .expand-icon-wrapper {
+                            background: rgba(255, 255, 255, 0.05);
+                            width: 32px;
+                            height: 32px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            flex-shrink: 0;
+                            border: 1px solid rgba(255, 255, 255, 0.05);
+                            transition: background 0.3s ease;
+                        }
+
+                        .glass-bubble-item:hover .expand-icon-wrapper {
+                            background: rgba(255, 255, 255, 0.1);
+                        }
+                    </style>
+
+                    <script>
+                        window.switchDay = (day) => {
+                            document.querySelectorAll('.mac-day-tab').forEach(t => {
+                                t.classList.toggle('active', parseInt(t.dataset.day) === day);
+                            });
+                            document.querySelectorAll('.day-group-container').forEach(g => {
+                                const isTarget = g.id === \`day-group-\${day}\`;
+                                g.classList.toggle('active-day', isTarget);
+                                g.classList.toggle('inactive-day', !isTarget);
+                            });
+                        }
+                    </script>
+                    ` : ''}
 
                     <!-- Date & Venue -->
                     <div class="glass-card p-6 md:p-8 animate-in delay-3">
