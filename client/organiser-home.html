@@ -184,6 +184,18 @@
 
     input:checked + .toggle-slider:before { transform: translateX(16px); }
 
+    /* Volunteer table rows */
+    #volunteerTable tr { border-bottom: 1px solid var(--card-border); transition: background 0.15s; }
+    #volunteerTable tr:last-child { border-bottom: none; }
+    #volunteerTable tr:hover { background: var(--article-bg); }
+    #volunteerTable td { padding: 1rem 1.5rem; vertical-align: middle; }
+
+    /* Offer card hover */
+    #offersList > div, #activeOffersList > div {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    #offersList > div:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
+
   </style>
 
 </head>
@@ -321,7 +333,7 @@
 
 
 
-  <main class="w-[90%] max-w-6xl mx-auto my-20 relative z-10 flex flex-col gap-28 pb-28">
+  <main class="w-[90%] max-w-6xl mx-auto my-20 relative z-10 flex flex-col gap-32 pb-32">
 
 
 
@@ -441,9 +453,9 @@
 
       <div class="mb-12 text-center">
 
-        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Client Offers for You</h2>
+        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy'] mb-3" style="color:var(--text-primary);">Client Offers for You</h2>
 
-        <p class="text-sm mt-2" style="color:var(--text-secondary);">Clients looking for organizers like you. Accept, reject, or mark as completed once the event is done.</p>
+        <p class="text-sm max-w-lg mx-auto leading-relaxed" style="color:var(--text-secondary);">Clients looking for organizers like you. Accept, reject, or mark as completed once the event is done.</p>
 
       </div>
 
@@ -465,9 +477,9 @@
 
       <div class="mb-12 text-center">
 
-        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Your Created Events</h2>
+        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy'] mb-3" style="color:var(--text-primary);">Your Created Events</h2>
 
-        <p class="text-sm mt-2" style="color:var(--text-secondary);">Track the events you???ve planned with current status and matched offers.</p>
+        <p class="text-sm max-w-lg mx-auto leading-relaxed" style="color:var(--text-secondary);">Track the events you've planned with current status and matched offers.</p>
 
       </div>
 
@@ -547,7 +559,9 @@
 
       <div class="mb-12 text-center">
 
-        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Why Organize with EventHive?</h2>
+        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy'] mb-3" style="color:var(--text-primary);">Why Organize with EventHive?</h2>
+
+        <p class="text-sm max-w-lg mx-auto leading-relaxed" style="color:var(--text-secondary);">Everything you need to run successful events, all in one place.</p>
 
       </div>
 
@@ -599,27 +613,74 @@
 
     const token = sessionStorage.getItem('token');
 
-
-
-    // ★★ Auth guard: must be logged in as organizer ★★
-
+    // ★★ Auth guard + init: must be logged in as organizer ★★
     (async function checkAuth() {
-
       if (!token) return showUnauthorized('not-logged-in');
-
       try {
-
         const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
-
         if (!res.ok) return showUnauthorized('not-logged-in');
-
         const data = await res.json();
-
         if (data.data?.role !== 'organizer') return showUnauthorized(data.data?.role || 'unknown');
-
+        // Auth confirmed — now init everything
+        initPage(data.data);
       } catch { showUnauthorized('not-logged-in'); }
-
     })();
+
+    function initPage(user) {
+      // Profile dropdown
+      const avatarBtn = document.getElementById('profileAvatarBtn');
+      const dropdown  = document.getElementById('profileDropdown');
+      if (avatarBtn && dropdown) {
+        avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('open'); });
+        document.addEventListener('click', (e) => {
+          if (!dropdown.contains(e.target) && e.target !== avatarBtn) dropdown.classList.remove('open');
+        });
+      }
+
+      // Theme toggle
+      const bgImage = document.getElementById('bgImage');
+      const themeToggle = document.getElementById('themeToggle');
+      function applyTheme(dark) {
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        if (bgImage) bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
+        if (themeToggle) themeToggle.checked = dark;
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+      }
+      applyTheme(localStorage.getItem('theme') !== 'light');
+      if (themeToggle) themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
+
+      // Logout
+      const logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) logoutBtn.addEventListener('click', () => {
+        sessionStorage.removeItem('token');
+        window.location.href = '/';
+      });
+
+      // Populate dropdown name + avatar
+      const name = user.profile?.orgName || user.username;
+      if (name) {
+        const el = document.getElementById('dropdownName');
+        if (el) el.textContent = name;
+      }
+      const pic = user.profile?.profilePic || user.profile?.logo;
+      if (pic && avatarBtn) {
+        const img = document.createElement('img');
+        img.src = pic; img.alt = 'Profile';
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+        avatarBtn.innerHTML = ''; avatarBtn.appendChild(img);
+      }
+
+      // Snapshot
+      const snapHosted = document.getElementById('snap-hosted');
+      const snapRating = document.getElementById('snap-rating');
+      if (snapHosted) snapHosted.textContent = `${user.eventsHosted || 0} completed`;
+      if (snapRating) snapRating.textContent = user.ratingAvg > 0 ? `${user.ratingAvg.toFixed(1)} ★ (${user.ratings?.length || 0} reviews)` : 'No ratings yet';
+
+      // Load data
+      loadOffers();
+      loadMyEvents();
+      loadApplications();
+    }
 
 
 
@@ -706,82 +767,6 @@
         </div>`;
 
     }
-
-
-
-    // ★★ Profile Avatar Dropdown ★★
-
-    const avatarBtn = document.getElementById('profileAvatarBtn');
-
-    const dropdown  = document.getElementById('profileDropdown');
-
-    avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('open'); });
-
-    document.addEventListener('click', (e) => {
-
-      if (!dropdown.contains(e.target) && e.target !== avatarBtn) dropdown.classList.remove('open');
-
-    });
-
-    // ★★ Theme toggle ★★
-
-    const bgImage = document.getElementById('bgImage');
-
-    const themeToggle = document.getElementById('themeToggle');
-
-    function applyTheme(dark) {
-
-      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-
-      bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
-
-      themeToggle.checked = dark;
-
-      localStorage.setItem('theme', dark ? 'dark' : 'light');
-
-    }
-
-    applyTheme(localStorage.getItem('theme') !== 'light');
-
-    themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
-
-
-
-    // ★★ Load organizer name into dropdown ★★
-
-    (async function() {
-
-      try {
-
-        const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
-
-        if (!res.ok) return;
-
-        const data = await res.json();
-
-        const u = data.data;
-
-        const name = u.profile?.orgName || u.username;
-
-        if (name) document.getElementById('dropdownName').textContent = name;
-
-        const pic = u.profile?.profilePic;
-
-        if (pic) {
-
-          const img = document.createElement('img');
-
-          img.src = pic; img.alt = 'Profile';
-
-          img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
-
-          avatarBtn.innerHTML = ''; avatarBtn.appendChild(img);
-
-        }
-
-      } catch(e) {}
-
-    })();
 
 
 
@@ -1629,14 +1614,6 @@
     };
 
 
-
-    loadSnapshot();
-
-    loadOffers();
-
-    loadMyEvents();
-
-    loadApplications();
 
   </script>
 
