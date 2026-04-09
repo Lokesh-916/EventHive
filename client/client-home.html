@@ -117,7 +117,6 @@
       <li><a href="/support" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Support<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
     </ul>
     <div class="flex gap-4 items-center">
-      <button onclick="window.location.href='/home'" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all" style="color:var(--text-primary);">Events Home</button>
       <li class="profile-wrapper" style="list-style:none;">
         <div class="profile-avatar" id="profileAvatarBtn" title="Account options">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);">
@@ -771,26 +770,20 @@
           <div class="rounded-[2rem] border overflow-hidden" style="background:var(--article-bg);border-color:var(--article-border);box-shadow:var(--shadow);">
 
             <!-- Card Header -->
-            <div class="px-7 pt-7 pb-5 flex flex-col sm:flex-row sm:items-start gap-4 border-b" style="border-color:var(--article-border);">
+            <div class="px-7 pt-6 pb-5 flex flex-col sm:flex-row sm:items-start gap-5 border-b" style="border-color:var(--article-border);">
               <div class="flex-1 min-w-0">
-                <div class="flex flex-wrap items-center gap-3 mb-2">
-                  <h3 class="font-bold text-lg" style="color:var(--text-primary);">${offer.title}</h3>
-                  <span class="px-3 py-1 text-xs font-bold rounded-full flex-shrink-0 ${badgeClass}">${statusLabel}</span>
+                <div class="flex flex-wrap items-center gap-3 mb-1">
+                  <h3 class="font-bold text-base" style="color:var(--text-primary);">${offer.title}</h3>
+                  <span class="px-2.5 py-0.5 text-xs font-bold rounded-full flex-shrink-0 ${badgeClass}">${statusLabel}</span>
                 </div>
-                <p class="text-sm mb-3" style="color:var(--text-secondary);">Organized by <span class="font-semibold" style="color:var(--text-primary);">${orgName}</span></p>
-                <div class="flex flex-wrap gap-4 text-xs" style="color:var(--text-muted);">
-                  ${budgetStr ? `<span class="flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    ${budgetStr.replace(/<\/?span>/g,'')}</span>` : ''}
-                  <span class="flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    ${date}</span>
-                  ${offer.city ? `<span class="flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    ${offer.city}</span>` : ''}
+                <p class="text-sm mb-3" style="color:var(--text-secondary);">Organizer: <span class="font-semibold" style="color:var(--text-primary);">${orgName}</span></p>
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs" style="color:var(--text-muted);">
+                  ${budgetStr ? `<span>${budgetStr.replace(/<\/?span>/g,'')}</span>` : ''}
+                  <span>${date}</span>
+                  ${offer.city ? `<span>${offer.city}</span>` : ''}
                 </div>
               </div>
-              <div class="flex sm:flex-col gap-2 flex-shrink-0">
+              <div class="flex sm:flex-col gap-2 flex-shrink-0 pt-1">
                 <button onclick="window.location.href='/organiser-profile?id=${offer.organizerId?._id}'"
                   class="px-4 py-2 text-xs uppercase tracking-widest font-bold rounded-xl border transition-all hover:opacity-80" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
                   View Profile
