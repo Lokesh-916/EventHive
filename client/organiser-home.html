@@ -8,6 +8,10 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+
+  <meta http-equiv="Pragma" content="no-cache">
+
   <title>EventHive Organizer Home</title>
 
   <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
@@ -1386,18 +1390,6 @@
       } catch (e) { empty.classList.remove('hidden'); }
 
     }
-
-
-
-    document.getElementById('logoutBtn').addEventListener('click', (e) => {
-
-      e.preventDefault();
-
-      sessionStorage.removeItem('token');
-
-      window.location.href = '/';
-
-    });
 
 
 

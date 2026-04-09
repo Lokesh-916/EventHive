@@ -34,10 +34,13 @@ app.use(helmet({
 }));
 app.use(morgan('dev'));
 
-// Ensure HTML files are served with UTF-8 charset
+// Ensure HTML files are served with UTF-8 charset and no caching
 app.use((req, res, next) => {
   if (req.path.endsWith('.html') || !req.path.includes('.')) {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
   }
   next();
 });
