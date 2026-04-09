@@ -26,6 +26,16 @@ const clientOfferSchema = new mongoose.Schema({
     status: { type: String, enum: ['pending', 'negotiating', 'paid'] },
     negotiationMessage: { type: String },
     requestedAmount: { type: Number }
+  },
+  finalPayment: {
+    amount: { type: Number },
+    status: { type: String, enum: ['pending', 'paid'], default: 'pending' },
+    paidAt: { type: Date }
+  },
+  refund: {
+    amount: { type: Number },
+    status: { type: String, enum: ['pending', 'refunded'], default: 'pending' },
+    refundedAt: { type: Date }
   }
 }, { timestamps: true });
 

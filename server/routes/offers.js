@@ -243,4 +243,70 @@ router.post('/:id/advance/pay', protect, authorize('client'), async (req, res) =
   }
 });
 
+// @route   POST /api/offers/:id/final-payment
+// @desc    Client pays the remaining balance (totalExpenses - advancePaid)
+// @access  Private (Client)
+router.post('/:id/final-payment', protect, authorize('client'), async (req, res) => {
+  try {
+    const offer = await ClientOffer.findOne({ _id: req.params.id, clientId: req.user.id });
+    if (!offer) return res.status(404).json({ success: false, error: 'Offer not found' });
+    if (offer.status !== 'completed') {
+      return res.status(400).json({ success: false, error: 'Final payment is only available for completed offers' });
+    }
+    if (offer.finalPayment && offer.finalPayment.status === 'paid') {
+      return res.status(400).json({ success: false, error: 'Final payment already made' });
+    }
+
+    const totalExpenses = offer.expenses
+      .filter(e => !e.isDeleted)
+      .reduce((sum, e) => sum + e.amount, 0);
+    const advancePaid = (offer.advance && offer.advance.status === 'paid') ? offer.advance.amount : 0;
+    const remaining = Math.max(0, totalExpenses - advancePaid);
+
+    if (remaining <= 0) {
+      return res.status(400).json({ success: false, error: 'No remaining balance to pay' });
+    }
+
+    offer.finalPayment = { amount: remaining, status: 'paid', paidAt: new Date() };
+    await offer.save();
+    res.json({ success: true, data: offer });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// @route   POST /api/offers/:id/refund
+// @desc    Organizer refunds excess advance (advance - totalExpenses) to client
+// @access  Private (Organizer)
+router.post('/:id/refund', protect, authorize('organizer'), async (req, res) => {
+  try {
+    const offer = await ClientOffer.findOne({ _id: req.params.id, organizerId: req.user.id });
+    if (!offer) return res.status(404).json({ success: false, error: 'Offer not found' });
+    if (offer.status !== 'completed') {
+      return res.status(400).json({ success: false, error: 'Refund is only available for completed offers' });
+    }
+    if (!offer.advance || offer.advance.status !== 'paid') {
+      return res.status(400).json({ success: false, error: 'Advance must have been paid before a refund can be issued' });
+    }
+    if (offer.refund && offer.refund.status === 'refunded') {
+      return res.status(400).json({ success: false, error: 'Refund already issued' });
+    }
+
+    const totalExpenses = offer.expenses
+      .filter(e => !e.isDeleted)
+      .reduce((sum, e) => sum + e.amount, 0);
+    const excess = Math.max(0, offer.advance.amount - totalExpenses);
+
+    if (excess <= 0) {
+      return res.status(400).json({ success: false, error: 'No excess advance to refund' });
+    }
+
+    offer.refund = { amount: excess, status: 'refunded', refundedAt: new Date() };
+    await offer.save();
+    res.json({ success: true, data: offer });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = router;
