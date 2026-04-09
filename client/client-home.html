@@ -425,7 +425,7 @@
       container.innerHTML = data.map(org => {
         const name = org.profile?.orgName || org.username || 'Unknown';
         const initials = name[0].toUpperCase();
-        const rating = org.ratingAvg > 0 ? `Γÿà ${org.ratingAvg.toFixed(1)}` : 'Γÿà New';
+        const rating = org.ratingAvg > 0 ? `★ ${org.ratingAvg.toFixed(1)}` : '★ New';
         const events = org.eventsHosted || 0;
         return `
           <div class="backdrop-blur-md rounded-[1.5rem] p-6 hover:-translate-y-1 transition-all duration-300 border flex flex-col gap-4" style="background:var(--article-bg);border-color:var(--article-border);box-shadow:var(--shadow);">

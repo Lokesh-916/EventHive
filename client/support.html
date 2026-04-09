@@ -204,92 +204,64 @@
     <!-- Sticky Header -->
     <header id="main-header"
         class="fixed w-full top-0 z-50 transition-all duration-300 bg-eh-cream/90 backdrop-blur-md border-b border-eh-pale shadow-sm">
-        <div class="container mx-auto px-6 py-2 flex justify-between items-center">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center gap-4">
 
             <!-- Left: Brand Logo -->
-            <div class="relative cursor-pointer h-16 w-64 flex items-center justify-center overflow-hidden">
-                <a href="/"
-                    class="satisfy-regular text-4xl text-eh-teal select-none z-10 relative no-underline">EventHive</a>
-            </div>
+            <a href="/" class="satisfy-regular text-3xl text-eh-teal select-none no-underline flex-shrink-0">EventHive</a>
 
             <!-- Center: Navigation -->
-            <nav class="hidden md:flex space-x-8 text-eh-teal font-medium absolute left-1/2 transform -translate-x-1/2">
-                <a href="/#home" class="nav-link hover:text-eh-yellow transition-colors">Home</a>
-                <a href="/#features" class="nav-link hover:text-eh-yellow transition-colors">Features</a>
-                <a href="/#how-it-works" class="nav-link hover:text-eh-yellow transition-colors">How It
-                    Works</a>
-                <a href="/#contact" class="nav-link hover:text-eh-yellow transition-colors">Contact</a>
+            <nav class="hidden md:flex gap-6 text-eh-teal font-medium">
+                <a href="/#home" class="nav-link hover:text-eh-yellow transition-colors text-sm">Home</a>
+                <a href="/#features" class="nav-link hover:text-eh-yellow transition-colors text-sm">Features</a>
+                <a href="/#how-it-works" class="nav-link hover:text-eh-yellow transition-colors text-sm">How It Works</a>
+                <a href="/#contact" class="nav-link hover:text-eh-yellow transition-colors text-sm">Contact</a>
             </nav>
 
-            <!-- Right: Auth Buttons / Profile -->
-            <div class="hidden md:flex items-center space-x-4" id="auth-section">
-                <button onclick="openLoginModal()"
-                    class="px-5 py-2 border-2 border-eh-teal text-eh-teal font-bold rounded-full hover:bg-eh-teal hover:text-white transition-colors">Login</button>
-                <button onclick="openSignupModal()"
-                    class="px-5 py-2 bg-eh-teal text-white font-bold rounded-full hover:bg-eh-yellow transition-colors shadow-md">Sign
-                    Up</button>
-            </div>
-            
-            <div class="hidden items-center" id="logged-in-section">
-                <li class="profile-wrapper" style="list-style:none;">
-                    <div class="profile-avatar" id="profileAvatarBtn" title="Account options">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);">
-                        <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/>
-                      </svg>
-                    </div>
-                    <div class="profile-dropdown" id="profileDropdown">
-                      <div class="dropdown-header">
-                        <p id="dropdownName">User</p>
-                        <span id="dropdownRole">Guest</span>
-                      </div>
-                      <div class="theme-toggle-row">
-                        <div class="theme-toggle-label">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            <!-- Right: Auth Buttons OR Profile (mutually exclusive) -->
+            <div class="flex items-center gap-3 flex-shrink-0">
+                <!-- Shown when NOT logged in -->
+                <div class="flex items-center gap-3" id="auth-section">
+                    <button onclick="openLoginModal()"
+                        class="px-4 py-2 border-2 border-eh-teal text-eh-teal font-bold rounded-full hover:bg-eh-teal hover:text-white transition-colors text-sm">Login</button>
+                    <button onclick="openSignupModal()"
+                        class="px-4 py-2 bg-eh-teal text-white font-bold rounded-full hover:bg-eh-yellow transition-colors shadow-md text-sm">Sign Up</button>
+                </div>
+                <!-- Shown when logged in -->
+                <div class="hidden items-center" id="logged-in-section">
+                    <li class="profile-wrapper" style="list-style:none;">
+                        <div class="profile-avatar" id="profileAvatarBtn" title="Account options">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);">
+                            <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/>
                           </svg>
-                          Dark Mode
                         </div>
-                        <label class="toggle-switch">
-                          <input type="checkbox" id="themeToggle">
-                          <span class="toggle-slider"></span>
-                        </label>
-                      </div>
-                      <a class="dropdown-item" id="homeLink" href="/home">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                        Dashboard
-                      </a>
-                      <div class="dropdown-item danger" id="logoutBtn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-                        </svg>
-                        Logout
-                      </div>
-                    </div>
-                </li>
+                        <div class="profile-dropdown" id="profileDropdown">
+                          <div class="dropdown-header">
+                            <p id="dropdownName">User</p>
+                            <span id="dropdownRole">Guest</span>
+                          </div>
+                          <div class="theme-toggle-row">
+                            <div class="theme-toggle-label">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+                              Dark Mode
+                            </div>
+                            <label class="toggle-switch">
+                              <input type="checkbox" id="themeToggle">
+                              <span class="toggle-slider"></span>
+                            </label>
+                          </div>
+                          <a class="dropdown-item" id="homeLink" href="/home">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                            Dashboard
+                          </a>
+                          <div class="dropdown-item danger" id="logoutBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            Logout
+                          </div>
+                        </div>
+                    </li>
+                </div>
             </div>
 
-            <!-- Mobile Menu Button -->
-            <button id="mobile-menu-btn" class="md:hidden text-eh-teal focus:outline-none ml-auto">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
-                    </path>
-                </svg>
-            </button>
-        </div>
-
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-eh-cream border-t border-eh-pale absolute w-full">
-            <div class="flex flex-col px-6 py-4 space-y-4 text-center">
-                <a href="/#home" class="text-eh-teal font-medium hover:text-eh-mint">Home</a>
-                <a href="/#features" class="text-eh-teal font-medium hover:text-eh-mint">Features</a>
-                <a href="/#how-it-works" class="text-eh-teal font-medium hover:text-eh-mint">How It Works</a>
-                <button onclick="openLoginModal()" class="text-eh-teal font-bold">Login</button>
-                <button onclick="openSignupModal()"
-                    class="px-4 py-2 bg-eh-teal text-white font-bold rounded-full hover:bg-eh-mint mx-auto w-32">Sign
-                    Up</button>
-            </div>
         </div>
     </header>
 
