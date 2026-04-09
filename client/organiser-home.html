@@ -454,7 +454,7 @@
 
 
 
-      <div id="offersList" class="flex flex-col gap-5"></div>
+      <div id="offersList" class="flex flex-col gap-6"></div>
 
       <div id="offers-loading" class="text-center py-10 italic text-sm" style="color:var(--text-muted);">Loading offers…</div>
 
@@ -478,18 +478,18 @@
 
 
 
-      <div id="activeOffersList" class="flex flex-col gap-8"></div>
+      <div id="activeOffersList" class="flex flex-col gap-10"></div>
 
       <div id="active-empty" class="hidden text-center py-10 italic" style="color:var(--text-muted);">You don't have any active events currently. Accept offers to see them here!</div>
 
       <!-- Completed offers (read-only summary) -->
-      <div id="completedOffersList" class="flex flex-col gap-4 mt-8"></div>
+      <div id="completedOffersList" class="flex flex-col gap-5 mt-10"></div>
 
 
 
       <!-- Directly created events -->
 
-      <div id="my-events-list" class="flex flex-col gap-6 mt-8"></div>
+      <div id="my-events-list" class="flex flex-col gap-5 mt-8"></div>
 
       <div id="my-events-empty" class="hidden text-center py-6 italic text-sm" style="color:var(--text-muted);">No directly created events yet. <a href="/create-event" class="text-blue-400 hover:underline">Create one →</a></div>
 
@@ -844,15 +844,15 @@
 
             return `
 
-              <div class="rounded-[1.5rem] p-6 flex flex-col sm:flex-row sm:items-center gap-5 transition-colors border" style="background:var(--article-bg);border-color:var(--article-border);" id="offer-${offer._id}">
+              <div class="rounded-[2rem] px-7 py-6 flex flex-col sm:flex-row sm:items-center gap-6 transition-colors border" style="background:var(--article-bg);border-color:var(--article-border);" id="offer-${offer._id}">
 
                 <div class="flex-1 min-w-0">
 
-                  <h3 class="font-bold text-base mb-1" style="color:var(--text-primary);">${esc(offer.title)}</h3>
+                  <h3 class="font-bold text-lg mb-1.5" style="color:var(--text-primary);">${esc(offer.title)}</h3>
 
-                  <p class="text-sm" style="color:var(--text-muted);">From: <span style="color:var(--text-secondary);">${esc(clientName)}</span></p>
+                  <p class="text-sm mb-2" style="color:var(--text-muted);">From: <span style="color:var(--text-secondary);">${esc(clientName)}</span></p>
 
-                  <div class="flex flex-wrap gap-4 mt-2 text-xs" style="color:var(--text-muted);">
+                  <div class="flex flex-wrap gap-4 text-sm" style="color:var(--text-muted);">
 
                     ${budgetStr}
 
@@ -862,15 +862,15 @@
 
                   </div>
 
-                  ${offer.description ? `<p class="text-xs mt-2 line-clamp-2" style="color:var(--text-muted);">${offer.description}</p>` : ''}
+                  ${offer.description ? `<p class="text-sm mt-3 leading-relaxed" style="color:var(--text-muted);">${offer.description}</p>` : ''}
 
                 </div>
 
-                <div class="flex gap-2 flex-shrink-0 flex-col">
+                <div class="flex gap-3 flex-shrink-0 flex-col">
 
-                  <button onclick="acceptOffer('${offer._id}')" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:opacity-90 rounded-xl transition-all shadow-lg" style="color:var(--text-primary);">Accept</button>
+                  <button onclick="acceptOffer('${offer._id}')" class="px-5 py-2.5 text-xs uppercase tracking-widest font-bold bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:opacity-90 rounded-xl transition-all shadow-lg" style="color:var(--text-primary);">Accept</button>
 
-                  <button onclick="rejectOffer('${offer._id}')" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-all">Reject</button>
+                  <button onclick="rejectOffer('${offer._id}')" class="px-5 py-2.5 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-all">Reject</button>
 
                 </div>
 
@@ -1321,29 +1321,29 @@
 
           return `
 
-            <div class="rounded-[1.5rem] px-6 py-4 flex items-center gap-4 border transition-colors" style="background:var(--article-bg);border-color:var(--article-border);">
+            <div class="rounded-[2rem] px-7 py-6 flex items-center gap-5 border transition-colors hover:-translate-y-0.5 hover:shadow-lg" style="background:var(--article-bg);border-color:var(--article-border);transition:transform 0.2s,box-shadow 0.2s;">
 
               <div class="flex-1 min-w-0">
 
-                <div class="flex items-center gap-3 mb-0.5">
+                <div class="flex items-center gap-3 mb-1.5">
 
-                  <h3 class="font-bold text-base" style="color:var(--text-primary);">${ev.title}</h3>
+                  <h3 class="font-bold text-lg" style="color:var(--text-primary);">${ev.title}</h3>
 
-                  <span class="px-2 py-0.5 rounded-full text-xs font-bold border ${statusColor}">${ev.status || 'published'}</span>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border flex-shrink-0 ${statusColor}">${ev.status || 'published'}</span>
 
                 </div>
 
-                <p class="text-xs" style="color:var(--text-muted);">${start}${ev.location?.city ? ' · ' + ev.location.city : ''}</p>
+                <p class="text-sm" style="color:var(--text-muted);">${start}${ev.location?.city ? ' · ' + ev.location.city : ''}</p>
 
               </div>
 
               <!-- Actions menu -->
               <div class="relative flex-shrink-0" id="${menuId}-wrap">
                 <button onclick="toggleEventMenu('${menuId}')"
-                  class="w-8 h-8 rounded-lg flex items-center justify-center border transition-all hover:opacity-80"
+                  class="w-10 h-10 rounded-xl flex items-center justify-center border transition-all hover:opacity-80"
                   style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);"
                   title="Actions">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
                 </button>
                 <div id="${menuId}" class="hidden absolute right-0 top-10 z-50 rounded-xl border shadow-xl overflow-hidden min-w-[160px]"
                   style="background:var(--dropdown-bg);border-color:var(--dropdown-border);">
