@@ -8,10 +8,6 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-
-  <meta http-equiv="Pragma" content="no-cache">
-
   <title>EventHive Organizer Home</title>
 
   <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
@@ -188,18 +184,6 @@
 
     input:checked + .toggle-slider:before { transform: translateX(16px); }
 
-    /* Volunteer table rows */
-    #volunteerTable tr { border-bottom: 1px solid var(--card-border); transition: background 0.15s; }
-    #volunteerTable tr:last-child { border-bottom: none; }
-    #volunteerTable tr:hover { background: var(--article-bg); }
-    #volunteerTable td { padding: 1rem 1.5rem; vertical-align: middle; }
-
-    /* Offer card hover */
-    #offersList > div, #activeOffersList > div {
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    #offersList > div:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
-
   </style>
 
 </head>
@@ -337,23 +321,23 @@
 
 
 
-  <main class="w-[90%] max-w-6xl mx-auto my-20 relative z-10 flex flex-col gap-32 pb-32">
+  <main class="w-[90%] max-w-6xl mx-auto my-20 relative z-10 flex flex-col gap-20 pb-20">
 
 
 
     <!-- HERO SECTION -->
 
-    <section id="hero" class="flex flex-col md:flex-row items-center gap-16">
+    <section id="hero" class="flex flex-col md:flex-row items-center gap-10">
 
       <div class="flex-1">
 
-        <h1 class="text-4xl md:text-6xl font-['Satisfy'] mb-6" style="color:var(--text-primary);">Welcome, Organizer</h1>
+        <h1 class="text-4xl md:text-6xl font-['Satisfy'] mb-4" style="color:var(--text-primary);">Welcome, Organizer</h1>
 
-        <p class="text-lg mb-10 max-w-xl leading-relaxed" style="color:var(--text-secondary);">Create unforgettable experiences, match with clients, and manage your events in one powerful hub.</p>
+        <p class="text-lg mb-8 max-w-xl" style="color:var(--text-secondary);">Create unforgettable experiences, match with clients, and manage your events in one powerful hub.</p>
 
 
 
-        <div class="flex gap-4 mb-12">
+        <div class="flex gap-4 mb-10">
 
           <button onclick="window.location.href='/create-event'" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 rounded-lg hover:shadow-[0_4px_16px_rgba(0,0,0,0.5)] transition-all transform hover:-translate-y-1" style="color:var(--text-primary);">Start New Event</button>
 
@@ -363,11 +347,11 @@
 
 
 
-        <div class="flex gap-10">
+        <div class="flex gap-8">
 
           <div>
 
-            <span class="block text-3xl font-bold mb-2" style="color:var(--text-primary);">32</span>
+            <span class="block text-3xl font-bold mb-1" style="color:var(--text-primary);">32</span>
 
             <span class="text-xs uppercase tracking-wider font-bold" style="color:var(--text-muted);">Active Organizers</span>
 
@@ -375,7 +359,7 @@
 
           <div>
 
-            <span class="block text-3xl font-bold mb-2" style="color:var(--text-primary);">58</span>
+            <span class="block text-3xl font-bold mb-1" style="color:var(--text-primary);">58</span>
 
             <span class="text-xs uppercase tracking-wider font-bold" style="color:var(--text-muted);">Live Offers</span>
 
@@ -383,7 +367,7 @@
 
           <div>
 
-            <span class="block text-3xl font-bold mb-2" style="color:var(--text-primary);">210+</span>
+            <span class="block text-3xl font-bold mb-1" style="color:var(--text-primary);">210+</span>
 
             <span class="text-xs uppercase tracking-wider font-bold" style="color:var(--text-muted);">Events Delivered</span>
 
@@ -395,49 +379,49 @@
 
 
 
-      <div class="backdrop-blur-[32px] rounded-[2rem] p-10 md:w-[400px] border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+      <div class="backdrop-blur-[32px] rounded-[2rem] p-8 md:w-[350px] border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
 
-        <h3 class="text-sm uppercase tracking-widest font-bold mb-8" style="color:var(--text-muted);">Quick Snapshot</h3>
+        <h3 class="text-sm uppercase tracking-widest font-bold mb-6" style="color:var(--text-muted);">Quick Snapshot</h3>
 
-        <ul class="space-y-6">
+        <ul class="space-y-4">
 
-          <li class="flex items-center gap-5">
+          <li class="flex items-center gap-4">
 
-            <div class="w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
+            <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
 
             <div>
 
               <p class="text-sm font-bold" style="color:var(--text-primary);">Pending offers</p>
 
-              <p id="snap-offers" class="text-xs mt-1" style="color:var(--text-secondary);">Loading…</p>
+              <p id="snap-offers" class="text-xs" style="color:var(--text-secondary);">Loading★</p>
 
             </div>
 
           </li>
 
-          <li class="flex items-center gap-5">
+          <li class="flex items-center gap-4">
 
-            <div class="w-12 h-12 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>
+            <div class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>
 
             <div>
 
               <p class="text-sm font-bold" style="color:var(--text-primary);">Events hosted</p>
 
-              <p id="snap-hosted" class="text-xs mt-1" style="color:var(--text-secondary);">Loading…</p>
+              <p id="snap-hosted" class="text-xs" style="color:var(--text-secondary);">Loading★</p>
 
             </div>
 
           </li>
 
-          <li class="flex items-center gap-5">
+          <li class="flex items-center gap-4">
 
-            <div class="w-12 h-12 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="w-10 h-10 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
 
             <div>
 
               <p class="text-sm font-bold" style="color:var(--text-primary);">Your rating</p>
 
-              <p id="snap-rating" class="text-xs mt-1" style="color:var(--text-secondary);">Loading…</p>
+              <p id="snap-rating" class="text-xs" style="color:var(--text-secondary);">Loading★</p>
 
             </div>
 
@@ -453,13 +437,13 @@
 
     <!-- CLIENT OFFERS SECTION -->
 
-    <section id="offers" class="backdrop-blur-[32px] rounded-[2.5rem] p-12 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+    <section id="offers" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
 
-      <div class="mb-12 text-center">
+      <div class="mb-10 text-center">
 
-        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy'] mb-3" style="color:var(--text-primary);">Client Offers for You</h2>
+        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Client Offers for You</h2>
 
-        <p class="text-sm max-w-lg mx-auto leading-relaxed" style="color:var(--text-secondary);">Clients looking for organizers like you. Accept, reject, or mark as completed once the event is done.</p>
+        <p class="text-sm mt-2" style="color:var(--text-secondary);">Clients looking for organizers like you. Accept, reject, or mark as completed once the event is done.</p>
 
       </div>
 
@@ -477,13 +461,13 @@
 
     <!-- MY EVENTS SECTION -->
 
-    <section id="my-events" class="backdrop-blur-[32px] rounded-[2.5rem] p-12 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+    <section id="my-events" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
 
-      <div class="mb-12 text-center">
+      <div class="mb-10 text-center">
 
-        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy'] mb-3" style="color:var(--text-primary);">Your Created Events</h2>
+        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Your Created Events</h2>
 
-        <p class="text-sm max-w-lg mx-auto leading-relaxed" style="color:var(--text-secondary);">Track the events you've planned with current status and matched offers.</p>
+        <p class="text-sm mt-2" style="color:var(--text-secondary);">Track the events you???ve planned with current status and matched offers.</p>
 
       </div>
 
@@ -507,9 +491,9 @@
 
     <!-- VOLUNTEER MANAGEMENT -->
 
-    <section id="volunteers" class="backdrop-blur-[32px] rounded-[2.5rem] p-12 border reveal" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+    <section id="volunteers" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border reveal" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
 
-      <div class="mb-10 border-b pb-6" style="border-color:var(--card-border);">
+      <div class="mb-8 border-b pb-4" style="border-color:var(--card-border);">
 
         <h2 class="text-3xl font-bold font-['Satisfy'] mb-2" style="color:var(--text-primary);">Volunteer Management</h2>
 
@@ -559,13 +543,11 @@
 
     <!-- WHY EVENTHIVE / INFO SECTION -->
 
-    <section class="backdrop-blur-[32px] rounded-[2.5rem] p-12 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+    <section class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
 
-      <div class="mb-12 text-center">
+      <div class="mb-10 text-center">
 
-        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy'] mb-3" style="color:var(--text-primary);">Why Organize with EventHive?</h2>
-
-        <p class="text-sm max-w-lg mx-auto leading-relaxed" style="color:var(--text-secondary);">Everything you need to run successful events, all in one place.</p>
+        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Why Organize with EventHive?</h2>
 
       </div>
 
@@ -617,74 +599,42 @@
 
     const token = sessionStorage.getItem('token');
 
-    // ★★ Auth guard + init: must be logged in as organizer ★★
+
+
+    // ★★ Auth guard: must be logged in as organizer ★★
+
     (async function checkAuth() {
+
       if (!token) return showUnauthorized('not-logged-in');
+
       try {
+
         const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
+
         if (!res.ok) return showUnauthorized('not-logged-in');
+
         const data = await res.json();
+
         if (data.data?.role !== 'organizer') return showUnauthorized(data.data?.role || 'unknown');
-        // Auth confirmed — now init everything
-        initPage(data.data);
+
+        // Auth confirmed — populate name/avatar
+        const u = data.data;
+        const name = u.profile?.orgName || u.username;
+        if (name) { const el = document.getElementById('dropdownName'); if (el) el.textContent = name; }
+        const pic = u.profile?.logo || u.profile?.profilePic;
+        if (pic) {
+          const avatarBtn = document.getElementById('profileAvatarBtn');
+          if (avatarBtn) {
+            const img = document.createElement('img');
+            img.src = pic; img.alt = 'Profile';
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+            avatarBtn.innerHTML = ''; avatarBtn.appendChild(img);
+          }
+        }
+
       } catch { showUnauthorized('not-logged-in'); }
+
     })();
-
-    function initPage(user) {
-      // Profile dropdown
-      const avatarBtn = document.getElementById('profileAvatarBtn');
-      const dropdown  = document.getElementById('profileDropdown');
-      if (avatarBtn && dropdown) {
-        avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('open'); });
-        document.addEventListener('click', (e) => {
-          if (!dropdown.contains(e.target) && e.target !== avatarBtn) dropdown.classList.remove('open');
-        });
-      }
-
-      // Theme toggle
-      const bgImage = document.getElementById('bgImage');
-      const themeToggle = document.getElementById('themeToggle');
-      function applyTheme(dark) {
-        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-        if (bgImage) bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
-        if (themeToggle) themeToggle.checked = dark;
-        localStorage.setItem('theme', dark ? 'dark' : 'light');
-      }
-      applyTheme(localStorage.getItem('theme') !== 'light');
-      if (themeToggle) themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
-
-      // Logout
-      const logoutBtn = document.getElementById('logoutBtn');
-      if (logoutBtn) logoutBtn.addEventListener('click', () => {
-        sessionStorage.removeItem('token');
-        window.location.href = '/';
-      });
-
-      // Populate dropdown name + avatar
-      const name = user.profile?.orgName || user.username;
-      if (name) {
-        const el = document.getElementById('dropdownName');
-        if (el) el.textContent = name;
-      }
-      const pic = user.profile?.profilePic || user.profile?.logo;
-      if (pic && avatarBtn) {
-        const img = document.createElement('img');
-        img.src = pic; img.alt = 'Profile';
-        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
-        avatarBtn.innerHTML = ''; avatarBtn.appendChild(img);
-      }
-
-      // Snapshot
-      const snapHosted = document.getElementById('snap-hosted');
-      const snapRating = document.getElementById('snap-rating');
-      if (snapHosted) snapHosted.textContent = `${user.eventsHosted || 0} completed`;
-      if (snapRating) snapRating.textContent = user.ratingAvg > 0 ? `${user.ratingAvg.toFixed(1)} ★ (${user.ratings?.length || 0} reviews)` : 'No ratings yet';
-
-      // Load data
-      loadOffers();
-      loadMyEvents();
-      loadApplications();
-    }
 
 
 
@@ -771,6 +721,82 @@
         </div>`;
 
     }
+
+
+
+    // ★★ Profile Avatar Dropdown ★★
+
+    const avatarBtn = document.getElementById('profileAvatarBtn');
+
+    const dropdown  = document.getElementById('profileDropdown');
+
+    avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('open'); });
+
+    document.addEventListener('click', (e) => {
+
+      if (!dropdown.contains(e.target) && e.target !== avatarBtn) dropdown.classList.remove('open');
+
+    });
+
+    // ★★ Theme toggle ★★
+
+    const bgImage = document.getElementById('bgImage');
+
+    const themeToggle = document.getElementById('themeToggle');
+
+    function applyTheme(dark) {
+
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+
+      bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
+
+      themeToggle.checked = dark;
+
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+
+    }
+
+    applyTheme(localStorage.getItem('theme') !== 'light');
+
+    themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
+
+
+
+    // ★★ Load organizer name into dropdown ★★
+
+    (async function() {
+
+      try {
+
+        const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        const u = data.data;
+
+        const name = u.profile?.orgName || u.username;
+
+        if (name) document.getElementById('dropdownName').textContent = name;
+
+        const pic = u.profile?.profilePic;
+
+        if (pic) {
+
+          const img = document.createElement('img');
+
+          img.src = pic; img.alt = 'Profile';
+
+          img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+
+          avatarBtn.innerHTML = ''; avatarBtn.appendChild(img);
+
+        }
+
+      } catch(e) {}
+
+    })();
 
 
 
@@ -993,7 +1019,7 @@
                 ${addExpHtml}
 
                 ${isCompleted && offer.finalPayment && offer.finalPayment.status === 'paid' ? `
-                <div class="mt-3 pt-3 border-t flex justify-between items-center" style="border-color:var(--card-border);">
+                <div class="flex justify-between items-center mt-3 pt-3 border-t" style="border-color:var(--card-border);">
                   <span class="text-xs font-bold" style="color:var(--text-muted);">Final Payment from Client</span>
                   <span class="text-xs font-bold text-green-400">Received ₹${offer.finalPayment.amount}</span>
                 </div>` : ''}
@@ -1002,7 +1028,7 @@
                   const dl = offer.finalPayment?.deadline;
                   const dlStr = dl ? new Date(dl).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : null;
                   const isOverdue = dl && new Date() > new Date(dl);
-                  return `<div class="mt-3 pt-3 border-t flex justify-between items-center gap-3" style="border-color:var(--card-border);">
+                  return `<div class="flex justify-between items-center gap-3 mt-3 pt-3 border-t" style="border-color:var(--card-border);">
                     <div>
                       <span class="text-xs font-bold" style="color:var(--text-muted);">Payment Deadline</span>
                       ${dlStr ? `<p class="text-xs mt-0.5 ${isOverdue ? 'text-red-400' : 'text-yellow-400'}">${isOverdue ? 'Overdue — ' : ''}${dlStr}</p>` : '<p class="text-xs text-white/30 mt-0.5">Not set</p>'}
@@ -1015,12 +1041,12 @@
 
             `;
 
-            // Advance UI Logic
+            // Advance UI
             let advanceHtml = '';
             if (!isCompleted) {
               if (!offer.advance || !offer.advance.status) {
                 advanceHtml = `<div class="mt-4 p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 flex justify-between items-center">
-                  <span class="text-sm font-bold text-blue-400">Advance Pending setup</span>
+                  <span class="text-sm font-bold text-blue-400">Advance: Not set</span>
                   <button onclick="openAdvanceModal('${offer._id}')" class="px-4 py-2 text-xs font-bold uppercase tracking-widest bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 rounded-lg transition-all">Set Advance</button>
                 </div>`;
               } else {
@@ -1061,7 +1087,7 @@
                 advanceHtml = `<div class="mt-4 p-4 rounded-xl border border-orange-500/20 bg-orange-500/5 flex justify-between items-center">
                   <div>
                     <span class="text-sm font-bold text-orange-400">Advance: ₹${adv.amount} — Paid</span>
-                    <p class="text-xs text-orange-400/70 mt-1">Excess of ₹${excess} over total expenses — refund to client</p>
+                    <p class="text-xs text-orange-400/70 mt-1">Excess ₹${excess} over expenses — refund to client</p>
                   </div>
                   <button onclick="issueRefund('${offer._id}')" class="px-4 py-2 text-xs font-bold uppercase bg-orange-600/20 hover:bg-orange-600/40 text-orange-300 border border-orange-500/30 rounded-lg transition-all">Issue Refund</button>
                 </div>`;
@@ -1185,49 +1211,11 @@
 
     }
 
-    async function issueRefund(id) {
-      if (!confirm('Issue refund of excess advance to the client?')) return;
-      try {
-        const res = await fetch(`/api/offers/${id}/refund`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const data = await res.json();
-        if (data.success) { loadOffers(); alert('Refund issued successfully.'); }
-        else alert(data.error || 'Failed to issue refund');
-      } catch(e) { alert('Error issuing refund'); }
-    }
-
-    let currentDeadlineOfferId = null;
-    function openDeadlineModal(offerId, existingDate) {
-      currentDeadlineOfferId = offerId;
-      document.getElementById('deadlineInput').value = existingDate || '';
-      document.getElementById('deadlineModal').classList.remove('hidden');
-    }
-    function closeDeadlineModal() {
-      currentDeadlineOfferId = null;
-      document.getElementById('deadlineModal').classList.add('hidden');
-    }
-    async function submitDeadline() {
-      if (!currentDeadlineOfferId) return;
-      const deadline = document.getElementById('deadlineInput').value;
-      if (!deadline) return alert('Please select a date.');
-      const btn = document.getElementById('submitDeadlineBtn');
-      btn.disabled = true; btn.textContent = 'Saving...';
-      try {
-        const res = await fetch(`/api/offers/${currentDeadlineOfferId}/payment-deadline`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ deadline })
-        });
-        const data = await res.json();
-        if (data.success) { closeDeadlineModal(); loadOffers(); }
-        else alert(data.error || 'Failed to set deadline');
-      } catch(e) { alert('Error setting deadline'); }
-      finally { btn.disabled = false; btn.textContent = 'Save Deadline'; }
-    }
 
 
+    async function addExpense(id) {
+
+      const descEl = document.getElementById(`exp-desc-${id}`);
 
       const amtEl = document.getElementById(`exp-amt-${id}`);
 
@@ -1390,6 +1378,18 @@
       } catch (e) { empty.classList.remove('hidden'); }
 
     }
+
+
+
+    document.getElementById('logoutBtn').addEventListener('click', (e) => {
+
+      e.preventDefault();
+
+      sessionStorage.removeItem('token');
+
+      window.location.href = '/';
+
+    });
 
 
 
@@ -1607,8 +1607,114 @@
 
 
 
+    loadSnapshot();
+
+    loadOffers();
+
+    loadMyEvents();
+
+    loadApplications();
+
+    // ★★ Payment features ★★
+    async function issueRefund(id) {
+      if (!confirm('Issue refund of excess advance to the client?')) return;
+      try {
+        const res = await fetch(`/api/offers/${id}/refund`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+        const data = await res.json();
+        if (data.success) { loadOffers(); alert('Refund issued successfully.'); }
+        else alert(data.error || 'Failed to issue refund');
+      } catch(e) { alert('Error issuing refund'); }
+    }
+
+    let currentDeadlineOfferId = null;
+    function openDeadlineModal(offerId, existingDate) {
+      currentDeadlineOfferId = offerId;
+      document.getElementById('deadlineInput').value = existingDate || '';
+      document.getElementById('deadlineModal').classList.remove('hidden');
+    }
+    function closeDeadlineModal() {
+      currentDeadlineOfferId = null;
+      document.getElementById('deadlineModal').classList.add('hidden');
+    }
+    async function submitDeadline() {
+      if (!currentDeadlineOfferId) return;
+      const deadline = document.getElementById('deadlineInput').value;
+      if (!deadline) return alert('Please select a date.');
+      const btn = document.getElementById('submitDeadlineBtn');
+      btn.disabled = true; btn.textContent = 'Saving...';
+      try {
+        const res = await fetch(`/api/offers/${currentDeadlineOfferId}/payment-deadline`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ deadline })
+        });
+        const data = await res.json();
+        if (data.success) { closeDeadlineModal(); loadOffers(); }
+        else alert(data.error || 'Failed to set deadline');
+      } catch(e) { alert('Error setting deadline'); }
+      finally { btn.disabled = false; btn.textContent = 'Save Deadline'; }
+    }
+
   </script>
 
+
+  <!-- ADVANCE MODAL -->
+  <div id="advanceModal" class="fixed inset-0 z-[100] flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeAdvanceModal()"></div>
+    <div class="relative bg-[#0F151F] border border-white/10 rounded-2xl p-6 w-[90%] max-w-sm shadow-2xl">
+      <h3 class="text-xl font-bold mb-4 font-['Satisfy'] text-white">Set Advance Budget</h3>
+      <input type="number" id="advanceAmount" placeholder="Amount (e.g. 5000)" class="w-full rounded-xl px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500 mb-4">
+      <div class="flex justify-end gap-3">
+        <button onclick="closeAdvanceModal()" class="px-4 py-2 text-sm font-bold text-gray-400 hover:text-white">Cancel</button>
+        <button id="submitAdvanceBtn" onclick="submitAdvance()" class="px-4 py-2 text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-xl">Set Advance</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYMENT DEADLINE MODAL -->
+  <div id="deadlineModal" class="fixed inset-0 z-[100] flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeDeadlineModal()"></div>
+    <div class="relative bg-[#0F151F] border border-white/10 rounded-2xl p-6 w-[90%] max-w-sm shadow-2xl">
+      <h3 class="text-xl font-bold mb-1 font-['Satisfy'] text-white">Payment Deadline</h3>
+      <p class="text-sm text-gray-400 mb-4">Set the date by which the client must pay the remaining balance.</p>
+      <input type="date" id="deadlineInput" class="w-full rounded-xl px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500 mb-4 [color-scheme:dark]">
+      <div class="flex justify-end gap-3">
+        <button onclick="closeDeadlineModal()" class="px-4 py-2 text-sm font-bold text-gray-400 hover:text-white">Cancel</button>
+        <button id="submitDeadlineBtn" onclick="submitDeadline()" class="px-4 py-2 text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-xl">Save Deadline</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentAdvanceOfferId = null;
+    function openAdvanceModal(offerId, existingAmount = '') {
+      currentAdvanceOfferId = offerId;
+      document.getElementById('advanceAmount').value = existingAmount;
+      document.getElementById('advanceModal').classList.remove('hidden');
+    }
+    function closeAdvanceModal() {
+      currentAdvanceOfferId = null;
+      document.getElementById('advanceModal').classList.add('hidden');
+    }
+    async function submitAdvance() {
+      if (!currentAdvanceOfferId) return;
+      const amt = document.getElementById('advanceAmount').value;
+      if (!amt || isNaN(amt) || amt < 0) return alert('Enter a valid amount');
+      const btn = document.getElementById('submitAdvanceBtn');
+      btn.disabled = true; btn.textContent = 'Saving...';
+      try {
+        const res = await fetch(`/api/offers/${currentAdvanceOfferId}/advance`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionStorage.getItem('token')}` },
+          body: JSON.stringify({ amount: Number(amt) })
+        });
+        const result = await res.json();
+        if (result.success) { closeAdvanceModal(); loadOffers(); }
+        else alert(result.error);
+      } catch(e) { alert('Error setting advance'); }
+      finally { btn.disabled = false; btn.textContent = 'Set Advance'; }
+    }
+  </script>
 
   <!-- ============================================================ -->
   <!-- CHAT WINDOW (Organizer side) -->
@@ -2087,66 +2193,7 @@
       }
     }
   </script>
-
-  <!-- ADVANCE MODAL -->
-  <div id="advanceModal" class="fixed inset-0 z-[100] flex items-center justify-center hidden">
-    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeAdvanceModal()"></div>
-    <div class="relative bg-[#0F151F] border border-white/10 rounded-2xl p-6 w-[90%] max-w-sm shadow-2xl">
-      <h3 class="text-xl font-bold mb-4 font-['Satisfy'] text-white">Set Advance Budget</h3>
-      <p class="text-sm text-gray-400 mb-4" id="advanceModalText">Enter the advance amount required for this event.</p>
-      <input type="number" id="advanceAmount" placeholder="Amount (e.g. 5000)" class="w-full rounded-xl px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500 mb-4">
-      <div class="flex justify-end gap-3">
-        <button onclick="closeAdvanceModal()" class="px-4 py-2 text-sm font-bold text-gray-400 hover:text-white">Cancel</button>
-        <button id="submitAdvanceBtn" onclick="submitAdvance()" class="px-4 py-2 text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-xl">Set Advance</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- PAYMENT DEADLINE MODAL -->
-  <div id="deadlineModal" class="fixed inset-0 z-[100] flex items-center justify-center hidden">
-    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeDeadlineModal()"></div>
-    <div class="relative bg-[#0F151F] border border-white/10 rounded-2xl p-6 w-[90%] max-w-sm shadow-2xl">
-      <h3 class="text-xl font-bold mb-1 font-['Satisfy'] text-white">Payment Deadline</h3>
-      <p class="text-sm text-gray-400 mb-4">Set the date by which the client must pay the remaining balance.</p>
-      <input type="date" id="deadlineInput" class="w-full rounded-xl px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500 mb-4 [color-scheme:dark]">
-      <div class="flex justify-end gap-3">
-        <button onclick="closeDeadlineModal()" class="px-4 py-2 text-sm font-bold text-gray-400 hover:text-white">Cancel</button>
-        <button id="submitDeadlineBtn" onclick="submitDeadline()" class="px-4 py-2 text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-xl">Save Deadline</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    let currentAdvanceOfferId = null;
-    function openAdvanceModal(offerId, existingAmount = '') {
-      currentAdvanceOfferId = offerId;
-      document.getElementById('advanceAmount').value = existingAmount;
-      document.getElementById('advanceModal').classList.remove('hidden');
-    }
-    function closeAdvanceModal() {
-      currentAdvanceOfferId = null;
-      document.getElementById('advanceModal').classList.add('hidden');
-    }
-    async function submitAdvance() {
-      if (!currentAdvanceOfferId) return;
-      const amt = document.getElementById('advanceAmount').value;
-      if (!amt || isNaN(amt) || amt < 0) return alert('Enter a valid amount');
-      const btn = document.getElementById('submitAdvanceBtn');
-      btn.disabled = true; btn.textContent = 'Saving...';
-      try {
-        const res = await fetch(`/api/offers/${currentAdvanceOfferId}/advance`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ amount: Number(amt) })
-        });
-        const result = await res.json();
-        if (result.success) { closeAdvanceModal(); loadOffers(); }
-        else alert(result.error);
-      } catch(e) { alert('Error setting advance'); }
-      finally { btn.disabled = false; btn.textContent = 'Set Advance'; }
-    }
-  </script>
-
 </body>
+
 </html>
 
