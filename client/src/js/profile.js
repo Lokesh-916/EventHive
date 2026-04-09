@@ -117,8 +117,8 @@ function buildHero(u) {
 
   const avatarSrc = p.profilePic || p.logo;
   const avatarHtml = avatarSrc
-    ? `<img src="${esc(avatarSrc)}" alt="Avatar">`
-    : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted)"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/></svg>`;
+    ? `<img id="heroAvatarImg" src="${esc(avatarSrc)}" alt="" style="width:100%;height:100%;object-fit:cover;">`
+    : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);width:60%;height:60%;opacity:0.5"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/></svg>`;
 
   const loc = p.location;
   const locationStr = loc ? [loc.city, loc.state, loc.country].filter(Boolean).join(', ') : '';
@@ -333,6 +333,15 @@ function renderProfile(u) {
   else if (role === 'client')    roleSections = buildClientSections(p);
 
   main.innerHTML = buildHero(u) + roleSections;
+
+  // Attach onerror to avatar image so broken images fall back to the SVG icon
+  const heroImg = document.getElementById('heroAvatarImg');
+  if (heroImg) {
+    heroImg.onerror = function() {
+      const wrap = document.getElementById('heroAvatarEl');
+      if (wrap) wrap.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);width:60%;height:60%;opacity:0.5"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/></svg>`;
+    };
+  }
 
   // Animate skill bars
   if (role === 'volunteer') {
@@ -852,8 +861,11 @@ function updateNavbar(u) {
   if (pic) {
     const img = document.createElement('img');
     img.src = pic;
-    img.alt = 'Avatar';
+    img.alt = '';
     img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+    img.onerror = () => {
+      avatarBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted)"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/></svg>`;
+    };
     avatarBtn.innerHTML = '';
     avatarBtn.appendChild(img);
   }
