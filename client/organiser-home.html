@@ -1269,22 +1269,15 @@
 
           const isPast = ev.schedule?.end && new Date(ev.schedule.end) < new Date();
 
-          const overviewBtn = isPast ? '' : `<a href="/event-overview?id=${ev._id}" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 rounded-xl transition-all text-purple-400">Overview</a>`;
-
-          const scheduleBtn = isPast ? '' : `<button onclick="openScheduleModal('${ev._id}', '${ev.title.replace(/'/g,"\\'")}')" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/30 rounded-xl transition-all text-teal-400 flex items-center gap-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            Schedule
-          </button>`;
-
-          
+          const menuId = `evmenu-${ev._id}`;
 
           return `
 
-            <div class="rounded-[1.5rem] p-6 flex flex-col sm:flex-row sm:items-center gap-5 transition-colors border" style="background:var(--article-bg);border-color:var(--article-border);">
+            <div class="rounded-[1.5rem] px-6 py-4 flex items-center gap-4 border transition-colors" style="background:var(--article-bg);border-color:var(--article-border);">
 
               <div class="flex-1 min-w-0">
 
-                <div class="flex items-center gap-3 mb-1">
+                <div class="flex items-center gap-3 mb-0.5">
 
                   <h3 class="font-bold text-base" style="color:var(--text-primary);">${ev.title}</h3>
 
@@ -1296,13 +1289,46 @@
 
               </div>
 
-              <a href="/event-info?id=${ev._id}" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all" style="color:var(--text-primary);">View</a>
-
-              <a href="/organiser?eventId=${ev._id}" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-xl transition-all text-blue-400">Manage</a>
-
-              ${scheduleBtn}
-
-              ${overviewBtn}
+              <!-- Actions menu -->
+              <div class="relative flex-shrink-0" id="${menuId}-wrap">
+                <button onclick="toggleEventMenu('${menuId}')"
+                  class="w-8 h-8 rounded-lg flex items-center justify-center border transition-all hover:opacity-80"
+                  style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);"
+                  title="Actions">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                </button>
+                <div id="${menuId}" class="hidden absolute right-0 top-10 z-50 rounded-xl border shadow-xl overflow-hidden min-w-[160px]"
+                  style="background:var(--dropdown-bg);border-color:var(--dropdown-border);">
+                  <a href="/event-info?id=${ev._id}"
+                    class="flex items-center gap-3 px-4 py-3 text-xs font-semibold transition-colors hover:opacity-80"
+                    style="color:var(--text-primary);background:transparent;"
+                    onmouseover="this.style.background='var(--dropdown-hover)'" onmouseout="this.style.background='transparent'">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    View Event
+                  </a>
+                  <button onclick="scrollToVolunteers('${ev._id}');toggleEventMenu('${menuId}')"
+                    class="w-full flex items-center gap-3 px-4 py-3 text-xs font-semibold transition-colors text-blue-400"
+                    style="background:transparent;"
+                    onmouseover="this.style.background='var(--dropdown-hover)'" onmouseout="this.style.background='transparent'">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Manage Volunteers
+                  </button>
+                  ${!isPast ? `<button onclick="openScheduleModal('${ev._id}', '${ev.title.replace(/'/g,"\\'")}');toggleEventMenu('${menuId}')"
+                    class="w-full flex items-center gap-3 px-4 py-3 text-xs font-semibold transition-colors text-teal-400"
+                    style="background:transparent;"
+                    onmouseover="this.style.background='var(--dropdown-hover)'" onmouseout="this.style.background='transparent'">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    Schedule
+                  </button>` : ''}
+                  ${!isPast ? `<a href="/event-overview?id=${ev._id}"
+                    class="flex items-center gap-3 px-4 py-3 text-xs font-semibold transition-colors text-purple-400"
+                    style="background:transparent;"
+                    onmouseover="this.style.background='var(--dropdown-hover)'" onmouseout="this.style.background='transparent'">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    Overview
+                  </a>` : ''}
+                </div>
+              </div>
 
             </div>`;
 
@@ -1384,7 +1410,7 @@
 
 
 
-    async function loadApplications() {
+    async function loadApplications(filterEventId) {
 
       const table = document.getElementById('volunteerTable');
 
@@ -1468,9 +1494,11 @@
 
           const tr = document.createElement('tr');
 
+          const isHighlighted = filterEventId && (app.eventId?._id || app.eventId) === filterEventId;
+
           tr.className = 'border-b hover:opacity-90 transition-colors';
 
-          tr.style.cssText = 'border-color:var(--card-border);';
+          tr.style.cssText = `border-color:var(--card-border);${isHighlighted ? 'background:rgba(59,130,246,0.08);' : filterEventId ? 'opacity:0.4;' : ''}`;
 
           tr.innerHTML = `
 
@@ -1557,6 +1585,33 @@
     };
 
 
+
+    // ★★ Event card menu ★★
+    function toggleEventMenu(menuId) {
+      const menu = document.getElementById(menuId);
+      if (!menu) return;
+      const isOpen = !menu.classList.contains('hidden');
+      // Close all other open menus first
+      document.querySelectorAll('[id^="evmenu-"]').forEach(m => m.classList.add('hidden'));
+      if (!isOpen) menu.classList.remove('hidden');
+    }
+    // Close menus when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('[id$="-wrap"]')) {
+        document.querySelectorAll('[id^="evmenu-"]').forEach(m => m.classList.add('hidden'));
+      }
+    });
+
+    function scrollToVolunteers(eventId) {
+      // Store the event filter so the volunteer table can highlight/filter by it
+      window._filterVolunteerEventId = eventId;
+      const section = document.getElementById('volunteers');
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Re-load applications filtered to this event after scroll
+        setTimeout(() => loadApplications(eventId), 400);
+      }
+    }
 
     // ★★ Payment features ★★
     async function issueRefund(id) {
