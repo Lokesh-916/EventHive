@@ -261,10 +261,18 @@
           </div>
         </div>
 
-        <button onclick="openOfferModal()" class="px-8 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white rounded-xl hover:shadow-[0_4px_16px_rgba(0,0,0,0.5)] transition-all transform hover:-translate-y-1">
-          Send Offer
-        </button>
-      </div>
+        <div class="flex gap-4">
+          <button onclick="openOfferModal()" class="px-8 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white rounded-xl hover:shadow-[0_4px_16px_rgba(0,0,0,0.5)] transition-all transform hover:-translate-y-1">
+            Send Offer
+          </button>
+          
+          <button onclick="openChat()" class="px-8 py-3 font-bold uppercase tracking-wider text-sm bg-blue-500/20 backdrop-blur-md border border-blue-500/30 hover:bg-blue-500/30 text-blue-400 rounded-xl hover:shadow-[0_4px_16px_rgba(59,130,246,0.5)] transition-all transform hover:-translate-y-1 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+            </svg>
+            Chat
+          </button>
+        </div>
     </section>
 
     <!-- HOSTED EVENTS -->
@@ -631,6 +639,24 @@
       } catch(e) {}
     }
     loadUserProfile();
+  </script>
+
+  <script>
+    // Get organizer ID from URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const organizerId = urlParams.get('id');
+    
+    function openChat() {
+      if (!organizerId) {
+        alert('Organizer ID not found');
+        return;
+      }
+      
+      // Store chat target in sessionStorage and redirect to client-home
+      sessionStorage.setItem('openChatWith', organizerId);
+      sessionStorage.setItem('openChatName', document.querySelector('h1')?.textContent || 'Organizer');
+      window.location.href = '/client-home#chat';
+    }
   </script>
 </body>
 </html>
