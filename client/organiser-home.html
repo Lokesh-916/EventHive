@@ -1271,6 +1271,11 @@
 
           const overviewBtn = isPast ? '' : `<a href="/event-overview?id=${ev._id}" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 rounded-xl transition-all text-purple-400">Overview</a>`;
 
+          const scheduleBtn = isPast ? '' : `<button onclick="openScheduleModal('${ev._id}', '${ev.title.replace(/'/g,"\\'")}')" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/30 rounded-xl transition-all text-teal-400 flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            Schedule
+          </button>`;
+
           
 
           return `
@@ -1294,6 +1299,8 @@
               <a href="/event-info?id=${ev._id}" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all" style="color:var(--text-primary);">View</a>
 
               <a href="/organiser?eventId=${ev._id}" class="flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-bold bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-xl transition-all text-blue-400">Manage</a>
+
+              ${scheduleBtn}
 
               ${overviewBtn}
 
@@ -1620,6 +1627,179 @@
       </div>
     </div>
   </div>
+
+  <!-- SCHEDULE MODAL -->
+  <div id="scheduleModal" class="fixed inset-0 z-[100] flex items-center justify-center hidden p-4">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeScheduleModal()"></div>
+    <div class="relative bg-[#0F151F] border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between px-6 py-5 border-b border-white/10 flex-shrink-0">
+        <div>
+          <h3 class="text-xl font-bold font-['Satisfy'] text-white">Event Schedule</h3>
+          <p id="scheduleModalSubtitle" class="text-xs text-gray-400 mt-0.5"></p>
+        </div>
+        <button onclick="closeScheduleModal()" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+      </div>
+
+      <!-- Body -->
+      <div class="flex-1 overflow-y-auto px-6 py-5">
+        <div id="scheduleSlotsList" class="flex flex-col gap-3 mb-5"></div>
+
+        <!-- Add slot form -->
+        <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+          <p class="text-xs uppercase tracking-widest font-bold text-gray-400 mb-4">Add New Slot</p>
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Day</label>
+              <input type="number" id="slotDay" min="1" placeholder="e.g. 1" class="w-full rounded-lg px-3 py-2 bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-teal-500 [appearance:textfield]">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Title</label>
+              <input type="text" id="slotTitle" placeholder="e.g. Opening Ceremony" class="w-full rounded-lg px-3 py-2 bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-teal-500">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Start Time</label>
+              <input type="time" id="slotStart" class="w-full rounded-lg px-3 py-2 bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-teal-500 [color-scheme:dark]">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">End Time</label>
+              <input type="time" id="slotEnd" class="w-full rounded-lg px-3 py-2 bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-teal-500 [color-scheme:dark]">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="block text-xs text-gray-400 mb-1">Description (optional)</label>
+            <input type="text" id="slotDesc" placeholder="Brief description..." class="w-full rounded-lg px-3 py-2 bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-teal-500">
+          </div>
+          <button onclick="addScheduleSlot()" class="px-4 py-2 text-xs font-bold uppercase tracking-widest bg-teal-600/30 hover:bg-teal-600/50 text-teal-300 border border-teal-500/30 rounded-lg transition-all">+ Add Slot</button>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex justify-between items-center px-6 py-4 border-t border-white/10 flex-shrink-0">
+        <p id="scheduleStatus" class="text-xs text-gray-400"></p>
+        <div class="flex gap-3">
+          <button onclick="closeScheduleModal()" class="px-4 py-2 text-sm font-bold text-gray-400 hover:text-white">Cancel</button>
+          <button id="saveScheduleBtn" onclick="saveSchedule()" class="px-5 py-2 text-sm font-bold bg-teal-600 hover:bg-teal-500 text-white rounded-xl transition-all">Save Schedule</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Schedule Modal ──────────────────────────────────────────
+    let _scheduleEventId = null;
+    let _scheduleSlots = [];
+
+    function openScheduleModal(eventId, eventTitle) {
+      _scheduleEventId = eventId;
+      _scheduleSlots = [];
+      document.getElementById('scheduleModalSubtitle').textContent = eventTitle;
+      document.getElementById('scheduleStatus').textContent = '';
+      document.getElementById('scheduleModal').classList.remove('hidden');
+      // Clear add form
+      ['slotDay','slotTitle','slotStart','slotEnd','slotDesc'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      // Load existing timetable
+      fetch(`/api/events/${eventId}`, { headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` } })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (data?.data?.timetable) {
+            _scheduleSlots = data.data.timetable.map(s => ({ ...s }));
+          }
+          renderScheduleSlots();
+        }).catch(() => renderScheduleSlots());
+    }
+
+    function closeScheduleModal() {
+      _scheduleEventId = null;
+      document.getElementById('scheduleModal').classList.add('hidden');
+    }
+
+    function renderScheduleSlots() {
+      const container = document.getElementById('scheduleSlotsList');
+      if (!_scheduleSlots.length) {
+        container.innerHTML = '<p class="text-xs italic text-gray-500 text-center py-4">No schedule slots yet. Add one below.</p>';
+        return;
+      }
+      // Group by day
+      const byDay = {};
+      _scheduleSlots.forEach((s, i) => {
+        const d = s.day || 1;
+        if (!byDay[d]) byDay[d] = [];
+        byDay[d].push({ ...s, _idx: i });
+      });
+      container.innerHTML = Object.keys(byDay).sort((a,b) => a-b).map(day => `
+        <div>
+          <p class="text-xs uppercase tracking-widest font-bold text-teal-400 mb-2">Day ${day}</p>
+          <div class="flex flex-col gap-2">
+            ${byDay[day].map(s => `
+              <div class="flex items-start gap-3 p-3 rounded-xl border border-white/8 bg-white/4 group" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);">
+                <div class="flex-shrink-0 text-center min-w-[56px]">
+                  <span class="text-xs font-bold text-teal-400">${s.startTime || '—'}</span>
+                  ${s.endTime ? `<span class="block text-xs text-gray-500">${s.endTime}</span>` : ''}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-white">${s.title || 'Untitled'}</p>
+                  ${s.description ? `<p class="text-xs text-gray-400 mt-0.5">${s.description}</p>` : ''}
+                </div>
+                <button onclick="removeScheduleSlot(${s._idx})" class="text-gray-600 hover:text-red-400 transition-colors flex-shrink-0 opacity-0 group-hover:opacity-100 text-lg leading-none">&times;</button>
+              </div>`).join('')}
+          </div>
+        </div>`).join('');
+    }
+
+    function addScheduleSlot() {
+      const day = parseInt(document.getElementById('slotDay').value) || 1;
+      const title = document.getElementById('slotTitle').value.trim();
+      const startTime = document.getElementById('slotStart').value;
+      const endTime = document.getElementById('slotEnd').value;
+      const description = document.getElementById('slotDesc').value.trim();
+      if (!title) return alert('Please enter a slot title.');
+      _scheduleSlots.push({ day, title, startTime, endTime, description });
+      // Sort by day then startTime
+      _scheduleSlots.sort((a, b) => (a.day - b.day) || (a.startTime || '').localeCompare(b.startTime || ''));
+      renderScheduleSlots();
+      // Clear form
+      ['slotDay','slotTitle','slotStart','slotEnd','slotDesc'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('scheduleStatus').textContent = 'Unsaved changes';
+    }
+
+    function removeScheduleSlot(idx) {
+      _scheduleSlots.splice(idx, 1);
+      renderScheduleSlots();
+      document.getElementById('scheduleStatus').textContent = 'Unsaved changes';
+    }
+
+    async function saveSchedule() {
+      if (!_scheduleEventId) return;
+      const btn = document.getElementById('saveScheduleBtn');
+      const status = document.getElementById('scheduleStatus');
+      btn.disabled = true; btn.textContent = 'Saving…';
+      try {
+        const res = await fetch(`/api/events/${_scheduleEventId}/timetable`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionStorage.getItem('token')}` },
+          body: JSON.stringify({ timetable: _scheduleSlots })
+        });
+        const data = await res.json();
+        if (data.success) {
+          status.textContent = 'Saved successfully';
+          status.style.color = '#34d399';
+          setTimeout(() => closeScheduleModal(), 800);
+        } else {
+          status.textContent = data.error || 'Failed to save';
+          status.style.color = '#f87171';
+        }
+      } catch(e) {
+        status.textContent = 'Network error';
+        status.style.color = '#f87171';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Save Schedule';
+      }
+    }
+  </script>
 
   <script>
     let currentAdvanceOfferId = null;
