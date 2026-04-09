@@ -639,20 +639,9 @@
       } catch(e) {}
     }
     loadUserProfile();
-  </script>
 
-  <script>
-    // Get organizer ID from URL params
-    const urlParams = new URLSearchParams(window.location.search);
-    const organizerId = urlParams.get('id');
-    
     function openChat() {
-      if (!organizerId) {
-        alert('Organizer ID not found');
-        return;
-      }
-      
-      // Store chat target in sessionStorage and redirect to client-home
+      if (!organizerId) { alert('Organizer ID not found'); return; }
       sessionStorage.setItem('openChatWith', organizerId);
       sessionStorage.setItem('openChatName', document.querySelector('h1')?.textContent || 'Organizer');
       window.location.href = '/client-home#chat';

@@ -3,6 +3,18 @@ const router = express.Router();
 const ClientOffer = require('../models/ClientOffer');
 const { protect, authorize } = require('../middleware/auth');
 
+// Helper: add N working days (Mon–Fri) to a date
+function addWorkingDays(date, days) {
+  const result = new Date(date);
+  let added = 0;
+  while (added < days) {
+    result.setDate(result.getDate() + 1);
+    const day = result.getDay();
+    if (day !== 0 && day !== 6) added++; // skip Sun(0) and Sat(6)
+  }
+  return result;
+}
+
 // @route   POST /api/offers
 // @desc    Client sends an offer to an organizer
 // @access  Private (Client)
@@ -236,6 +248,116 @@ router.post('/:id/advance/pay', protect, authorize('client'), async (req, res) =
     // Mock successful payment
     offer.advance.status = 'paid';
     
+    await offer.save();
+    res.json({ success: true, data: offer });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// @route   PUT /api/offers/:id/payment-deadline
+// @desc    Organizer sets or updates the final payment deadline
+// @access  Private (Organizer)
+router.put('/:id/payment-deadline', protect, authorize('organizer'), async (req, res) => {
+  try {
+    const { deadline } = req.body;
+    if (!deadline) {
+      return res.status(400).json({ success: false, error: 'deadline date is required' });
+    }
+    const deadlineDate = new Date(deadline);
+    if (isNaN(deadlineDate.getTime())) {
+      return res.status(400).json({ success: false, error: 'Invalid deadline date' });
+    }
+
+    const offer = await ClientOffer.findOne({ _id: req.params.id, organizerId: req.user.id });
+    if (!offer) return res.status(404).json({ success: false, error: 'Offer not found' });
+    if (offer.status !== 'completed') {
+      return res.status(400).json({ success: false, error: 'Payment deadline can only be set on completed offers' });
+    }
+    if (offer.finalPayment && offer.finalPayment.status === 'paid') {
+      return res.status(400).json({ success: false, error: 'Final payment already made' });
+    }
+
+    if (!offer.finalPayment) offer.finalPayment = {};
+    offer.finalPayment.deadline = deadlineDate;
+    offer.markModified('finalPayment');
+    await offer.save();
+    res.json({ success: true, data: offer });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+
+// @desc    Client pays the remaining balance (totalExpenses - advancePaid)
+// @access  Private (Client)
+router.post('/:id/final-payment', protect, authorize('client'), async (req, res) => {
+  try {
+    const offer = await ClientOffer.findOne({ _id: req.params.id, clientId: req.user.id });
+    if (!offer) return res.status(404).json({ success: false, error: 'Offer not found' });
+    if (offer.status !== 'completed') {
+      return res.status(400).json({ success: false, error: 'Final payment is only available for completed offers' });
+    }
+    if (offer.finalPayment && offer.finalPayment.status === 'paid') {
+      return res.status(400).json({ success: false, error: 'Final payment already made' });
+    }
+
+    const totalExpenses = offer.expenses
+      .filter(e => !e.isDeleted)
+      .reduce((sum, e) => sum + e.amount, 0);
+    const advancePaid = (offer.advance && offer.advance.status === 'paid') ? offer.advance.amount : 0;
+    const remaining = Math.max(0, totalExpenses - advancePaid);
+
+    if (remaining <= 0) {
+      return res.status(400).json({ success: false, error: 'No remaining balance to pay' });
+    }
+
+    // Enforce deadline if set
+    if (offer.finalPayment?.deadline && new Date() > new Date(offer.finalPayment.deadline)) {
+      return res.status(400).json({ success: false, error: 'Payment deadline has passed. Please contact the organizer.' });
+    }
+
+    offer.finalPayment = {
+      deadline: offer.finalPayment?.deadline || null,
+      amount: remaining,
+      status: 'paid',
+      paidAt: new Date()
+    };
+    offer.markModified('finalPayment');
+    await offer.save();
+    res.json({ success: true, data: offer });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// @route   POST /api/offers/:id/refund
+// @desc    Organizer refunds excess advance (advance - totalExpenses) to client
+// @access  Private (Organizer)
+router.post('/:id/refund', protect, authorize('organizer'), async (req, res) => {
+  try {
+    const offer = await ClientOffer.findOne({ _id: req.params.id, organizerId: req.user.id });
+    if (!offer) return res.status(404).json({ success: false, error: 'Offer not found' });
+    if (offer.status !== 'completed') {
+      return res.status(400).json({ success: false, error: 'Refund is only available for completed offers' });
+    }
+    if (!offer.advance || offer.advance.status !== 'paid') {
+      return res.status(400).json({ success: false, error: 'Advance must have been paid before a refund can be issued' });
+    }
+    if (offer.refund && offer.refund.status === 'refunded') {
+      return res.status(400).json({ success: false, error: 'Refund already issued' });
+    }
+
+    const totalExpenses = offer.expenses
+      .filter(e => !e.isDeleted)
+      .reduce((sum, e) => sum + e.amount, 0);
+    const excess = Math.max(0, offer.advance.amount - totalExpenses);
+
+    if (excess <= 0) {
+      return res.status(400).json({ success: false, error: 'No excess advance to refund' });
+    }
+
+    offer.refund = { amount: excess, status: 'refunded', refundedAt: new Date(), dueDate: addWorkingDays(new Date(), 3) };
     await offer.save();
     res.json({ success: true, data: offer });
   } catch (err) {
