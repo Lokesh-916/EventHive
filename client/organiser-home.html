@@ -1003,9 +1003,85 @@
 
                 ${addExpHtml}
 
+                ${isCompleted && offer.finalPayment && offer.finalPayment.status === 'paid' ? `
+                <div class="mt-3 pt-3 border-t flex justify-between items-center" style="border-color:var(--card-border);">
+                  <span class="text-xs font-bold" style="color:var(--text-muted);">Final Payment from Client</span>
+                  <span class="text-xs font-bold text-green-400">Received ₹${offer.finalPayment.amount}</span>
+                </div>` : ''}
+
+                ${isCompleted && !(offer.finalPayment && offer.finalPayment.status === 'paid') && totalValid > 0 ? (() => {
+                  const dl = offer.finalPayment?.deadline;
+                  const dlStr = dl ? new Date(dl).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : null;
+                  const isOverdue = dl && new Date() > new Date(dl);
+                  return `<div class="mt-3 pt-3 border-t flex justify-between items-center gap-3" style="border-color:var(--card-border);">
+                    <div>
+                      <span class="text-xs font-bold" style="color:var(--text-muted);">Payment Deadline</span>
+                      ${dlStr ? `<p class="text-xs mt-0.5 ${isOverdue ? 'text-red-400' : 'text-yellow-400'}">${isOverdue ? 'Overdue — ' : ''}${dlStr}</p>` : '<p class="text-xs text-white/30 mt-0.5">Not set</p>'}
+                    </div>
+                    <button onclick="openDeadlineModal('${offer._id}', '${dl ? new Date(dl).toISOString().split('T')[0] : ''}')" class="px-3 py-1.5 text-xs font-bold uppercase bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg transition-all flex-shrink-0" style="color:var(--text-primary);">${dlStr ? 'Modify' : 'Set Deadline'}</button>
+                  </div>`;
+                })() : ''}
+
               </div>
 
             `;
+
+            // Advance UI Logic
+            let advanceHtml = '';
+            if (!isCompleted) {
+              if (!offer.advance || !offer.advance.status) {
+                advanceHtml = `<div class="mt-4 p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 flex justify-between items-center">
+                  <span class="text-sm font-bold text-blue-400">Advance Pending setup</span>
+                  <button onclick="openAdvanceModal('${offer._id}')" class="px-4 py-2 text-xs font-bold uppercase tracking-widest bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 rounded-lg transition-all">Set Advance</button>
+                </div>`;
+              } else {
+                const adv = offer.advance;
+                if (adv.status === 'pending') {
+                  advanceHtml = `<div class="mt-4 p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/5 flex justify-between items-center">
+                    <span class="text-sm font-bold text-yellow-500">Advance: ₹${adv.amount} (Waiting for Client)</span>
+                    <button onclick="openAdvanceModal('${offer._id}', '${adv.amount}')" class="px-4 py-2 text-xs font-bold uppercase tracking-widest bg-yellow-600/20 hover:bg-yellow-600/40 text-yellow-300 rounded-lg transition-all">Update</button>
+                  </div>`;
+                } else if (adv.status === 'negotiating') {
+                  advanceHtml = `<div class="mt-4 p-4 rounded-xl border border-red-500/20 bg-red-500/5">
+                    <div class="flex justify-between items-center mb-2">
+                      <span class="text-sm font-bold text-red-400">Negotiation Request: ₹${adv.requestedAmount}</span>
+                      <button onclick="openAdvanceModal('${offer._id}')" class="px-4 py-2 text-xs font-bold uppercase tracking-widest bg-red-600/20 hover:bg-red-600/40 text-red-300 rounded-lg transition-all">Review & Set New</button>
+                    </div>
+                    <p class="text-xs italic text-red-300/80 bg-black/20 p-2 rounded">"${adv.negotiationMessage}"</p>
+                  </div>`;
+                } else if (adv.status === 'paid') {
+                  advanceHtml = `<div class="mt-4 p-4 rounded-xl border border-green-500/20 bg-green-500/5">
+                    <span class="text-sm font-bold text-green-400">Advance: ₹${adv.amount} — Paid</span>
+                  </div>`;
+                }
+              }
+            } else if (offer.advance && offer.advance.status === 'paid') {
+              const adv = offer.advance;
+              const excess = Math.max(0, adv.amount - totalValid);
+              const alreadyRefunded = offer.refund && offer.refund.status === 'refunded';
+              if (alreadyRefunded) {
+                const dueDate = offer.refund.dueDate ? new Date(offer.refund.dueDate).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : null;
+                advanceHtml = `<div class="mt-4 p-4 rounded-xl border border-green-500/20 bg-green-500/5">
+                  <div class="flex justify-between items-center">
+                    <span class="text-sm font-bold text-green-400">Advance: ₹${adv.amount} — Paid</span>
+                    <span class="text-xs font-bold text-green-400">Refund ₹${offer.refund.amount} issued</span>
+                  </div>
+                  ${dueDate ? `<p class="text-xs text-blue-400 mt-1">Client will receive within 3 working days (by ${dueDate})</p>` : ''}
+                </div>`;
+              } else if (excess > 0) {
+                advanceHtml = `<div class="mt-4 p-4 rounded-xl border border-orange-500/20 bg-orange-500/5 flex justify-between items-center">
+                  <div>
+                    <span class="text-sm font-bold text-orange-400">Advance: ₹${adv.amount} — Paid</span>
+                    <p class="text-xs text-orange-400/70 mt-1">Excess of ₹${excess} over total expenses — refund to client</p>
+                  </div>
+                  <button onclick="issueRefund('${offer._id}')" class="px-4 py-2 text-xs font-bold uppercase bg-orange-600/20 hover:bg-orange-600/40 text-orange-300 border border-orange-500/30 rounded-lg transition-all">Issue Refund</button>
+                </div>`;
+              } else {
+                advanceHtml = `<div class="mt-4 p-4 rounded-xl border border-green-500/20 bg-green-500/5">
+                  <span class="text-sm font-bold text-green-400">Advance: ₹${adv.amount} — Paid</span>
+                </div>`;
+              }
+            }
 
 
 
@@ -1033,6 +1109,7 @@
 
                 </div>
 
+                ${advanceHtml}
                 ${expensesHtml}
 
               </div>
@@ -1119,11 +1196,49 @@
 
     }
 
+    async function issueRefund(id) {
+      if (!confirm('Issue refund of excess advance to the client?')) return;
+      try {
+        const res = await fetch(`/api/offers/${id}/refund`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success) { loadOffers(); alert('Refund issued successfully.'); }
+        else alert(data.error || 'Failed to issue refund');
+      } catch(e) { alert('Error issuing refund'); }
+    }
+
+    let currentDeadlineOfferId = null;
+    function openDeadlineModal(offerId, existingDate) {
+      currentDeadlineOfferId = offerId;
+      document.getElementById('deadlineInput').value = existingDate || '';
+      document.getElementById('deadlineModal').classList.remove('hidden');
+    }
+    function closeDeadlineModal() {
+      currentDeadlineOfferId = null;
+      document.getElementById('deadlineModal').classList.add('hidden');
+    }
+    async function submitDeadline() {
+      if (!currentDeadlineOfferId) return;
+      const deadline = document.getElementById('deadlineInput').value;
+      if (!deadline) return alert('Please select a date.');
+      const btn = document.getElementById('submitDeadlineBtn');
+      btn.disabled = true; btn.textContent = 'Saving...';
+      try {
+        const res = await fetch(`/api/offers/${currentDeadlineOfferId}/payment-deadline`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ deadline })
+        });
+        const data = await res.json();
+        if (data.success) { closeDeadlineModal(); loadOffers(); }
+        else alert(data.error || 'Failed to set deadline');
+      } catch(e) { alert('Error setting deadline'); }
+      finally { btn.disabled = false; btn.textContent = 'Save Deadline'; }
+    }
 
 
-    async function addExpense(id) {
-
-      const descEl = document.getElementById(`exp-desc-${id}`);
 
       const amtEl = document.getElementById(`exp-amt-${id}`);
 
@@ -2003,7 +2118,66 @@
       }
     }
   </script>
-</body>
 
+  <!-- ADVANCE MODAL -->
+  <div id="advanceModal" class="fixed inset-0 z-[100] flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeAdvanceModal()"></div>
+    <div class="relative bg-[#0F151F] border border-white/10 rounded-2xl p-6 w-[90%] max-w-sm shadow-2xl">
+      <h3 class="text-xl font-bold mb-4 font-['Satisfy'] text-white">Set Advance Budget</h3>
+      <p class="text-sm text-gray-400 mb-4" id="advanceModalText">Enter the advance amount required for this event.</p>
+      <input type="number" id="advanceAmount" placeholder="Amount (e.g. 5000)" class="w-full rounded-xl px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500 mb-4">
+      <div class="flex justify-end gap-3">
+        <button onclick="closeAdvanceModal()" class="px-4 py-2 text-sm font-bold text-gray-400 hover:text-white">Cancel</button>
+        <button id="submitAdvanceBtn" onclick="submitAdvance()" class="px-4 py-2 text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-xl">Set Advance</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYMENT DEADLINE MODAL -->
+  <div id="deadlineModal" class="fixed inset-0 z-[100] flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeDeadlineModal()"></div>
+    <div class="relative bg-[#0F151F] border border-white/10 rounded-2xl p-6 w-[90%] max-w-sm shadow-2xl">
+      <h3 class="text-xl font-bold mb-1 font-['Satisfy'] text-white">Payment Deadline</h3>
+      <p class="text-sm text-gray-400 mb-4">Set the date by which the client must pay the remaining balance.</p>
+      <input type="date" id="deadlineInput" class="w-full rounded-xl px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500 mb-4 [color-scheme:dark]">
+      <div class="flex justify-end gap-3">
+        <button onclick="closeDeadlineModal()" class="px-4 py-2 text-sm font-bold text-gray-400 hover:text-white">Cancel</button>
+        <button id="submitDeadlineBtn" onclick="submitDeadline()" class="px-4 py-2 text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-xl">Save Deadline</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentAdvanceOfferId = null;
+    function openAdvanceModal(offerId, existingAmount = '') {
+      currentAdvanceOfferId = offerId;
+      document.getElementById('advanceAmount').value = existingAmount;
+      document.getElementById('advanceModal').classList.remove('hidden');
+    }
+    function closeAdvanceModal() {
+      currentAdvanceOfferId = null;
+      document.getElementById('advanceModal').classList.add('hidden');
+    }
+    async function submitAdvance() {
+      if (!currentAdvanceOfferId) return;
+      const amt = document.getElementById('advanceAmount').value;
+      if (!amt || isNaN(amt) || amt < 0) return alert('Enter a valid amount');
+      const btn = document.getElementById('submitAdvanceBtn');
+      btn.disabled = true; btn.textContent = 'Saving...';
+      try {
+        const res = await fetch(`/api/offers/${currentAdvanceOfferId}/advance`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ amount: Number(amt) })
+        });
+        const result = await res.json();
+        if (result.success) { closeAdvanceModal(); loadOffers(); }
+        else alert(result.error);
+      } catch(e) { alert('Error setting advance'); }
+      finally { btn.disabled = false; btn.textContent = 'Set Advance'; }
+    }
+  </script>
+
+</body>
 </html>
 

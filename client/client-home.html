@@ -1,3452 +1,1452 @@
 ﻿<!DOCTYPE html>
-
-
-
-
 <html lang="en" data-theme="dark">
-
-
-
-
 <head>
-
-
-
-
   <meta charset="UTF-8">
-
-
-
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-
-
   <title>EventHive Client Home</title>
-
-
-
-
   <meta name="description" content="Browse top-rated event organizers on EventHive and find the perfect fit for your next event.">
-
-
-
-
   <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
-
-
-
-
   <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
-
-
-
-
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-
-
-
-
   <link rel="stylesheet" href="src/styles/output.css">
-
-
-
-
   <script>
-
-
-
-
     // Apply theme before paint to prevent flash
-
-
-
-
     (function() {
-
-
-
-
       const t = localStorage.getItem('theme') || 'dark';
-
-
-
-
       document.documentElement.setAttribute('data-theme', t);
-
-
-
-
     })();
-
-
-
-
   </script>
-
-
-
-
   <style>
-
-
-
-
+    /* ====== THEME VARIABLES ====== */
     :root {
-
-
-
-
       --bg-overlay: rgba(255,255,255,0.72);
-
-
-
-
       --section-bg: rgba(255,255,255,0.6);
-
-
-
-
-      --card-bg: rgba(255,255,255,0.5);
-
-
-
-
       --card-border: rgba(0,0,0,0.08);
-
-
-
-
       --text-primary: #1a1a2e;
-
-
-
-
       --text-secondary: rgba(20,20,40,0.6);
-
-
-
-
       --text-muted: rgba(20,20,40,0.4);
-
-
-
-
       --nav-bg: rgba(255,255,255,0.65);
-
-
-
-
       --nav-border: rgba(0,0,0,0.08);
-
-
-
-
       --article-bg: rgba(255,255,255,0.5);
-
-
-
-
       --article-border: rgba(0,0,0,0.06);
-
-
-
-
-      --input-bg: rgba(255,255,255,0.5);
-
-
-
-
-      --dropdown-bg: rgba(255,255,255,0.92);
-
-
-
-
-      --dropdown-border: rgba(0,0,0,0.1);
-
-
-
-
-      --dropdown-hover: rgba(0,0,0,0.05);
-
-
-
-
       --shadow: 0 8px 32px rgba(0,0,0,0.1);
-
-
-
-
+      --dropdown-bg: rgba(255,255,255,0.92);
+      --dropdown-border: rgba(0,0,0,0.1);
+      --dropdown-hover: rgba(0,0,0,0.05);
       --footer-text: rgba(20,20,40,0.4);
-
-
-
-
+      --input-bg: rgba(255,255,255,0.5);
     }
-
-
-
-
     [data-theme="dark"] {
-
-
-
-
       --bg-overlay: rgba(10,15,20,0.80);
-
-
-
-
       --section-bg: rgba(10,15,20,0.85);
-
-
-
-
-      --card-bg: rgba(255,255,255,0.04);
-
-
-
-
       --card-border: rgba(255,255,255,0.08);
-
-
-
-
       --text-primary: #ffffff;
-
-
-
-
       --text-secondary: rgba(255,255,255,0.6);
-
-
-
-
-      --text-muted: rgba(255,255,255,0.35);
-
-
-
-
+      --text-muted: rgba(255,255,255,0.4);
       --nav-bg: rgba(15,15,35,0.65);
-
-
-
-
       --nav-border: rgba(255,255,255,0.12);
-
-
-
-
       --article-bg: rgba(255,255,255,0.05);
-
-
-
-
       --article-border: rgba(255,255,255,0.08);
-
-
-
-
-      --input-bg: rgba(255,255,255,0.06);
-
-
-
-
-      --dropdown-bg: rgba(20,25,35,0.96);
-
-
-
-
-      --dropdown-border: rgba(255,255,255,0.12);
-
-
-
-
-      --dropdown-hover: rgba(255,255,255,0.08);
-
-
-
-
       --shadow: 0 20px 50px rgba(0,0,0,0.6);
-
-
-
-
+      --dropdown-bg: rgba(20,25,35,0.96);
+      --dropdown-border: rgba(255,255,255,0.12);
+      --dropdown-hover: rgba(255,255,255,0.08);
       --footer-text: rgba(255,255,255,0.4);
-
-
-
-
+      --input-bg: rgba(255,255,255,0.06);
     }
-
-
-
 
     * { box-sizing: border-box; }
-
-
-
-
-    body { font-family: 'Inter', sans-serif; min-height: 100vh; color: var(--text-primary); margin: 0; overflow-x: hidden; }
-
-
-
+    body { font-family: 'Inter', sans-serif; min-height: 100vh; margin: 0; overflow-x: hidden; }
 
     /* Modal backdrop */
-
-
-
-
     .modal-backdrop { backdrop-filter: blur(12px); background: rgba(0,0,0,0.7); }
-
-
-
-
     /* Status badges */
-
-
-
-
     .badge-pending   { background: rgba(234,179,8,0.2);   color:#facc15; border:1px solid rgba(234,179,8,0.3); }
-
-
-
-
     .badge-accepted  { background: rgba(59,130,246,0.2);  color:#60a5fa; border:1px solid rgba(59,130,246,0.3); }
-
-
-
-
-    .badge-rejected  { background: rgba(239,68,68,0.2);   color:#f87171; border:1px solid rgba(239,68,68,0.3); }
-
-
-
-
+    .badge-rejected  { background: rgba(239,68,68,0.2);   color:#f87171; border:1px solid rgba(234,179,8,0.3); }
     .badge-completed { background: rgba(16,185,129,0.2);  color:#34d399; border:1px solid rgba(16,185,129,0.3); }
-
-
-
-
     input:focus, select:focus, textarea:focus { outline: none; border-color: rgba(59,130,246,0.5); }
-    select option { background: #1a1f2e; color: #ffffff; }
-
-
-
-
+    
     /* Profile dropdown */
-
-
-
-
     .profile-wrapper { position: relative; }
-
-
-
-
-    .profile-avatar { width:40px;height:40px;border-radius:50%;border:2px solid var(--card-border);cursor:pointer;background:var(--card-bg);display:flex;align-items:center;justify-content:center;overflow:hidden;transition:border-color .3s,box-shadow .3s; }
-
-
-
-
+    .profile-avatar { width:40px;height:40px;border-radius:50%;border:2px solid var(--card-border);cursor:pointer;background:var(--article-bg);display:flex;align-items:center;justify-content:center;overflow:hidden;transition:border-color .3s,box-shadow .3s; }
     .profile-avatar:hover { border-color:var(--text-primary);box-shadow:0 0 0 3px rgba(0,0,0,.08); }
-
-
-
-
     .profile-avatar svg,.profile-avatar img { width:100%;height:100%;object-fit:cover; }
-
-
-
-
     .profile-dropdown { position:absolute;top:calc(100% + 12px);right:0;min-width:200px;background:var(--dropdown-bg);border:1px solid var(--dropdown-border);border-radius:1rem;box-shadow:0 12px 40px rgba(0,0,0,.15);backdrop-filter:blur(20px);padding:.5rem;opacity:0;pointer-events:none;transform:translateY(-8px);transition:opacity .2s,transform .2s;z-index:100; }
-
-
-
-
     .profile-dropdown.open { opacity:1;pointer-events:all;transform:translateY(0); }
-
-
-
-
     .dropdown-header { padding:.6rem .85rem;border-bottom:1px solid var(--dropdown-border);margin-bottom:.4rem; }
-
-
-
-
     .dropdown-header p { margin:0;font-size:.75rem;font-weight:700;color:var(--text-primary); }
-
-
-
-
     .dropdown-header span { font-size:.65rem;color:var(--text-muted); }
-
-
-
-
     .dropdown-item { display:flex;align-items:center;gap:.65rem;padding:.6rem .85rem;border-radius:.6rem;font-size:.8rem;color:var(--text-primary);cursor:pointer;transition:background .2s;text-decoration:none;user-select:none; }
-
-
-
-
     .dropdown-item:hover { background:var(--dropdown-hover); }
-
-
-
-
+    .dropdown-item svg { flex-shrink: 0; opacity: 0.6; }
     .dropdown-item.danger { color:#e53e3e; }
-
-
-
-
+    .dropdown-item.danger svg { opacity: 0.8; }
     .theme-toggle-row { display:flex;align-items:center;justify-content:space-between;padding:.5rem .85rem;border-radius:.6rem;cursor:pointer;transition:background .2s; }
-
-
-
-
     .theme-toggle-row:hover { background:var(--dropdown-hover); }
-
-
-
-
     .theme-toggle-label { display:flex;align-items:center;gap:.65rem;font-size:.8rem;color:var(--text-primary); }
-
-
-
-
+    .theme-toggle-label svg { opacity: 0.6; }
     .toggle-switch { position:relative;width:36px;height:20px; }
-
-
-
-
     .toggle-switch input { opacity:0;width:0;height:0; }
-
-
-
-
     .toggle-slider { position:absolute;inset:0;border-radius:20px;background:rgba(0,0,0,.15);transition:background .3s;cursor:pointer; }
-
-
-
-
     .toggle-slider:before { content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:var(--text-primary);top:3px;left:3px;transition:transform .3s; }
-
-
-
-
     input:checked + .toggle-slider { background:rgba(0,0,0,.35); }
-
-
-
-
     input:checked + .toggle-slider:before { transform:translateX(16px); }
-
-
-
-
-    /* ====== CHAT STYLES ====== */
-  <!-- ============================================================ -->
-  <style>
-    /* Chat window styles */
-    #chat-window {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 200;
-      display: flex;
-      flex-direction: column;
-      border-radius: 1.5rem;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-      border: 1px solid rgba(255,255,255,0.1);
-      background: #0d1117;
-      transition: width 0.3s ease, height 0.3s ease, bottom 0.3s ease, right 0.3s ease, border-radius 0.3s ease;
-      width: 380px;
-      height: 520px;
-    }
-    #chat-window.minimized { height: 56px; border-radius: 1rem; }
-    #chat-window.fullscreen {
-      width: 100vw !important;
-      height: 100vh !important;
-      bottom: 0 !important;
-      right: 0 !important;
-      border-radius: 0 !important;
-    }
-    #chat-window.hidden-chat { display: none !important; }
-
-    .chat-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      background: rgba(255,255,255,0.05);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      cursor: pointer;
-      flex-shrink: 0;
-      user-select: none;
-    }
-    .chat-header-title { flex: 1; font-size: 0.85rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .chat-header-sub { font-size: 0.65rem; color: rgba(255,255,255,0.4); }
-    .chat-header-btn { background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; padding: 4px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: color 0.2s, background 0.2s; }
-    .chat-header-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
-
-    .chat-body { display: flex; flex: 1; overflow: hidden; }
-
-    /* Sidebar */
-    .chat-sidebar {
-      width: 120px;
-      flex-shrink: 0;
-      border-right: 1px solid rgba(255,255,255,0.08);
-      overflow-y: auto;
-      background: rgba(0,0,0,0.2);
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      padding: 8px 4px;
-    }
-    #chat-window.fullscreen .chat-sidebar { width: 240px; }
-    .chat-sidebar-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      padding: 8px 4px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.2s;
-      position: relative;
-    }
-    .chat-sidebar-item:hover, .chat-sidebar-item.active { background: rgba(255,255,255,0.08); }
-    .chat-sidebar-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: linear-gradient(135deg, #3b82f6, #06b6d4);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 0.85rem; color: #fff; flex-shrink: 0;
-    }
-    .chat-sidebar-name { font-size: 0.6rem; color: rgba(255,255,255,0.6); text-align: center; line-height: 1.2; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    #chat-window.fullscreen .chat-sidebar-name { font-size: 0.75rem; max-width: 160px; }
-    .chat-unread-badge {
-      position: absolute; top: 4px; right: 4px;
-      background: #3b82f6; color: #fff;
-      font-size: 0.55rem; font-weight: 700;
-      width: 16px; height: 16px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    /* Messages area */
-    .chat-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    .chat-messages {
-      flex: 1; overflow-y: auto; padding: 12px;
-      display: flex; flex-direction: column; gap: 8px;
-      scroll-behavior: smooth;
-    }
-    .chat-messages::-webkit-scrollbar { width: 4px; }
-    .chat-messages::-webkit-scrollbar-track { background: transparent; }
-    .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
-
-    .chat-bubble {
-      max-width: 75%;
-      padding: 8px 12px;
-      border-radius: 14px;
-      font-size: 0.8rem;
-      line-height: 1.4;
-      word-break: break-word;
-    }
-    .chat-bubble.sent {
-      align-self: flex-end;
-      background: rgba(59,130,246,0.3);
-      border: 1px solid rgba(59,130,246,0.4);
-      color: #e0f2fe;
-      border-bottom-right-radius: 4px;
-    }
-    .chat-bubble.received {
-      align-self: flex-start;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: rgba(255,255,255,0.85);
-      border-bottom-left-radius: 4px;
-    }
-    .chat-bubble-time { font-size: 0.6rem; color: rgba(255,255,255,0.3); margin-top: 3px; text-align: right; }
-
-    .chat-empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: rgba(255,255,255,0.25); font-size: 0.8rem; gap: 8px; }
-
-    .chat-input-row {
-      display: flex; gap: 8px; padding: 10px 12px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      background: rgba(0,0,0,0.2);
-      flex-shrink: 0;
-    }
-    .chat-input {
-      flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px; padding: 8px 12px; font-size: 0.8rem; color: #fff;
-      outline: none; resize: none; font-family: inherit;
-    }
-    .chat-input:focus { border-color: rgba(59,130,246,0.5); }
-    .chat-send-btn {
-      background: rgba(59,130,246,0.3); border: 1px solid rgba(59,130,246,0.4);
-      color: #93c5fd; border-radius: 10px; padding: 8px 12px;
-      cursor: pointer; transition: background 0.2s; display: flex; align-items: center;
-    }
-    .chat-send-btn:hover { background: rgba(59,130,246,0.5); }
-
-    /* Floating chat toggle button */
-    #chat-fab {
-      position: fixed; bottom: 24px; right: 24px; z-index: 199;
-      width: 52px; height: 52px; border-radius: 50%;
-      background: rgba(59,130,246,0.3); border: 1px solid rgba(59,130,246,0.5);
-      color: #93c5fd; cursor: pointer; display: none;
-      align-items: center; justify-content: center;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      transition: background 0.2s, transform 0.2s;
-    }
-    #chat-fab:hover { background: rgba(59,130,246,0.5); transform: scale(1.05); }
-    #chat-fab-badge {
-      position: absolute; top: -2px; right: -2px;
-      background: #ef4444; color: #fff; font-size: 0.6rem; font-weight: 700;
-      width: 18px; height: 18px; border-radius: 50%;
-      display: none; align-items: center; justify-content: center;
-    }
-
-    .chat-no-selection { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: rgba(255,255,255,0.2); font-size: 0.8rem; gap: 8px; padding: 16px; text-align: center; }
-    .chat-loading { text-align: center; color: rgba(255,255,255,0.3); font-size: 0.75rem; padding: 16px; }
-  </style>
-
   </style>
 </head>
+<body class="font-['Inter'] min-h-screen relative overflow-x-hidden" style="color:var(--text-primary);">
 
-
-
-
-<body class="font-['Inter'] min-h-screen relative overflow-x-hidden" style="background:#0a0f14;">
-
-
-
-
-
-
-
-
-
-  <!-- Background -->
-
-
-
-
+  <!-- Consistent Background Image -->
   <div class="fixed inset-0 z-[-2]">
-
-
-
-
     <img id="bgImage" src="public/images/dark.avif" alt="Background" class="w-full h-full object-cover">
-
-
-
-
   </div>
-
-
-
-
-  <div class="fixed inset-0 z-[-1]" style="background:var(--bg-overlay);transition:background .4s;"></div>
-
-
-
-
+  <div class="bg-overlay" style="position:fixed;inset:0;z-index:-1;background:var(--bg-overlay);transition:background 0.4s ease;"></div>
   <script>
-
-
-
-
     document.getElementById('bgImage').src = (localStorage.getItem('theme') === 'light') ? 'public/images/light.jpeg' : 'public/images/dark.avif';
-
-
-
-
   </script>
 
-
-
-
-
-
-
-
-
   <!-- NAVBAR -->
-
-
-
-
   <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center backdrop-blur-[18px] rounded-[50px] z-50 border shadow-[0_18px_40px_rgba(0,0,0,0.5)]" style="background:var(--nav-bg);border-color:var(--nav-border);">
-
-
-
-
     <div class="font-bold text-2xl font-['Satisfy'] cursor-pointer" style="color:var(--text-primary);" onclick="window.location.href='/client-home'">
-
-
-
-
       Event<span>Hive</span>
-
-
-
-
     </div>
-
-
-
-
-    <ul class="flex gap-6 list-none m-0 p-0">
-
-
-
-
+    <ul class="flex gap-6 list-none m-0 p-0 hidden md:flex">
       <li><a href="#hero" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Home<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-
-
-
-
       <li><a href="#organizers" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Organizers<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-
-
-
-
       <li><a href="#my-bookings" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">My Bookings<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-
-
-
-
       <li><a href="/support" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Support<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-
-
-
-
     </ul>
-
-
-
-
     <div class="flex gap-4 items-center">
-
-
-
-
-      <div class="profile-wrapper">
-
-
-
-
-        <div class="profile-avatar" id="profileAvatarBtn">
-
-
-
-
+      <button onclick="window.location.href='/home'" class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all" style="color:var(--text-primary);">Events Home</button>
+      <li class="profile-wrapper" style="list-style:none;">
+        <div class="profile-avatar" id="profileAvatarBtn" title="Account options">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);">
-
-
-
-
             <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/>
-
-
-
-
           </svg>
-
-
-
-
         </div>
-
-
-
-
         <div class="profile-dropdown" id="profileDropdown">
-
-
-
-
-          <div class="dropdown-header"><p id="dropdownName">Client</p><span id="dropdownRole">Client</span></div>
-
-
-
-
+          <div class="dropdown-header">
+            <p id="dropdownName">Client</p>
+            <span id="dropdownRole">Client</span>
+          </div>
           <div class="theme-toggle-row">
-
-
-
-
             <div class="theme-toggle-label">
-
-
-
-
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
-
-
-
-
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+              </svg>
               Dark Mode
-
-
-
-
             </div>
-
-
-
-
-            <label class="toggle-switch"><input type="checkbox" id="themeToggle" checked><span class="toggle-slider"></span></label>
-
-
-
-
+            <label class="toggle-switch">
+              <input type="checkbox" id="themeToggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
           </div>
-
-
-
-
-          <a class="dropdown-item" href="/profile">
-
-
-
-
+          <div class="dropdown-item danger" id="logoutBtn">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-
-
-
-
-              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
-
-
-
-
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
             </svg>
-
-
-
-
-            My Profile
-
-
-
-
-          </a>
-
-
-
-
-          <div class="dropdown-item danger" id="logout-btn">
-
-
-
-
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-
-
-
-
             Logout
-
-
-
-
           </div>
-
-
-
-
         </div>
-
-
-
-
-      </div>
-
-
-
-
+      </li>
     </div>
-
-
-
-
   </nav>
-
-
-
-
-
-
-
-
 
   <main class="w-[90%] max-w-6xl mx-auto my-20 relative z-10 flex flex-col gap-20 pb-20">
 
-
-
-
-
-
-
-
-
     <!-- HERO SECTION -->
-
-
-
-
     <section id="hero" class="flex flex-col md:flex-row items-center gap-10">
-
-
-
-
       <div class="flex-1">
-
-
-
-
         <h1 class="text-4xl md:text-6xl font-['Satisfy'] mb-4" style="color:var(--text-primary);">Find Your Perfect Organizer</h1>
-
-
-
-
         <p class="text-lg mb-8 max-w-xl" style="color:var(--text-secondary);">Browse top-rated event organizers, compare experience and ratings, and send an offer to book the best fit for your next event.</p>
 
-
-
-
-
-
-
-
-
         <div class="flex gap-4 mb-10">
-
-
-
-
           <button onclick="document.getElementById('organizers').scrollIntoView({behavior: 'smooth'})" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 rounded-lg hover:shadow-[0_4px_16px_rgba(0,0,0,0.5)] transition-all transform hover:-translate-y-1" style="color:var(--text-primary);">Browse Organizers</button>
-
-
-
-
           <button onclick="document.getElementById('my-bookings').scrollIntoView({behavior: 'smooth'})" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 transition-all transform hover:-translate-y-1" style="color:var(--text-primary);">My Bookings</button>
-
-
-
-
         </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       </div>
-
-
-
-
-
-
-
-
 
       <div class="backdrop-blur-[32px] rounded-[2rem] p-8 md:w-[350px] border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-
-
-
-
         <h3 class="text-sm uppercase tracking-widest font-bold mb-6" style="color:var(--text-muted);">Quick Snapshot</h3>
-
-
-
-
         <ul class="space-y-4">
-
-
-
-
           <li class="flex items-center gap-4">
-
-
-
-
             <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
-
-
-
-
             <div>
-
-
-
-
               <p class="text-sm font-bold" style="color:var(--text-primary);">Your next event</p>
-
-
-
-
               <p id="snap-next" class="text-xs" style="color:var(--text-secondary);">No upcoming events yet</p>
-
-
-
-
             </div>
-
-
-
-
           </li>
-
-
-
-
           <li class="flex items-center gap-4">
-
-
-
-
             <div class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
-
-
-
-
             <div>
-
-
-
-
               <p class="text-sm font-bold" style="color:var(--text-primary);">Active bookings</p>
-
-
-
-
-              <p id="snap-bookings" class="text-xs" style="color:var(--text-secondary);">Loading…</p>
-
-
-
-
+              <p id="snap-bookings" class="text-xs" style="color:var(--text-secondary);">LoadingΓÇª</p>
             </div>
-
-
-
-
           </li>
-
-
-
-
           <li class="flex items-center gap-4">
-
-
-
-
             <div class="w-10 h-10 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
-
-
-
-
             <div>
-
-
-
-
               <p class="text-sm font-bold" style="color:var(--text-primary);">Pending ratings</p>
-
-
-
-
-              <p id="snap-ratings" class="text-xs" style="color:var(--text-secondary);">Loading…</p>
-
-
-
-
+              <p id="snap-ratings" class="text-xs" style="color:var(--text-secondary);">LoadingΓÇª</p>
             </div>
-
-
-
-
           </li>
-
-
-
-
         </ul>
-
-
-
-
       </div>
-
-
-
-
     </section>
-
-
-
-
-
-
-
-
 
     <!-- BROWSE ORGANIZERS -->
-
-
-
-
     <section id="organizers" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-
-
-
-
       <div class="mb-10 text-center">
-
-
-
-
         <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Browse Organizers</h2>
-
-
-
-
         <p class="text-sm mt-2" style="color:var(--text-secondary);">Find the perfect organizer. Send them an offer to get started.</p>
-
-
-
-
       </div>
-
-
-
-
       <!-- Filters -->
-
-
-
-
       <div class="flex flex-col sm:flex-row gap-4 mb-8">
-
-
-
-
         <div class="relative flex-1">
-
-
-
-
-          <span class="absolute left-4 top-1/2 -translate-y-1/2" style="color:var(--text-muted);">
-
-
-
-
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-
-
-
-
-          </span>
-
-
-
-
+          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm" style="color:var(--text-muted);">≡ƒöì</span>
           <input id="search" type="text" placeholder="Search organizers by name..."
-
-
-
-
             class="w-full pl-10 pr-4 py-3 rounded-xl text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
-
-
-
-
         </div>
-
-
-
-
-        <select id="sort" class="px-5 py-3 rounded-xl text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);color-scheme:dark;appearance:none;-webkit-appearance:none;padding-right:2rem;background-image:url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'rgba(255,255,255,0.5)\' stroke-width=\'2\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 0.75rem center;;color-scheme:dark;">
-
-
-
-
+        <select id="sort" class="px-5 py-3 rounded-xl text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
           <option value="rating">Sort by Rating</option>
-
-
-
-
           <option value="events">Sort by Experience</option>
-
-
-
-
         </select>
-
-
-
-
       </div>
-
-
-
-
       <!-- Cards -->
-
-
-
-
       <div id="organizer-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-
-
-
-
       <div id="empty-state" class="hidden text-center py-16 italic" style="color:var(--text-muted);">No organizers found.</div>
-
-
-
-
     </section>
-
-
-
-
-
-
-
-
 
     <!-- MY BOOKINGS -->
-
-
-
-
     <section id="my-bookings" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-
-
-
-
       <div class="mb-10 text-center">
-
-
-
-
         <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">My Bookings</h2>
-
-
-
-
         <p class="text-sm mt-2" style="color:var(--text-secondary);">Track your offers to organizers. Rate them once your event is completed.</p>
-
-
-
-
       </div>
-
-
-
-
       <div id="bookings-list" class="flex flex-col gap-4"></div>
-
-
-
-
       <div id="bookings-empty" class="hidden text-center py-10 italic" style="color:var(--text-muted);">You haven't sent any offers yet. Browse organizers above to get started.</div>
-
-
-
-
-      <div id="bookings-loading" class="text-center py-10 text-sm italic" style="color:var(--text-muted);">Loading bookings…</div>
-
-
-
-
+      <div id="bookings-loading" class="text-center py-10 text-sm italic" style="color:var(--text-muted);">Loading bookingsΓÇª</div>
     </section>
-
-
-
-
-
-
-
-
 
     <!-- WHY EVENTHIVE -->
-
-
-
-
     <section class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-
-
-
-
       <div class="mb-10 text-center">
-
-
-
-
         <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Why Book with EventHive?</h2>
-
-
-
-
       </div>
-
-
-
-
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-
-
-
         <div class="p-6 rounded-[1.5rem] border hover:opacity-90 transition-colors" style="background:var(--article-bg);border-color:var(--article-border);">
-
-
-
-
           <h3 class="text-lg font-bold mb-3 flex items-center gap-2" style="color:var(--text-primary);"><div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>Verified Organizers</h3>
-
-
-
-
           <p class="text-sm leading-relaxed" style="color:var(--text-secondary);">Every organizer on our platform is verified and rated by real clients for full transparency.</p>
-
-
-
-
         </div>
-
-
-
-
         <div class="p-6 rounded-[1.5rem] border hover:opacity-90 transition-colors" style="background:var(--article-bg);border-color:var(--article-border);">
-
-
-
-
           <h3 class="text-lg font-bold mb-3 flex items-center gap-2" style="color:var(--text-primary);"><div class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>Easy Booking</h3>
-
-
-
-
           <p class="text-sm leading-relaxed" style="color:var(--text-secondary);">Browse profiles, compare options, and send offers in just a few clicks — no hassle.</p>
-
-
-
-
         </div>
-
-
-
-
         <div class="p-6 rounded-[1.5rem] border hover:opacity-90 transition-colors" style="background:var(--article-bg);border-color:var(--article-border);">
-
-
-
-
           <h3 class="text-lg font-bold mb-3 flex items-center gap-2" style="color:var(--text-primary);"><div class="w-8 h-8 rounded-full bg-yellow-500/20 text-yellow-500 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>Top Experiences</h3>
-
-
-
-
           <p class="text-sm leading-relaxed" style="color:var(--text-secondary);">From corporate summits to weddings, find specialists for every type of event.</p>
-
-
-
-
         </div>
-
-
-
-
       </div>
-
-
-
-
     </section>
-
-
-
-
-
-
-
-
 
   </main>
 
-
-
-
-
-
-
-
-
   <footer class="mt-auto py-8 text-center text-sm" style="color:var(--footer-text);">
-
-
-
-
     <p>&copy; 2026 EventHive. All rights reserved.</p>
-
-
-
-
   </footer>
 
-
-
-
-
-
-
-
-
   <!-- ============================================================ -->
-
-
-
-
   <!-- SEND OFFER MODAL -->
-
-
-
-
   <!-- ============================================================ -->
-
-
-
-
   <div id="offer-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
-
-
-
-
     <div class="modal-backdrop absolute inset-0" id="offer-backdrop"></div>
-
-
-
-
     <div class="relative border rounded-[2rem] p-8 w-full max-w-lg shadow-[0_30px_80px_rgba(0,0,0,0.8)] z-10 transition-all" style="background:var(--section-bg);border-color:var(--card-border);">
-
-
-
-
       <button id="close-offer-modal" class="absolute top-5 right-6 text-2xl leading-none transition-colors" style="color:var(--text-muted);">&times;</button>
-
-
-
-
       <h3 class="text-xl font-bold font-['Satisfy'] mb-1" style="color:var(--text-primary);">Send an Offer</h3>
-
-
-
-
       <p id="offer-modal-org-name" class="text-sm mb-6" style="color:var(--text-secondary);">to —</p>
-
-
-
-
       <form id="offer-form" class="flex flex-col gap-4">
-
-
-
-
         <div>
-
-
-
-
           <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">Event Title *</label>
-
-
-
-
           <input id="offer-title" type="text" required placeholder="e.g. Annual Corporate Gala"
-
-
-
-
             class="w-full rounded-xl px-4 py-3 text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
-
-
-
-
         </div>
-
-
-
-
         <div class="grid grid-cols-2 gap-4">
-
-
-
-
           <div>
-
-
-
-
             <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">Min Budget (₹)</label>
-
-
-
-
             <input id="offer-budget-min" type="number" placeholder="50000"
-
-
-
-
               class="w-full rounded-xl px-4 py-3 text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
-
-
-
-
           </div>
-
-
-
-
           <div>
-
-
-
-
             <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">Max Budget (₹)</label>
-
-
-
-
             <input id="offer-budget-max" type="number" placeholder="200000"
-
-
-
-
               class="w-full rounded-xl px-4 py-3 text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
-
-
-
-
           </div>
-
-
-
-
         </div>
-
-
-
-
         <div class="grid grid-cols-2 gap-4">
-
-
-
-
           <div>
-
-
-
-
             <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">Event Date</label>
-
-
-
-
             <input id="offer-date" type="date"
-
-
-
-
               class="w-full rounded-xl px-4 py-3 text-sm border transition-all [color-scheme:dark]" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
-
-
-
-
           </div>
-
-
-
-
           <div>
-
-
-
-
             <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">City</label>
-
-
-
-
             <input id="offer-city" type="text" placeholder="e.g. Hyderabad"
-
-
-
-
               class="w-full rounded-xl px-4 py-3 text-sm border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
-
-
-
-
           </div>
-
-
-
-
         </div>
-
-
-
-
         <div>
-
-
-
-
           <label class="block text-xs uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">Description</label>
-
-
-
-
           <textarea id="offer-description" rows="3" placeholder="Describe your event needs..."
-
-
-
-
             class="w-full rounded-xl px-4 py-3 text-sm resize-none border transition-all" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);"></textarea>
-
-
-
-
         </div>
-
-
-
-
         <p id="offer-error" class="text-red-400 text-xs hidden"></p>
-
-
-
-
         <button type="submit" id="offer-submit-btn"
-
-
-
-
           class="mt-2 w-full py-3 font-bold uppercase tracking-wider text-sm bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 rounded-xl hover:opacity-90 transition-all shadow-lg" style="color:var(--text-primary);">
-
-
-
-
           Send Offer
-
-
-
-
         </button>
-
-
-
-
       </form>
 
-
-
-
-
-
-
-
-
       <!-- Success state -->
-
-
-
-
       <div id="offer-success" class="hidden text-center py-6">
-
-
-
-
         <p class="text-4xl mb-3"><svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></p>
-
-
-
-
         <h4 class="text-lg font-bold text-white mb-1">Offer Sent!</h4>
-
-
-
-
         <p class="text-white/50 text-sm mb-5">The organizer will review your offer and respond soon.</p>
-
-
-
-
-        <button onclick="closeOfferModal()" class="px-6 py-2 bg-white/10 border border-white/20 rounded-xl text-sm font-bold hover:bg-white/20 transition-all">Close</button>
-
-
-
-
+        <button onclick="closeOfferModal()" class="px-6 py-2 bg-white/10 border border-white/20 rounded-xl text-sm font-bold hover:bg-white/20 transition-all" style="color:var(--text-primary);">Close</button>
       </div>
-
-
-
-
     </div>
-
-
-
-
   </div>
 
-
-
-
-
-
-
-
-
   <script>
-
-
-
-
-    // — Auth guard: client only —————————————————
-
-
-
-
+    // ── Auth guard: client only ──────────────────────────────────
     (async function checkAuth() {
-
-
-
-
       const token = sessionStorage.getItem('token');
-
-
-
-
       if (!token) return showUnauth('not-logged-in');
-
-
-
-
       try {
-
-
-
-
         const r = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
-
-
-
-
         if (!r.ok) return showUnauth('not-logged-in');
-
-
-
-
         const d = await r.json();
-
-
-
-
         if (d.data?.role !== 'client') return showUnauth(d.data?.role || 'unknown');
-
-
-
-
         const u = d.data;
-
-
-
-
         document.getElementById('dropdownName').textContent = u.profile?.clientName || u.username || 'Client';
-
-
-
-
         document.getElementById('dropdownRole').textContent = 'Client';
-
-
-
-
-        // Update avatar with profile picture if available
+        
+        // Add avatar picture if present
         const pic = u.profile?.profilePic;
-        const avatarBtn = document.getElementById('profileAvatarBtn');
-        if (pic && avatarBtn) {
+        if (pic) {
+          const avatarBtn = document.getElementById('profileAvatarBtn');
           const img = document.createElement('img');
-          img.src = pic;
-          img.alt = 'Profile';
+          img.src = pic; img.alt = 'Profile';
           img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
-          img.onerror = () => {
-            avatarBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/></svg>`;
-          };
-          avatarBtn.innerHTML = '';
-          avatarBtn.appendChild(img);
+          avatarBtn.innerHTML = ''; avatarBtn.appendChild(img);
         }
-
-
-
-
-      } catch { showUnauth('not-logged-in'); }
-
-
-
-
+      } catch (err) { showUnauth('not-logged-in'); }
     })();
 
-
-
-
-
-
-
-
-
     function showUnauth(role) {
-
-
-
-
       const isIn = role !== 'not-logged-in';
-
-
-
-
       const labels = { volunteer:'Volunteer', organizer:'Organizer' };
+      const roleName = labels[role] || role;
+      
+      const loggedInMsg = "You're logged in as a <strong style='color:rgba(255,255,255,.8);'>" + roleName + "</strong>, but this page is for <strong style='color:rgba(255,255,255,.8);'>Clients</strong> only.";
+      const notLoggedInMsg = "You need to log in as a <strong style='color:rgba(255,255,255,.8);'>Client</strong> to access this page.";
+      
+      const loggedInSubMsg = "Please log out and sign in with your client account.";
+      const notLoggedInSubMsg = "Please log in with your client account to continue.";
 
+      const logoutBtn = "<button onclick=\"sessionStorage.removeItem('token');window.location.href='/register';\" style=\"padding:.75rem 1.5rem;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;\">Log Out</button>";
 
-
-
-      document.body.innerHTML = `<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0f14;font-family:Inter,sans-serif;padding:2rem;"><div style="max-width:480px;width:100%;text-align:center;"><div style="width:72px;height:72px;border-radius:50%;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;"><svg xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;color:#f87171;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg></div><h1 style="font-family:Satisfy,cursive;font-size:2rem;color:#fff;margin-bottom:.75rem;">Access Restricted</h1><p style="color:rgba(255,255,255,.5);font-size:.9rem;margin-bottom:.5rem;">${isIn ? `You're logged in as a <strong style="color:rgba(255,255,255,.8);">${labels[role]||role}</strong>, but this page is for <strong style="color:rgba(255,255,255,.8);">Clients</strong> only.` : `You need to log in as a <strong style="color:rgba(255,255,255,.8);">Client</strong> to access this page.`}</p><p style="color:rgba(255,255,255,.3);font-size:.75rem;margin-bottom:2rem;">${isIn ? 'Please log out and sign in with your client account.' : 'Please log in with your client account to continue.'}</p><div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">${isIn ? `<button onclick="sessionStorage.removeItem('token');window.location.href='/register';" style="padding:.75rem 1.5rem;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">Log Out</button>` : ''}<button onclick="window.location.href='/register';" style="padding:.75rem 1.5rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">${isIn ? 'Switch Account' : 'Log In'}</button><button onclick="window.location.href='/';" style="padding:.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;" onclick="history.back();">← Back</button><button onclick="window.location.href='/'" style="padding:.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">Home</button></div></div></div>`;
-
-
-
-
+      document.body.innerHTML = `
+        <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0f14;font-family:Inter,sans-serif;padding:2rem;">
+          <div style="max-width:480px;width:100%;text-align:center;">
+            <div style="width:72px;height:72px;border-radius:50%;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;color:#f87171;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+              </svg>
+            </div>
+            <h1 style="font-family:Satisfy,cursive;font-size:2rem;color:#fff;margin-bottom:.75rem;">Access Restricted</h1>
+            <p style="color:rgba(255,255,255,.5);font-size:.9rem;margin-bottom:.5rem;">${isIn ? loggedInMsg : notLoggedInMsg}</p>
+            <p style="color:rgba(255,255,255,.3);font-size:.75rem;margin-bottom:2rem;">${isIn ? loggedInSubMsg : notLoggedInSubMsg}</p>
+            <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
+              ${isIn ? logoutBtn : ''}
+              <button onclick="window.location.href='/register';" style="padding:.75rem 1.5rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">${isIn ? 'Switch Account' : 'Log In'}</button>
+              <button onclick="window.location.href='/';" style="padding:.75rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">Go Home</button>
+            </div>
+          </div>
+        </div>`;
     }
 
-
-
-
-
-
-
-
-
-    // — Theme ——————————————————————————
-
-
-
-
+    // ── Theme ────────────────────────────────────────────────────
     const bgImage = document.getElementById('bgImage');
-
-
-
-
     const themeToggle = document.getElementById('themeToggle');
-
-
-
-
     function applyTheme(dark) {
-
-
-
-
       document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-
-
-
-
       bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
-
-
-
-
       themeToggle.checked = dark;
-
-
-
-
       localStorage.setItem('theme', dark ? 'dark' : 'light');
-
-
-
-
     }
-
-
-
-
     applyTheme(localStorage.getItem('theme') !== 'light');
-
-
-
-
     themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
 
-
-
-
+    // ── Profile dropdown ─────────────────────────────────────────
     const avatarBtn = document.getElementById('profileAvatarBtn');
-
-
-
-
     const dropdown  = document.getElementById('profileDropdown');
-
-
-
-
     avatarBtn.addEventListener('click', e => { e.stopPropagation(); dropdown.classList.toggle('open'); });
-
-
-
-
     document.addEventListener('click', e => { if (!dropdown.contains(e.target) && e.target !== avatarBtn) dropdown.classList.remove('open'); });
 
-
-
-
-
-
-
-
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        sessionStorage.removeItem('token');
+        window.location.href = '/register';
+    });
 
     const token = sessionStorage.getItem('token');
-
-
-
-
     let organizers = [];
-
-
-
-
     let selectedOrganizerId = null;
 
-
-
-
-
-
-
-
-
-    // — Organizer cards —————————————————————
-
-
-
-
+    // ── Organizer cards ──────────────────────────────────────────
     async function loadOrganizers() {
-
-
-
-
       try {
-
-
-
-
         const res = await fetch('/api/organizers');
-
-
-
-
         organizers = await res.json();
-
-
-
-
         renderOrganizers(organizers);
-
-
-
-
       } catch (err) { showEmpty(true); }
-
-
-
-
     }
-
-
-
-
-
-
-
-
 
     function showEmpty(show) { document.getElementById('empty-state').classList.toggle('hidden', !show); }
 
-
-
-
-
-
-
-
-
     function renderOrganizers(data) {
-
-
-
-
       const container = document.getElementById('organizer-list');
-
-
-
-
       if (!data.length) { container.innerHTML = ''; showEmpty(true); return; }
-
-
-
-
       showEmpty(false);
-
-
-
-
       container.innerHTML = data.map(org => {
-
-
-
-
         const name = org.profile?.orgName || org.username || 'Unknown';
-
-
-
-
         const initials = name[0].toUpperCase();
-
-
-
-
-        const rating = org.ratingAvg > 0 ? `★ ${org.ratingAvg.toFixed(1)}` : '★ New';
-
-
-
-
+        const rating = org.ratingAvg > 0 ? `Γÿà ${org.ratingAvg.toFixed(1)}` : 'Γÿà New';
         const events = org.eventsHosted || 0;
-
-
-
-
         return `
-
-
-
-
           <div class="backdrop-blur-md rounded-[1.5rem] p-6 hover:-translate-y-1 transition-all duration-300 border flex flex-col gap-4" style="background:var(--article-bg);border-color:var(--article-border);box-shadow:var(--shadow);">
-
-
-
-
             <div class="flex items-center gap-4">
-
-
-
-
               <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">${initials}</div>
-
-
-
-
               <div>
-
-
-
-
                 <h3 class="text-base font-bold" style="color:var(--text-primary);">${name}</h3>
-
-
-
-
                 <p class="text-xs" style="color:var(--text-muted);">${org.email || ''}</p>
-
-
-
-
               </div>
-
-
-
-
             </div>
-
-
-
-
             <div class="flex justify-between items-center text-sm border-t pt-4" style="border-color:var(--card-border);">
-
-
-
-
               <span class="text-yellow-400 font-bold">${rating}</span>
-
-
-
-
               <span style="color:var(--text-secondary);">${events} event${events===1?'':'s'} hosted</span>
-
-
-
-
             </div>
-
-
-
-
             <div class="flex gap-2">
-
-
-
-
               <button onclick="window.location.href='/organiser-profile?id=${org._id}'"
-
-
-
-
                 class="flex-1 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-all" style="color:var(--text-primary);">
-
-
-
-
                 View Profile
-
-
-
-
               </button>
-
-
-
-
               <button onclick="openOfferModal('${org._id}', '${name.replace(/'/g, "\\'")}')"
-
-
-
-
                 class="flex-1 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all" style="color:var(--text-primary);">
-
-
-
-
                 Send Offer
-
-
-
-
               </button>
-
-
-
-
-              <button onclick="openChat('${org._id}', '${name.replace(/'/g, "\\'")}')"
-
-
-
-
-                class="flex-1 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all" style="color:var(--text-primary);">
-
-
-
-
-                Chat
-
-
-
-
-              </button>
-
-
-
-
             </div>
-
-
-
-
           </div>`;
-
-
-
-
       }).join('');
-
-
-
-
     }
-
-
-
-
-
-
-
-
 
     document.getElementById('search').addEventListener('input', e => {
-
-
-
-
       const v = e.target.value.toLowerCase();
-
-
-
-
       renderOrganizers(organizers.filter(o => (o.profile?.orgName || o.username || '').toLowerCase().includes(v)));
-
-
-
-
     });
-
-
-
-
     document.getElementById('sort').addEventListener('change', e => {
-
-
-
-
       let sorted = [...organizers];
-
-
-
-
       if (e.target.value === 'rating') sorted.sort((a,b) => (b.ratingAvg||0)-(a.ratingAvg||0));
-
-
-
-
       else sorted.sort((a,b) => (b.eventsHosted||0)-(a.eventsHosted||0));
-
-
-
-
       renderOrganizers(sorted);
-
-
-
-
     });
 
-
-
-
-
-
-
-
-
-    // — My Bookings ———————————————————————
-
-
-
-
+    // ── My Bookings ──────────────────────────────────────────────
     async function loadBookings() {
-
-
-
-
       if (!token) { showBookingsEmpty(); return; }
-
-
-
-
       try {
-
-
-
-
         const res = await fetch('/api/offers/my-offers', { headers: { Authorization: `Bearer ${token}` } });
-
-
-
-
         document.getElementById('bookings-loading').classList.add('hidden');
-
-
-
-
         if (!res.ok) { showBookingsEmpty(); return; }
-
-
-
-
         const data = await res.json();
-
-
-
-
         renderBookings(data.data || []);
-
-
-
-
       } catch (err) {
-
-
-
-
         document.getElementById('bookings-loading').classList.add('hidden');
-
-
-
-
         showBookingsEmpty();
-
-
-
-
       }
-
-
-
-
     }
-
-
-
-
-
-
-
-
 
     function showBookingsEmpty() {
-
-
-
-
       document.getElementById('bookings-loading').classList.add('hidden');
-
-
-
-
       document.getElementById('bookings-empty').classList.remove('hidden');
-
-
-
-
     }
 
+    let currentNegotiateOfferId = null;
+    let currentPayOfferId = null;
 
+    function openNegotiateModal(offerId) {
+      currentNegotiateOfferId = offerId;
+      document.getElementById('negotiateModal').classList.remove('hidden');
+    }
+    function closeNegotiateModal() {
+      currentNegotiateOfferId = null;
+      document.getElementById('negotiateModal').classList.add('hidden');
+    }
 
+    function openRazorpayMock(offerId, amount) {
+      currentPayOfferId = offerId;
+      document.getElementById('rzpAmountDisplay').textContent = amount;
+      document.getElementById('razorpayMockModal').classList.remove('hidden');
+    }
+    function closeRazorpayMock() {
+      currentPayOfferId = null;
+      document.getElementById('razorpayMockModal').classList.add('hidden');
+    }
 
+    async function submitNegotiation() {
+      if (!currentNegotiateOfferId) return;
+      const amount = document.getElementById('negotiateAmount').value;
+      const message = document.getElementById('negotiateMessage').value;
+      if (!amount || !message) return alert('Both amount and message are required.');
 
+      const btn = document.getElementById('submitNegBtn');
+      btn.disabled = true; btn.textContent = 'Sending...';
+      
+      try {
+        const res = await fetch(`/api/offers/${currentNegotiateOfferId}/advance/negotiate`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ requestedAmount: amount, message })
+        });
+        const data = await res.json();
+        if(data.success) {
+          closeNegotiateModal();
+          loadBookings();
+        } else alert(data.error);
+      } catch(e) {
+        alert('Error submitting negotiation');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Submit Request';
+      }
+    }
 
+    async function confirmDummyPayment() {
+      if (!currentPayOfferId) return;
+      const btn = document.getElementById('confirmRzpBtn');
+      btn.disabled = true; btn.textContent = 'Processing...';
 
+      try {
+        const res = await fetch(`/api/offers/${currentPayOfferId}/advance/pay`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if(data.success) {
+          closeRazorpayMock();
+          loadBookings();
+          alert('Payment Successful!');
+        } else alert(data.error);
+      } catch(e) {
+        alert('Error communicating with dummy gateway');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Pay Now';
+      }
+    }
 
+    // ── Final Payment (remaining balance) ────────────────────────
+    let currentFinalPayOfferId = null;
+    let currentFinalPayAmount = 0;
 
+    function openFinalPayModal(offerId, amount) {
+      currentFinalPayOfferId = offerId;
+      currentFinalPayAmount = amount;
+      document.getElementById('finalPayAmountDisplay').textContent = amount;
+      document.getElementById('finalPayModal').classList.remove('hidden');
+    }
+    function closeFinalPayModal() {
+      currentFinalPayOfferId = null;
+      document.getElementById('finalPayModal').classList.add('hidden');
+    }
+
+    async function confirmFinalPayment() {
+      if (!currentFinalPayOfferId) return;
+      const btn = document.getElementById('confirmFinalPayBtn');
+      btn.disabled = true; btn.textContent = 'Processing...';
+      try {
+        const res = await fetch(`/api/offers/${currentFinalPayOfferId}/final-payment`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeFinalPayModal();
+          loadBookings();
+          alert('Final payment successful!');
+        } else alert(data.error);
+      } catch(e) {
+        alert('Error processing payment');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Pay Now';
+      }
+    }
     function renderBookings(offers) {
-
-
-
-
       const container = document.getElementById('bookings-list');
-
-
-
-
       if (!offers.length) { showBookingsEmpty(); return; }
 
-
-
-
-
-
-
-
-
       // Update snapshot
-
-
-
-
       const active = offers.filter(o => o.status === 'accepted').length;
-
-
-
-
       const pendingRatings = offers.filter(o => o.status === 'completed' && !o.isRated).length;
-
-
-
-
       document.getElementById('snap-bookings').textContent = active > 0 ? `${active} accepted` : 'None active';
-
-
-
-
       document.getElementById('snap-ratings').textContent = pendingRatings > 0 ? `${pendingRatings} awaiting your review` : 'All caught up!';
 
-
-
-
-
-
-
-
-
       // Next upcoming event
-
-
-
-
       const upcoming = offers
-
-
-
-
         .filter(o => o.eventDate && o.status === 'accepted' && new Date(o.eventDate) > new Date())
-
-
-
-
         .sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
-
-
-
-
       if (upcoming.length) {
-
-
-
-
         const d = new Date(upcoming[0].eventDate);
-
-
-
-
         document.getElementById('snap-next').textContent = `${upcoming[0].title} — ${d.toLocaleDateString('en-IN', { day:'numeric', month:'short' })}`;
-
-
-
-
       }
-
-
-
-
-
-
-
-
 
       container.innerHTML = offers.map(offer => {
-
-
-
-
         const orgName = offer.organizerId?.profile?.orgName || offer.organizerId?.username || 'Organizer';
-
-
-
-
         const statusMap = { pending:'badge-pending', accepted:'badge-accepted', rejected:'badge-rejected', completed:'badge-completed' };
-
-
-
-
         const badgeClass = statusMap[offer.status] || 'badge-pending';
-
-
-
-
         const statusLabel = offer.status.charAt(0).toUpperCase() + offer.status.slice(1);
-
-
-
-
         const date = offer.eventDate ? new Date(offer.eventDate).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }) : 'No date';
 
-
-
-
-
-
-
-
-
         const rateBtn = offer.status === 'completed' && !offer.isRated
-
-
-
-
           ? `<a href="/rate-organizer?organizerId=${offer.organizerId?._id}&offerId=${offer._id}"
-
-
-
-
-               class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-gradient-to-r from-yellow-500 to-amber-400 hover:opacity-90 rounded-xl transition-all shadow-lg whitespace-nowrap">
-
-
-
-
+               class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 border border-white/20 hover:bg-white/20 rounded-xl transition-all shadow-lg whitespace-nowrap" style="color:var(--text-primary);">
                Rate Organizer
-
-
-
-
              </a>`
-
-
-
-
           : offer.isRated
-
-
-
-
-            ? `<span class="px-4 py-2 text-xs text-green-400 border border-green-500/30 rounded-xl bg-green-500/10 font-bold">✓ Rated</span>`
-
-
-
-
+            ? `<span class="px-4 py-2 text-xs text-green-400 border border-green-500/30 rounded-xl bg-green-500/10 font-bold">Γ£ô Rated</span>`
             : '';
 
-
-
-
-
-
-
-
-
         let budgetStr = '';
-
-
-
-
         if (offer.budgetMin || offer.budgetMax) {
-
-
-
-
-          budgetStr = `<span>₹${offer.budgetMin || 0} — ₹${offer.budgetMax || 'Any'}</span>`;
-
-
-
-
+          budgetStr = `<span>₹${offer.budgetMin || 0} – ₹${offer.budgetMax || 'Any'}</span>`;
         } else if (offer.budget) {
-
-
-
-
           budgetStr = `<span>${offer.budget}</span>`;
-
-
-
-
         }
-
-
-
-
-
-
-
-
 
         let expensesHtml = '';
-
-
-
-
-        if ((offer.status === 'accepted' || offer.status === 'completed') && offer.expenses && offer.expenses.length > 0) {
-
-
-
-
-          const expenseList = offer.expenses.map(exp => {
-
-
-
-
+        if (offer.status === 'accepted' || offer.status === 'completed') {
+          const expenses = offer.expenses || [];
+          const expenseList = expenses.length > 0 ? expenses.map(exp => {
             const expDate = new Date(exp.date).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
-
-
-
-
             if (exp.isDeleted) {
-
-
-
-
               return `<li class="flex justify-between items-center text-white/30 line-through text-xs px-2 py-1"><span>${exp.description}</span><span>₹${exp.amount}</span></li>`;
-
-
-
-
             }
-
-
-
-
-            return `<li class="flex justify-between items-center text-white/70 text-xs px-2 py-1 border-b border-white/5 last:border-0 hover:bg-white/5"><span>${expDate} - ${exp.description}</span><span class="font-bold text-red-300">₹${exp.amount}</span></li>`;
-
-
-
-
-          }).join('');
-
-
-
-
+            return `<li class="flex justify-between items-center text-xs px-2 py-1 border-b last:border-0 hover:opacity-80" style="border-color:var(--card-border);color:var(--text-secondary);"><span>${expDate} - ${exp.description}</span><span class="font-bold text-red-400">₹${exp.amount}</span></li>`;
+          }).join('') : `<li class="text-xs italic px-2 py-1" style="color:var(--text-muted);">No expenses logged yet by the organizer.</li>`;
           
+          const totalExpenses = expenses.filter(e => !e.isDeleted).reduce((sum, e) => sum + e.amount, 0);
+          const advancePaid = (offer.advance && offer.advance.status === 'paid') ? offer.advance.amount : 0;
+          const remaining = Math.max(0, totalExpenses - advancePaid);
 
-
-
-
-          const totalValid = offer.expenses.filter(e => !e.isDeleted).reduce((sum, e) => sum + e.amount, 0);
-
-
-
-
-
-
-
-
+          // Final payment row (only for completed offers)
+          let finalPaymentRow = '';
+          if (offer.status === 'completed') {
+            if (offer.finalPayment && offer.finalPayment.status === 'paid') {
+              finalPaymentRow = `
+                <div class="flex justify-between items-center mt-3 pt-3 border-t" style="border-color:var(--card-border);">
+                  <span class="text-xs font-bold" style="color:var(--text-primary);">Final Payment</span>
+                  <span class="text-xs font-bold text-green-400">Paid ₹${offer.finalPayment.amount}</span>
+                </div>`;
+            } else if (remaining > 0) {
+              const dl = offer.finalPayment?.deadline;
+              const dlDate = dl ? new Date(dl) : null;
+              const now = new Date();
+              const isOverdue = dlDate && now > dlDate;
+              const daysLeft = dlDate ? Math.ceil((dlDate - now) / (1000*60*60*24)) : null;
+              const dlStr = dlDate ? dlDate.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : null;
+              let deadlineTag = '';
+              if (isOverdue) {
+                const orgId = offer.organizerId?._id || '';
+                const orgName = offer.organizerId?.profile?.orgName || offer.organizerId?.username || 'Organizer';
+                deadlineTag = `
+                  <p class="text-xs text-red-400 mt-1 font-bold">Deadline passed</p>
+                  <button onclick="ccOpenWith('${orgId}','${orgName.replace(/'/g,"\\'")}')" class="mt-1.5 px-3 py-1 text-xs font-bold uppercase bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all">Contact Organizer</button>`;
+              } else if (dlStr && daysLeft <= 3) {
+                deadlineTag = `<p class="text-xs text-orange-400 mt-1 font-bold">Due by ${dlStr} — ${daysLeft} day${daysLeft !== 1 ? 's' : ''} left</p>`;
+              } else if (dlStr) {
+                deadlineTag = `<p class="text-xs text-yellow-400 mt-1">Pay by ${dlStr}</p>`;
+              } else {
+                deadlineTag = `<p class="text-xs mt-1" style="color:var(--text-muted);">No deadline set yet</p>`;
+              }
+              finalPaymentRow = `
+                <div class="flex justify-between items-center mt-3 pt-3 border-t" style="border-color:var(--card-border);">
+                  <div>
+                    <span class="text-xs font-bold" style="color:var(--text-primary);">Remaining Balance</span>
+                    ${deadlineTag}
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="text-sm font-bold text-red-400">₹${remaining}</span>
+                    ${!isOverdue ? `<button onclick="openFinalPayModal('${offer._id}', ${remaining})" class="px-3 py-1.5 text-xs font-bold uppercase bg-blue-600 hover:bg-blue-500 text-white rounded-lg shadow-lg transition-all">Pay Now</button>` : ''}
+                  </div>
+                </div>`;
+            } else if (offer.refund && offer.refund.status === 'refunded') {
+              const dueDate = offer.refund.dueDate ? new Date(offer.refund.dueDate).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : null;
+              const refundedAt = offer.refund.refundedAt ? new Date(offer.refund.refundedAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : null;
+              finalPaymentRow = `
+                <div class="mt-3 pt-3 border-t" style="border-color:var(--card-border);">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold" style="color:var(--text-primary);">Refund Initiated</span>
+                    <span class="text-xs font-bold text-green-400">₹${offer.refund.amount}</span>
+                  </div>
+                  <p class="text-xs mt-1 text-blue-400">Expected within 3 working days${dueDate ? ` — by ${dueDate}` : ''}.</p>
+                  ${refundedAt ? `<p class="text-xs mt-0.5" style="color:var(--text-muted);">Initiated on ${refundedAt}</p>` : ''}
+                </div>`;
+            } else {
+              finalPaymentRow = `
+                <div class="flex justify-between items-center mt-3 pt-3 border-t" style="border-color:var(--card-border);">
+                  <span class="text-xs font-bold text-green-400">No remaining balance — fully covered by advance</span>
+                </div>`;
+            }
+          }
 
           expensesHtml = `
-
-
-
-
-            <div class="mt-4 rounded-xl p-4 border" style="background:var(--card-bg);border-color:var(--card-border);">
-
-
-
-
+            <div class="mt-4 rounded-xl p-4 border" style="background:var(--section-bg);border-color:var(--card-border);">
               <div class="flex justify-between items-center mb-2">
-
-
-
-
-                <h4 class="text-xs uppercase tracking-widest font-bold" style="color:var(--text-muted);">Tracked Expenses</h4>
-
-
-
-
-                <span class="text-xs font-bold text-red-400">Total: ₹${totalValid}</span>
-
-
-
-
+                <h4 class="text-xs uppercase tracking-widest font-bold flex items-center gap-2" style="color:var(--text-primary);">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  Budget Tracker
+                </h4>
+                <span class="text-xs font-bold text-red-400">Total Spent: ₹${totalExpenses}</span>
               </div>
-
-
-
-
-              <ul class="flex flex-col gap-1 max-h-32 overflow-y-auto pr-2">
-
-
-
-
+              <ul class="flex flex-col gap-1 max-h-32 overflow-y-auto pr-2 mt-2">
                 ${expenseList}
-
-
-
-
               </ul>
-
-
-
-
+              ${finalPaymentRow}
             </div>
-
-
-
-
           `;
-
-
-
-
         }
 
-
-
-
-
-
-
-
+        let advanceHtml = '';
+        if (offer.status === 'accepted') {
+          const adv = offer.advance;
+          if (adv && adv.status === 'pending') {
+            advanceHtml = `
+              <div class="mt-4 p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/10">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-sm font-bold text-yellow-500">Advance Setting: ₹${adv.amount}</span>
+                  <div class="flex gap-2">
+                    <button onclick="openNegotiateModal('${offer._id}')" class="px-3 py-1 text-xs font-bold uppercase bg-yellow-600/20 hover:bg-yellow-600/40 text-yellow-300 rounded-lg">Negotiate</button>
+                    <button onclick="openRazorpayMock('${offer._id}', ${adv.amount})" class="px-3 py-1 text-xs font-bold uppercase bg-blue-600 hover:bg-blue-500 text-white rounded-lg shadow-lg">Pay Advance</button>
+                  </div>
+                </div>
+                <p class="text-xs text-yellow-500/80">Organizer requested ₹${adv.amount} advance before the event starts.</p>
+              </div>
+            `;
+          } else if (adv && adv.status === 'negotiating') {
+            advanceHtml = `
+              <div class="mt-4 p-4 rounded-xl border border-orange-500/20 bg-orange-500/10">
+                <span class="text-sm font-bold text-orange-400">Negotiation Pending (₹${adv.requestedAmount})</span>
+                <p class="text-xs text-orange-400/80 mt-1">Waiting for the organizer to review your request.</p>
+              </div>
+            `;
+          } else if (adv && adv.status === 'paid') {
+            advanceHtml = `
+              <div class="mt-4 p-4 rounded-xl border border-green-500/20 bg-green-500/10 flex justify-between items-center">
+                <span class="text-sm font-bold text-green-400">Advance Paid: ₹${adv.amount} — Confirmed</span>
+              </div>
+            `;
+          }
+        } else if (offer.status === 'completed' && offer.advance && offer.advance.status === 'paid') {
+          advanceHtml = `
+            <div class="mt-4 p-4 rounded-xl border border-green-500/20 bg-green-500/10 flex justify-between items-center">
+              <span class="text-sm font-bold text-green-400">Advance was Paid: ₹${offer.advance.amount}</span>
+            </div>
+          `;
+        }
 
         return `
-
-
-
-
           <div class="rounded-[1.5rem] p-6 flex flex-col sm:flex-row gap-5 transition-colors items-start border" style="background:var(--article-bg);border-color:var(--article-border);">
-
-
-
-
             <div class="flex-1 min-w-0">
-
-
-
-
               <div class="flex items-center gap-3 mb-1">
-
-
-
-
                 <h3 class="font-bold text-base truncate" style="color:var(--text-primary);">${offer.title}</h3>
-
-
-
-
                 <span class="px-2 py-0.5 text-xs font-bold rounded-full flex-shrink-0 ${badgeClass}">${statusLabel}</span>
-
-
-
-
               </div>
-
-
-
-
               <p class="text-sm" style="color:var(--text-secondary);">Organizer: <span style="color:var(--text-primary);">${orgName}</span></p>
-
-
-
-
               <div class="flex gap-4 mt-2 text-xs" style="color:var(--text-muted);">
-
-
-
-
                 ${budgetStr}
-
-
-
-
                 <span>${date}</span>
-
-
-
-
                 ${offer.city ? `<span>${offer.city}</span>` : ''}
-
-
-
-
               </div>
-
-
-
-
+              ${advanceHtml}
               ${expensesHtml}
-
-
-
-
             </div>
-
-
-
-
             <div class="flex gap-2 flex-shrink-0 sm:flex-col items-end">
-
-
-
-
               <button onclick="window.location.href='/organiser-profile?id=${offer.organizerId?._id}'"
-
-
-
-
                 class="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-all" style="color:var(--text-primary);">
-
-
-
-
                 View Profile
-
-
-
-
               </button>
-
-
-
-
               ${rateBtn}
-
-
-
-
             </div>
-
-
-
-
           </div>
-
-
-
-
         `;
-
-
-
-
       }).join('');
-
-
-
-
     }
 
-
-
-
-
-
-
-
-
-    // — Offer Modal ———————————————————————
-
-
-
-
+    // ── Offer Modal ──────────────────────────────────────────────
     function openOfferModal(orgId, orgName) {
-
-
-
-
       if (!token) { alert('Please log in to send an offer.'); return; }
-
-
-
-
       selectedOrganizerId = orgId;
-
-
-
-
       document.getElementById('offer-modal-org-name').textContent = `to ${orgName}`;
-
-
-
-
       document.getElementById('offer-form').classList.remove('hidden');
-
-
-
-
       document.getElementById('offer-success').classList.add('hidden');
-
-
-
-
       document.getElementById('offer-form').reset();
-
-
-
-
       document.getElementById('offer-error').classList.add('hidden');
-
-
-
-
       document.getElementById('offer-modal').classList.remove('hidden');
-
-
-
-
     }
-
-
-
-
-
-
-
-
 
     function closeOfferModal() {
-
-
-
-
       document.getElementById('offer-modal').classList.add('hidden');
-
-
-
-
     }
 
-
-
-
-
-
-
-
-
     document.getElementById('close-offer-modal').addEventListener('click', closeOfferModal);
-
-
-
-
     document.getElementById('offer-backdrop').addEventListener('click', closeOfferModal);
 
-
-
-
-
-
-
-
+    // ── Submit Offer Logic ───────────────────────────────────────
 
     document.getElementById('offer-form').addEventListener('submit', async e => {
-
-
-
-
       e.preventDefault();
-
-
-
-
       const btn = document.getElementById('offer-submit-btn');
-
-
-
-
       const errEl = document.getElementById('offer-error');
-
-
-
-
       errEl.classList.add('hidden');
-
-
-
-
-      btn.disabled = true; btn.textContent = 'Sending…';
-
-
-
-
-
-
-
-
+      btn.disabled = true; btn.textContent = 'SendingΓÇª';
 
       try {
-
-
-
-
         const res = await fetch('/api/offers', {
-
-
-
-
           method: 'POST',
-
-
-
-
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-
-
-
-
           body: JSON.stringify({
-
-
-
-
             organizerId: selectedOrganizerId,
-
-
-
-
             title:       document.getElementById('offer-title').value,
-
-
-
-
             budgetMin:   document.getElementById('offer-budget-min').value,
-
-
-
-
             budgetMax:   document.getElementById('offer-budget-max').value,
-
-
-
-
             eventDate:   document.getElementById('offer-date').value || undefined,
-
-
-
-
             city:        document.getElementById('offer-city').value,
-
-
-
-
             description: document.getElementById('offer-description').value
-
-
-
-
           })
-
-
-
-
         });
-
-
-
-
         const data = await res.json();
-
-
-
-
         if (data.success) {
-
-
-
-
           document.getElementById('offer-form').classList.add('hidden');
-
-
-
-
           document.getElementById('offer-success').classList.remove('hidden');
-
-
-
-
           loadBookings(); // refresh bookings
-
-
-
-
         } else {
-
-
-
-
           errEl.textContent = data.error || 'Failed to send offer.';
-
-
-
-
           errEl.classList.remove('hidden');
-
-
-
-
           btn.disabled = false; btn.textContent = 'Send Offer';
-
-
-
-
         }
-
-
-
-
       } catch (err) {
-
-
-
-
         errEl.textContent = 'Network error. Please try again.';
-
-
-
-
         errEl.classList.remove('hidden');
-
-
-
-
         btn.disabled = false; btn.textContent = 'Send Offer';
-
-
-
-
       }
-
-
-
-
     });
 
-
-
-
-
-
-
-
-
-    // — Logout ——————————————————————————
-
-
-
-
-    document.getElementById('logout-btn').addEventListener('click', () => {
-
-
-
-
-      sessionStorage.removeItem('token');
-
-
-
-
-      window.location.href = '/';
-
-
-
-
-    });
-
-
-
-
-
-
-
-
-
-    // — Init ———————————————————————————
-
-
-
-
+    // ── Init ─────────────────────────────────────────────────────
     loadOrganizers();
-
-
-
-
     loadBookings();
+  </script>
 
+  <!-- NEGOTIATE MODAL -->
+  <div id="negotiateModal" class="fixed inset-0 z-[200] flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeNegotiateModal()"></div>
+    <div class="relative bg-[#0F151F] border border-white/10 rounded-2xl p-6 w-[90%] max-w-md shadow-2xl">
+      <h3 class="text-xl font-bold mb-2 font-['Satisfy'] text-white">Negotiate Advance</h3>
+      <p class="text-sm text-gray-400 mb-4">Request a lower advance amount if you are unable to pay the current one.</p>
+      <div class="mb-4">
+        <label class="block text-xs font-bold text-gray-400 mb-1">New Requested Amount (₹)</label>
+        <input type="number" id="negotiateAmount" placeholder="e.g. 2000" class="w-full rounded-xl px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500">
+      </div>
+      <div class="mb-6">
+        <label class="block text-xs font-bold text-gray-400 mb-1">Message to Organizer</label>
+        <textarea id="negotiateMessage" rows="3" placeholder="Explain your situation..." class="w-full rounded-xl px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500"></textarea>
+      </div>
+      <div class="flex justify-end gap-3">
+        <button onclick="closeNegotiateModal()" class="px-4 py-2 text-sm font-bold text-gray-400 hover:text-white">Cancel</button>
+        <button id="submitNegBtn" onclick="submitNegotiation()" class="px-4 py-2 text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-xl">Submit Request</button>
+      </div>
+    </div>
+  </div>
 
+  <!-- RAZORPAY MOCK MODAL -->
+  <!-- FINAL PAYMENT MODAL -->
+  <div id="finalPayModal" class="fixed inset-0 z-[200] flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeFinalPayModal()"></div>
+    <div class="relative bg-[#0F151F] border border-white/10 rounded-2xl p-6 w-[90%] max-w-md shadow-2xl">
+      <button onclick="closeFinalPayModal()" class="absolute top-4 right-5 text-2xl text-gray-400 hover:text-white">&times;</button>
+      <h3 class="text-xl font-bold mb-1 font-['Satisfy'] text-white">Pay Remaining Balance</h3>
+      <p class="text-sm text-gray-400 mb-5">Complete the final payment for this event.</p>
+      <div class="rounded-xl p-4 mb-5 border border-blue-500/20 bg-blue-500/10 flex justify-between items-center">
+        <span class="text-sm text-blue-300 font-bold">Amount Due</span>
+        <span class="text-2xl font-extrabold text-white">₹<span id="finalPayAmountDisplay">0</span></span>
+      </div>
+      <div class="flex flex-col gap-3 mb-5">
+        <div class="rzp-field">
+          <label>Card Number</label>
+          <input type="text" placeholder="4242 4242 4242 4242" maxlength="19" class="rzp-field input" style="background:#1a2030;border:1.5px solid rgba(255,255,255,0.1);color:#fff;border-radius:8px;padding:10px 12px;font-size:14px;width:100%;outline:none;">
+        </div>
+        <div style="display:flex;gap:12px;">
+          <div class="rzp-field" style="flex:1;">
+            <label>Expiry</label>
+            <input type="text" placeholder="MM / YY" maxlength="7" style="background:#1a2030;border:1.5px solid rgba(255,255,255,0.1);color:#fff;border-radius:8px;padding:10px 12px;font-size:14px;width:100%;outline:none;">
+          </div>
+          <div class="rzp-field" style="flex:1;">
+            <label>CVV</label>
+            <input type="text" placeholder="ΓÇóΓÇóΓÇó" maxlength="3" style="background:#1a2030;border:1.5px solid rgba(255,255,255,0.1);color:#fff;border-radius:8px;padding:10px 12px;font-size:14px;width:100%;outline:none;">
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end gap-3">
+        <button onclick="closeFinalPayModal()" class="px-4 py-2 text-sm font-bold text-gray-400 hover:text-white">Cancel</button>
+        <button id="confirmFinalPayBtn" onclick="confirmFinalPayment()" class="px-6 py-2 text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-all">Pay Now</button>
+      </div>
+    </div>
+  </div>
 
+  <!-- RAZORPAY MOCK MODAL -->
+  <style>
+    .rzp-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:'Inter',-apple-system,sans-serif}
+    .rzp-overlay.hidden{display:none!important}
+    .rzp-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px)}
+    .rzp-box{position:relative;width:420px;max-width:95vw;max-height:92vh;background:#fff;border-radius:8px;box-shadow:0 25px 80px rgba(0,0,0,.5);overflow:hidden;display:flex;flex-direction:column}
+    .rzp-header{background:linear-gradient(135deg,#1a1aff 0%,#3395ff 100%);padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+    .rzp-header-left{display:flex;align-items:center;gap:10px}
+    .rzp-logo{width:28px;height:28px;background:rgba(255,255,255,.15);border-radius:4px;display:flex;align-items:center;justify-content:center}
+    .rzp-logo svg{width:18px;height:18px;fill:#fff}
+    .rzp-merchant{color:#fff;font-size:14px;font-weight:700;letter-spacing:.3px}
+    .rzp-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:22px;cursor:pointer;padding:0 4px;transition:color .2s}
+    .rzp-close:hover{color:#fff}
+    .rzp-amount-bar{background:#f7f9fc;padding:12px 20px;border-bottom:1px solid #e8ecf1;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+    .rzp-amount-label{font-size:12px;color:#7b8794;font-weight:600}
+    .rzp-amount-value{font-size:20px;font-weight:800;color:#1a1a2e}
+    .rzp-body{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+    .rzp-tabs{display:flex;border-bottom:1px solid #e8ecf1;flex-shrink:0}
+    .rzp-tab{flex:1;padding:12px 6px;text-align:center;font-size:11px;font-weight:700;color:#7b8794;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;text-transform:uppercase;letter-spacing:.5px}
+    .rzp-tab:hover{color:#3395ff;background:#f0f6ff}
+    .rzp-tab.active{color:#1a1aff;border-bottom-color:#1a1aff;background:#f0f4ff}
+    .rzp-panel{padding:20px;display:none;flex-direction:column;gap:14px}
+    .rzp-panel.active{display:flex}
+    .rzp-field{display:flex;flex-direction:column;gap:5px}
+    .rzp-field label{font-size:11px;font-weight:700;color:#5a6577;text-transform:uppercase;letter-spacing:.5px}
+    .rzp-field input,.rzp-field select{padding:10px 12px;border:1.5px solid #d1d9e6;border-radius:6px;font-size:14px;color:#1a1a2e;outline:none;transition:border .2s;background:#fff}
+    .rzp-field input:focus,.rzp-field select:focus{border-color:#3395ff;box-shadow:0 0 0 3px rgba(51,149,255,.1)}
+    .rzp-field input::placeholder{color:#b0b8c4}
+    .rzp-row{display:flex;gap:12px}
+    .rzp-row .rzp-field{flex:1}
+    .rzp-pay-btn{width:100%;padding:14px;background:linear-gradient(135deg,#1a1aff,#3395ff);color:#fff;font-size:15px;font-weight:800;border:none;border-radius:6px;cursor:pointer;transition:opacity .2s,transform .1s;letter-spacing:.3px}
+    .rzp-pay-btn:hover{opacity:.92}
+    .rzp-pay-btn:active{transform:scale(.98)}
+    .rzp-pay-btn:disabled{opacity:.5;cursor:not-allowed}
+    .rzp-footer{background:#f7f9fc;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #e8ecf1;flex-shrink:0}
+    .rzp-footer-left{display:flex;align-items:center;gap:5px;font-size:10px;color:#7b8794;font-weight:600}
+    .rzp-footer-left svg{width:12px;height:12px;fill:#22c55e}
+    .rzp-footer-right{font-size:10px;color:#b0b8c4;font-weight:600}
+    .rzp-bank-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .rzp-bank-opt{padding:10px 12px;border:1.5px solid #e0e5ec;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;color:#3a4553;transition:all .15s;display:flex;align-items:center;gap:8px}
+    .rzp-bank-opt:hover{border-color:#3395ff;background:#f0f6ff}
+    .rzp-bank-opt.selected{border-color:#1a1aff;background:#eef2ff;color:#1a1aff}
+    .rzp-bank-dot{width:8px;height:8px;border-radius:50%;border:2px solid #c0c8d4;flex-shrink:0}
+    .rzp-bank-opt.selected .rzp-bank-dot{border-color:#1a1aff;background:#1a1aff}
+    .rzp-wallet-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .rzp-wallet-opt{padding:12px;border:1.5px solid #e0e5ec;border-radius:8px;cursor:pointer;text-align:center;font-size:12px;font-weight:700;color:#3a4553;transition:all .15s}
+    .rzp-wallet-opt:hover{border-color:#3395ff;background:#f0f6ff}
+    .rzp-wallet-opt.selected{border-color:#1a1aff;background:#eef2ff;color:#1a1aff}
+    .rzp-processing{display:none;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:16px}
+    .rzp-processing.active{display:flex}
+    .rzp-spinner{width:48px;height:48px;border:4px solid #e0e5ec;border-top-color:#1a1aff;border-radius:50%;animation:rzpSpin .8s linear infinite}
+    @keyframes rzpSpin{to{transform:rotate(360deg)}}
+    .rzp-success{display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:12px}
+    .rzp-success.active{display:flex}
+    .rzp-success-check{width:64px;height:64px;border-radius:50%;background:#22c55e;display:flex;align-items:center;justify-content:center;animation:rzpPop .4s ease}
+    .rzp-success-check svg{width:32px;height:32px;fill:#fff}
+    @keyframes rzpPop{0%{transform:scale(0)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+    .rzp-upi-apps{display:flex;gap:10px;justify-content:center;margin:8px 0 4px}
+    .rzp-upi-app{width:48px;height:48px;border:1.5px solid #e0e5ec;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;font-size:10px;font-weight:800;color:#555}
+    .rzp-upi-app:hover{border-color:#3395ff;background:#f0f6ff}
+    .rzp-upi-app.selected{border-color:#1a1aff;background:#eef2ff}
+    .rzp-or{text-align:center;font-size:11px;color:#b0b8c4;font-weight:700;position:relative;margin:6px 0}
+    .rzp-or::before,.rzp-or::after{content:'';position:absolute;top:50%;width:calc(50% - 20px);height:1px;background:#e0e5ec}
+    .rzp-or::before{left:0}
+    .rzp-or::after{right:0}
+    .rzp-test-badge{display:inline-flex;align-items:center;gap:4px;background:#fff3cd;color:#856404;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;margin-left:8px}
+  </style>
 
-  
-    // ====== CHAT ======
-    // ============================================================
-    const chatToken = sessionStorage.getItem('token');
-    let chatCurrentUserId = null;
-    let chatActiveOrgId = null;
-    let chatActiveOrgName = null;
-    let chatPollInterval = null;
-    let chatSidebarInterval = null;
-    let chatIsMinimized = false;
-    let chatIsFullscreen = false;
-    let chatConversations = [];
+  <div id="razorpayMockModal" class="rzp-overlay hidden">
+    <div class="rzp-backdrop" onclick="closeRazorpayMock()"></div>
+    <div class="rzp-box">
+      <!-- Header -->
+      <div class="rzp-header">
+        <div class="rzp-header-left">
+          <div class="rzp-logo">
+            <svg viewBox="0 0 24 24"><path d="M7.076 21.337H2L14.907 2.663h5.077L7.076 21.337zM15.27 21.337h-5.077l3.37-5.6h5.077l-3.37 5.6z"/></svg>
+          </div>
+          <div>
+            <div class="rzp-merchant">EventHive<span class="rzp-test-badge">ΓÜí TEST</span></div>
+          </div>
+        </div>
+        <button class="rzp-close" onclick="closeRazorpayMock()">&times;</button>
+      </div>
 
-    // Get current user id from profile
-    (async function initChat() {
-      if (!chatToken) return;
+      <!-- Amount Bar -->
+      <div class="rzp-amount-bar">
+        <span class="rzp-amount-label">Amount</span>
+        <span class="rzp-amount-value">₹<span id="rzpAmountDisplay">0</span></span>
+      </div>
+
+      <!-- Body -->
+      <div class="rzp-body" id="rzpBody">
+        <!-- Tabs -->
+        <div class="rzp-tabs" id="rzpTabs">
+          <div class="rzp-tab active" onclick="rzpSwitchTab('card')">≡ƒÆ│ Card</div>
+          <div class="rzp-tab" onclick="rzpSwitchTab('upi')">≡ƒô▒ UPI</div>
+          <div class="rzp-tab" onclick="rzpSwitchTab('netbanking')">≡ƒÅª Netbanking</div>
+          <div class="rzp-tab" onclick="rzpSwitchTab('wallet')">≡ƒæ¢ Wallet</div>
+        </div>
+
+        <!-- CARD Panel -->
+        <div class="rzp-panel active" id="rzpPanel-card">
+          <div class="rzp-field">
+            <label>Card Number</label>
+            <input type="text" id="rzpCardNum" placeholder="4111 1111 1111 1111" maxlength="19" oninput="rzpFormatCard(this)">
+          </div>
+          <div class="rzp-row">
+            <div class="rzp-field">
+              <label>Expiry</label>
+              <input type="text" id="rzpCardExp" placeholder="MM / YY" maxlength="7" oninput="rzpFormatExpiry(this)">
+            </div>
+            <div class="rzp-field">
+              <label>CVV</label>
+              <input type="password" id="rzpCardCvv" placeholder="ΓÇóΓÇóΓÇó" maxlength="4">
+            </div>
+          </div>
+          <div class="rzp-field">
+            <label>Card Holder Name</label>
+            <input type="text" id="rzpCardName" placeholder="Name on card">
+          </div>
+          <button class="rzp-pay-btn" onclick="rzpProcessPayment()">Pay ₹<span class="rzpBtnAmt">0</span></button>
+        </div>
+
+        <!-- UPI Panel -->
+        <div class="rzp-panel" id="rzpPanel-upi">
+          <p style="font-size:12px;color:#5a6577;font-weight:600;margin:0">Select a UPI App</p>
+          <div class="rzp-upi-apps" id="rzpUpiApps">
+            <div class="rzp-upi-app" onclick="rzpSelectUpi(this,'gpay')">GPay</div>
+            <div class="rzp-upi-app" onclick="rzpSelectUpi(this,'phonepe')">PhonePe</div>
+            <div class="rzp-upi-app" onclick="rzpSelectUpi(this,'paytm')">Paytm</div>
+            <div class="rzp-upi-app" onclick="rzpSelectUpi(this,'bhim')">BHIM</div>
+          </div>
+          <div class="rzp-or">OR</div>
+          <div class="rzp-field">
+            <label>UPI ID</label>
+            <input type="text" id="rzpUpiId" placeholder="username@upi">
+          </div>
+          <button class="rzp-pay-btn" onclick="rzpProcessPayment()">Pay ₹<span class="rzpBtnAmt">0</span></button>
+        </div>
+
+        <!-- NETBANKING Panel -->
+        <div class="rzp-panel" id="rzpPanel-netbanking">
+          <p style="font-size:12px;color:#5a6577;font-weight:600;margin:0">Popular Banks</p>
+          <div class="rzp-bank-grid" id="rzpBankGrid">
+            <div class="rzp-bank-opt" onclick="rzpSelectBank(this)"><div class="rzp-bank-dot"></div>HDFC Bank</div>
+            <div class="rzp-bank-opt" onclick="rzpSelectBank(this)"><div class="rzp-bank-dot"></div>SBI</div>
+            <div class="rzp-bank-opt" onclick="rzpSelectBank(this)"><div class="rzp-bank-dot"></div>ICICI Bank</div>
+            <div class="rzp-bank-opt" onclick="rzpSelectBank(this)"><div class="rzp-bank-dot"></div>Axis Bank</div>
+            <div class="rzp-bank-opt" onclick="rzpSelectBank(this)"><div class="rzp-bank-dot"></div>Kotak Bank</div>
+            <div class="rzp-bank-opt" onclick="rzpSelectBank(this)"><div class="rzp-bank-dot"></div>Yes Bank</div>
+          </div>
+          <div class="rzp-field" style="margin-top:4px">
+            <label>Or Select Other Bank</label>
+            <select id="rzpBankSelect">
+              <option value="">— Select Bank —</option>
+              <option>Bank of Baroda</option>
+              <option>Punjab National Bank</option>
+              <option>Central Bank of India</option>
+              <option>Indian Overseas Bank</option>
+              <option>Union Bank of India</option>
+              <option>Canara Bank</option>
+            </select>
+          </div>
+          <button class="rzp-pay-btn" onclick="rzpProcessPayment()">Pay ₹<span class="rzpBtnAmt">0</span></button>
+        </div>
+
+        <!-- WALLET Panel -->
+        <div class="rzp-panel" id="rzpPanel-wallet">
+          <p style="font-size:12px;color:#5a6577;font-weight:600;margin:0">Select Wallet</p>
+          <div class="rzp-wallet-grid" id="rzpWalletGrid">
+            <div class="rzp-wallet-opt" onclick="rzpSelectWallet(this)">Paytm</div>
+            <div class="rzp-wallet-opt" onclick="rzpSelectWallet(this)">PhonePe</div>
+            <div class="rzp-wallet-opt" onclick="rzpSelectWallet(this)">Amazon Pay</div>
+            <div class="rzp-wallet-opt" onclick="rzpSelectWallet(this)">Freecharge</div>
+            <div class="rzp-wallet-opt" onclick="rzpSelectWallet(this)">Mobikwik</div>
+            <div class="rzp-wallet-opt" onclick="rzpSelectWallet(this)">Jio Money</div>
+          </div>
+          <button class="rzp-pay-btn" onclick="rzpProcessPayment()">Pay ₹<span class="rzpBtnAmt">0</span></button>
+        </div>
+
+        <!-- Processing -->
+        <div class="rzp-processing" id="rzpProcessing">
+          <div class="rzp-spinner"></div>
+          <p style="font-size:14px;font-weight:700;color:#1a1a2e;margin:0">Processing Payment</p>
+          <p style="font-size:12px;color:#7b8794;margin:0">Do not close this window or press back.</p>
+        </div>
+
+        <!-- Success -->
+        <div class="rzp-success" id="rzpSuccess">
+          <div class="rzp-success-check">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+          </div>
+          <p style="font-size:18px;font-weight:800;color:#1a1a2e;margin:0">Payment Successful!</p>
+          <p style="font-size:13px;color:#7b8794;margin:0">Transaction ID: <strong style="color:#1a1a2e">TXN_<span id="rzpTxnId">000000</span></strong></p>
+          <p style="font-size:12px;color:#22c55e;font-weight:700;margin:4px 0 0">₹<span class="rzpBtnAmt">0</span> paid successfully</p>
+          <button onclick="rzpFinish()" style="margin-top:16px;padding:10px 32px;background:#22c55e;color:#fff;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:13px">Done</button>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="rzp-footer">
+        <div class="rzp-footer-left">
+          <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+          Secured by Razorpay
+        </div>
+        <div class="rzp-footer-right">Test Mode</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Razorpay Mock Gateway Logic ──
+    function rzpSwitchTab(tab) {
+      document.querySelectorAll('.rzp-tab').forEach((t,i) => {
+        t.classList.toggle('active', ['card','upi','netbanking','wallet'][i] === tab);
+      });
+      document.querySelectorAll('.rzp-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('rzpPanel-' + tab)?.classList.add('active');
+    }
+
+    function rzpFormatCard(el) {
+      let v = el.value.replace(/\D/g,'').slice(0,16);
+      el.value = v.replace(/(.{4})/g,'$1 ').trim();
+    }
+    function rzpFormatExpiry(el) {
+      let v = el.value.replace(/\D/g,'').slice(0,4);
+      if(v.length >= 3) v = v.slice(0,2) + ' / ' + v.slice(2);
+      el.value = v;
+    }
+
+    function rzpSelectUpi(el) {
+      document.querySelectorAll('.rzp-upi-app').forEach(a => a.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+    function rzpSelectBank(el) {
+      document.querySelectorAll('.rzp-bank-opt').forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+      document.getElementById('rzpBankSelect').value = '';
+    }
+    function rzpSelectWallet(el) {
+      document.querySelectorAll('.rzp-wallet-opt').forEach(w => w.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function rzpProcessPayment() {
+      // hide tabs + panels, show processing
+      document.getElementById('rzpTabs').style.display = 'none';
+      document.querySelectorAll('.rzp-panel').forEach(p => p.style.display = 'none');
+      document.getElementById('rzpProcessing').classList.add('active');
+
+      // simulate 2s bank processing
+      setTimeout(async () => {
+        document.getElementById('rzpProcessing').classList.remove('active');
+
+        // hit real backend
+        try {
+          const res = await fetch(`/api/offers/${currentPayOfferId}/advance/pay`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const data = await res.json();
+          if (data.success) {
+            document.getElementById('rzpTxnId').textContent = Math.random().toString(36).slice(2,10).toUpperCase();
+            document.getElementById('rzpSuccess').classList.add('active');
+          } else {
+            alert(data.error || 'Payment failed');
+            rzpResetView();
+          }
+        } catch(e) {
+          alert('Gateway communication error');
+          rzpResetView();
+        }
+      }, 2200);
+    }
+
+    function rzpResetView() {
+      document.getElementById('rzpTabs').style.display = 'flex';
+      document.querySelectorAll('.rzp-panel').forEach(p => p.style.display = '');
+      rzpSwitchTab('card');
+      document.getElementById('rzpProcessing').classList.remove('active');
+      document.getElementById('rzpSuccess').classList.remove('active');
+    }
+
+    function rzpFinish() {
+      rzpResetView();
+      closeRazorpayMock();
+      loadBookings();
+    }
+
+    // override openRazorpayMock to also set amounts on all pay buttons
+    const _origOpenRzp = openRazorpayMock;
+    openRazorpayMock = function(offerId, amount) {
+      currentPayOfferId = offerId;
+      document.getElementById('rzpAmountDisplay').textContent = Number(amount).toLocaleString('en-IN');
+      document.querySelectorAll('.rzpBtnAmt').forEach(s => s.textContent = Number(amount).toLocaleString('en-IN'));
+      rzpResetView();
+      // pre-fill test card
+      const cn = document.getElementById('rzpCardNum');
+      if(cn) cn.value = '4111 1111 1111 1111';
+      const ce = document.getElementById('rzpCardExp');
+      if(ce) ce.value = '12 / 29';
+      const cc = document.getElementById('rzpCardCvv');
+      if(cc) cc.value = '123';
+      const cname = document.getElementById('rzpCardName');
+      if(cname) cname.value = 'TEST USER';
+      document.getElementById('razorpayMockModal').classList.remove('hidden');
+    };
+  </script>
+
+  <!-- CLIENT CHAT WINDOW -->
+  <style>
+    #client-chat-window{position:fixed;bottom:24px;right:24px;z-index:200;display:flex;flex-direction:column;border-radius:1.5rem;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.1);background:#0d1117;width:360px;height:480px;transition:width .3s,height .3s,bottom .3s,right .3s,border-radius .3s;}
+    #client-chat-window.minimized{height:52px;border-radius:1rem;}
+    #client-chat-window.hidden-chat{display:none!important;}
+    #client-chat-fab{position:fixed;bottom:24px;right:24px;z-index:199;width:52px;height:52px;border-radius:50%;background:rgba(59,130,246,0.3);border:1px solid rgba(59,130,246,0.5);color:#93c5fd;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,0.5);transition:background .2s,transform .2s;}
+    #client-chat-fab:hover{background:rgba(59,130,246,0.5);transform:scale(1.05);}
+    #client-chat-fab-badge{position:absolute;top:-2px;right:-2px;background:#ef4444;color:#fff;font-size:.6rem;font-weight:700;width:18px;height:18px;border-radius:50%;display:none;align-items:center;justify-content:center;}
+    .cc-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.08);cursor:pointer;flex-shrink:0;user-select:none;}
+    .cc-header-title{flex:1;font-size:.85rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .cc-header-sub{font-size:.65rem;color:rgba(255,255,255,0.4);}
+    .cc-header-btn{background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s;}
+    .cc-header-btn:hover{color:#fff;background:rgba(255,255,255,0.1);}
+    .cc-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth;}
+    .cc-messages::-webkit-scrollbar{width:4px;}
+    .cc-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:4px;}
+    .cc-bubble{max-width:78%;padding:8px 12px;border-radius:14px;font-size:.8rem;line-height:1.4;word-break:break-word;}
+    .cc-bubble.sent{align-self:flex-end;background:rgba(59,130,246,0.3);border:1px solid rgba(59,130,246,0.4);color:#dbeafe;border-bottom-right-radius:4px;}
+    .cc-bubble.received{align-self:flex-start;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.85);border-bottom-left-radius:4px;}
+    .cc-bubble-time{font-size:.6rem;color:rgba(255,255,255,0.3);margin-top:3px;text-align:right;}
+    .cc-input-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.2);flex-shrink:0;}
+    .cc-input{flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 12px;font-size:.8rem;color:#fff;outline:none;resize:none;font-family:inherit;}
+    .cc-input:focus{border-color:rgba(59,130,246,0.5);}
+    .cc-send-btn{background:rgba(59,130,246,0.3);border:1px solid rgba(59,130,246,0.4);color:#93c5fd;border-radius:10px;padding:8px 12px;cursor:pointer;transition:background .2s;display:flex;align-items:center;}
+    .cc-send-btn:hover{background:rgba(59,130,246,0.5);}
+    .cc-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,0.25);font-size:.8rem;gap:8px;padding:16px;text-align:center;}
+  </style>
+
+  <button id="client-chat-fab" title="Messages">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+    <span id="client-chat-fab-badge"></span>
+  </button>
+
+  <div id="client-chat-window" class="hidden-chat">
+    <div class="cc-header" id="cc-header-toggle">
+      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="cc-header-title" id="cc-header-name">Messages</div>
+        <div class="cc-header-sub" id="cc-header-sub">Chat with organizers</div>
+      </div>
+      <button class="cc-header-btn" id="cc-minimize-btn" title="Minimize"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/></svg></button>
+      <button class="cc-header-btn" id="cc-close-btn" title="Close"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div id="cc-body" style="display:flex;flex:1;flex-direction:column;overflow:hidden;">
+      <div class="cc-messages" id="cc-messages">
+        <div class="cc-empty" id="cc-empty">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          <span>No messages yet</span>
+        </div>
+      </div>
+      <div class="cc-input-row">
+        <textarea class="cc-input" id="cc-input" placeholder="Type a messageΓÇª" rows="1" maxlength="2000"></textarea>
+        <button class="cc-send-btn" id="cc-send-btn"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Client Chat ──────────────────────────────────────────────
+    const ccToken = sessionStorage.getItem('token');
+    let ccCurrentUserId = null;
+    let ccActiveOrganizerId = null;
+    let ccPollInterval = null;
+    let ccMinimized = false;
+
+    (async function initClientChat() {
+      if (!ccToken) return;
       try {
-        const r = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${chatToken}` } });
+        const r = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${ccToken}` } });
         if (!r.ok) return;
         const d = await r.json();
-        chatCurrentUserId = d.data?._id || d.data?.id;
-        // Show FAB
-        document.getElementById('chat-fab').style.display = 'flex';
-        // Load unread count
-        loadUnreadCount();
-        
-        // Check if we should auto-open chat from organizer profile
-        const chatWithId = sessionStorage.getItem('openChatWith');
-        const chatWithName = sessionStorage.getItem('openChatName');
-        if (chatWithId && window.location.hash === '#chat') {
+        ccCurrentUserId = d.data?._id || d.data?.id;
+        document.getElementById('client-chat-fab').style.display = 'flex';
+        ccLoadUnread();
+        setInterval(ccLoadUnread, 15000);
+
+        // Auto-open if redirected from organiser-profile
+        const openWith = sessionStorage.getItem('openChatWith');
+        const openName = sessionStorage.getItem('openChatName');
+        if (openWith) {
           sessionStorage.removeItem('openChatWith');
           sessionStorage.removeItem('openChatName');
-          openChat(chatWithId, chatWithName);
+          ccOpenWith(openWith, openName || 'Organizer');
         }
       } catch(e) {}
     })();
 
-    async function loadUnreadCount() {
-      if (!chatToken) return;
+    async function ccLoadUnread() {
+      if (!ccToken) return;
       try {
-        const r = await fetch('/api/chat/unread-count', { headers: { Authorization: `Bearer ${chatToken}` } });
+        const r = await fetch('/api/chat/unread-count', { headers: { Authorization: `Bearer ${ccToken}` } });
         const d = await r.json();
-        const badge = document.getElementById('chat-fab-badge');
-        if (d.count > 0) {
-          badge.textContent = d.count > 9 ? '9+' : d.count;
-          badge.style.display = 'flex';
-        } else {
-          badge.style.display = 'none';
-        }
+        const badge = document.getElementById('client-chat-fab-badge');
+        if (d.count > 0) { badge.textContent = d.count > 9 ? '9+' : d.count; badge.style.display = 'flex'; }
+        else badge.style.display = 'none';
       } catch(e) {}
     }
 
-    // Open chat window targeting a specific organizer
-    function openChat(orgId, orgName) {
-      if (!chatToken) { alert('Please log in to use chat.'); return; }
-      chatActiveOrgId = orgId;
-      chatActiveOrgName = orgName;
-      showChatWindow();
-      loadConversations(orgId);
-    }
-
-    function showChatWindow() {
-      const win = document.getElementById('chat-window');
-      const fab = document.getElementById('chat-fab');
+    function ccOpenWith(organizerId, organizerName) {
+      ccActiveOrganizerId = organizerId;
+      document.getElementById('cc-header-name').textContent = organizerName;
+      document.getElementById('cc-header-sub').textContent = 'Organizer';
+      const win = document.getElementById('client-chat-window');
       win.classList.remove('hidden-chat', 'minimized');
-      chatIsMinimized = false;
-      fab.style.display = 'none';
-      document.getElementById('chat-body').style.display = 'flex';
+      ccMinimized = false;
+      document.getElementById('client-chat-fab').style.display = 'none';
+      document.getElementById('cc-body').style.display = 'flex';
+      ccLoadMessages();
+      ccStartPoll();
     }
 
-    function hideChatWindow() {
-      const win = document.getElementById('chat-window');
-      win.classList.add('hidden-chat');
-      win.classList.remove('fullscreen', 'minimized');
-      chatIsMinimized = false;
-      chatIsFullscreen = false;
-      document.getElementById('chat-fab').style.display = 'flex';
-      stopChatPoll();
-    }
-
-    function minimizeChat() {
-      const win = document.getElementById('chat-window');
-      if (chatIsMinimized) {
-        win.classList.remove('minimized');
-        document.getElementById('chat-body').style.display = 'flex';
-        chatIsMinimized = false;
+    document.getElementById('client-chat-fab').addEventListener('click', () => {
+      if (ccActiveOrganizerId) {
+        ccOpenWith(ccActiveOrganizerId, document.getElementById('cc-header-name').textContent);
       } else {
-        win.classList.add('minimized');
-        document.getElementById('chat-body').style.display = 'none';
-        chatIsMinimized = true;
+        // open with last conversation if any
+        fetch('/api/chat/conversations', { headers: { Authorization: `Bearer ${ccToken}` } })
+          .then(r => r.json()).then(d => {
+            const convs = d.data || [];
+            if (convs.length) {
+              const c = convs[0];
+              const name = c.user.profile?.orgName || c.user.username || 'Organizer';
+              ccOpenWith(c.user._id, name);
+            } else {
+              const win = document.getElementById('client-chat-window');
+              win.classList.remove('hidden-chat');
+              document.getElementById('client-chat-fab').style.display = 'none';
+            }
+          }).catch(() => {});
       }
-    }
-
-    function toggleFullscreen() {
-      const win = document.getElementById('chat-window');
-      if (chatIsFullscreen) {
-        win.classList.remove('fullscreen');
-        chatIsFullscreen = false;
-      } else {
-        win.classList.add('fullscreen');
-        win.classList.remove('minimized');
-        document.getElementById('chat-body').style.display = 'flex';
-        chatIsMinimized = false;
-        chatIsFullscreen = true;
-      }
-    }
-
-    document.getElementById('chat-close-btn').addEventListener('click', (e) => { e.stopPropagation(); hideChatWindow(); });
-    document.getElementById('chat-minimize-btn').addEventListener('click', (e) => { e.stopPropagation(); minimizeChat(); });
-    document.getElementById('chat-fullscreen-btn').addEventListener('click', (e) => { e.stopPropagation(); toggleFullscreen(); });
-    document.getElementById('chat-header-toggle').addEventListener('click', () => { if (chatIsMinimized) minimizeChat(); });
-    document.getElementById('chat-fab').addEventListener('click', () => { showChatWindow(); loadConversations(chatActiveOrgId); });
-
-    // Load sidebar conversations
-    async function loadConversations(selectOrgId) {
-      const sidebar = document.getElementById('chat-sidebar');
-      try {
-        const r = await fetch('/api/chat/conversations', { headers: { Authorization: `Bearer ${chatToken}` } });
-        const d = await r.json();
-        chatConversations = d.data || [];
-
-        // If selectOrgId not in conversations, add a placeholder
-        if (selectOrgId && !chatConversations.find(c => c.user._id === selectOrgId)) {
-          chatConversations.unshift({ user: { _id: selectOrgId, profile: { orgName: chatActiveOrgName }, username: chatActiveOrgName }, lastMessage: null, unread: 0 });
-        }
-
-        renderSidebar(chatConversations, selectOrgId);
-
-        if (selectOrgId) {
-          selectConversation(selectOrgId, chatActiveOrgName || selectOrgId);
-        }
-      } catch(e) {
-        sidebar.innerHTML = '<div class="chat-loading">Failed to load</div>';
-      }
-    }
-
-    function renderSidebar(convs, activeId) {
-      const sidebar = document.getElementById('chat-sidebar');
-      if (!convs.length) {
-        sidebar.innerHTML = '<div style="font-size:0.65rem;color:rgba(255,255,255,0.25);text-align:center;padding:12px;">No chats yet</div>';
-        return;
-      }
-      sidebar.innerHTML = convs.map(c => {
-        const name = c.user.profile?.orgName || c.user.username || 'Organizer';
-        const initial = name[0].toUpperCase();
-        const isActive = c.user._id === activeId;
-        const unreadBadge = c.unread > 0 ? `<span class="chat-unread-badge">${c.unread > 9 ? '9+' : c.unread}</span>` : '';
-        return `
-          <div class="chat-sidebar-item ${isActive ? 'active' : ''}" onclick="selectConversation('${c.user._id}', '${(name).replace(/'/g,"\\'")}')">
-            <div class="chat-sidebar-avatar">${initial}</div>
-            <div class="chat-sidebar-name">${name}</div>
-            ${unreadBadge}
-          </div>`;
-      }).join('');
-    }
-
-    function selectConversation(orgId, orgName) {
-      chatActiveOrgId = orgId;
-      chatActiveOrgName = orgName;
-      // Update active state in sidebar
-      document.querySelectorAll('.chat-sidebar-item').forEach(el => el.classList.remove('active'));
-      const items = document.querySelectorAll('.chat-sidebar-item');
-      items.forEach(el => { if (el.onclick?.toString().includes(orgId)) el.classList.add('active'); });
-
-      document.getElementById('chat-header-name').textContent = orgName;
-      document.getElementById('chat-header-sub').textContent = 'Organizer';
-      document.getElementById('chat-no-selection').style.display = 'none';
-      document.getElementById('chat-messages').style.display = 'flex';
-      document.getElementById('chat-input-row').style.display = 'flex';
-
-      loadMessages(orgId);
-      startChatPoll(orgId);
-    }
-
-    async function loadMessages(orgId) {
-      const container = document.getElementById('chat-messages');
-      if (!container.children.length) {
-        container.innerHTML = '<div class="chat-loading">Loadingn++</div>';
-      }
-      try {
-        const r = await fetch(`/api/chat/messages/${orgId}`, { headers: { Authorization: `Bearer ${chatToken}` } });
-        const d = await r.json();
-        const msgs = d.data || [];
-        renderMessages(msgs);
-
-
-
-      } catch(e) {}
-    }
-
-    function renderMessages(msgs) {
-      const container = document.getElementById('chat-messages');
-      const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 40;
-
-      if (!msgs.length) {
-        container.innerHTML = '<div class="chat-empty-state"><svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><span>No messages yet. Say hello!</span></div>';
-        return;
-      }
-
-      container.innerHTML = msgs.map(msg => {
-        const isSent = msg.senderId === chatCurrentUserId || msg.senderId?._id === chatCurrentUserId;
-        const time = new Date(msg.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-        return `
-          <div class="chat-bubble ${isSent ? 'sent' : 'received'}">
-            ${escapeHtml(msg.text)}
-            <div class="chat-bubble-time">${time}</div>
-          </div>`;
-      }).join('');
-
-      if (wasAtBottom || container.children.length <= 3) {
-        container.scrollTop = container.scrollHeight;
-      }
-    }
-
-    function escapeHtml(str) {
-      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-    }
-
-    // Send message
-    document.getElementById('chat-send-btn').addEventListener('click', sendMessage);
-    document.getElementById('chat-input').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
     });
 
-    async function sendMessage() {
-      const input = document.getElementById('chat-input');
-      const text = input.value.trim();
-      if (!text || !chatActiveOrgId) return;
-      input.value = '';
-      input.style.height = 'auto';
+    document.getElementById('cc-close-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('client-chat-window').classList.add('hidden-chat');
+      document.getElementById('client-chat-fab').style.display = 'flex';
+      ccStopPoll();
+    });
 
-      // Optimistic UI
-      const container = document.getElementById('chat-messages');
-      const time = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-      const bubble = document.createElement('div');
-      bubble.className = 'chat-bubble sent';
-      bubble.innerHTML = `${escapeHtml(text)}<div class="chat-bubble-time">${time}</div>`;
-      // Remove empty state if present
-      const emptyState = container.querySelector('.chat-empty-state');
-      if (emptyState) emptyState.remove();
-      container.appendChild(bubble);
-      container.scrollTop = container.scrollHeight;
+    document.getElementById('cc-minimize-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const win = document.getElementById('client-chat-window');
+      if (ccMinimized) {
+        win.classList.remove('minimized');
+        document.getElementById('cc-body').style.display = 'flex';
+        ccMinimized = false;
+      } else {
+        win.classList.add('minimized');
+        document.getElementById('cc-body').style.display = 'none';
+        ccMinimized = true;
+      }
+    });
 
+    document.getElementById('cc-header-toggle').addEventListener('click', () => {
+      if (ccMinimized) document.getElementById('cc-minimize-btn').click();
+    });
+
+    async function ccLoadMessages() {
+      if (!ccToken || !ccActiveOrganizerId) return;
       try {
-        await fetch('/api/chat/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${chatToken}` },
-          body: JSON.stringify({ receiverId: chatActiveOrgId, text })
-        });
-        // Reload to sync
-        loadMessages(chatActiveOrgId);
+        const r = await fetch(`/api/chat/messages/${ccActiveOrganizerId}`, { headers: { Authorization: `Bearer ${ccToken}` } });
+        const d = await r.json();
+        ccRenderMessages(d.data || []);
       } catch(e) {}
     }
 
-    // Auto-resize textarea
-    document.getElementById('chat-input').addEventListener('input', function() {
+    function ccRenderMessages(msgs) {
+      const container = document.getElementById('cc-messages');
+      const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 40;
+      if (!msgs.length) {
+        container.innerHTML = '<div class="cc-empty"><svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><span>No messages yet. Say hello!</span></div>';
+        return;
+      }
+      container.innerHTML = msgs.map(msg => {
+        const isSent = msg.senderId === ccCurrentUserId || msg.senderId?._id === ccCurrentUserId;
+        const time = new Date(msg.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        const text = String(msg.text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        return `<div class="cc-bubble ${isSent ? 'sent' : 'received'}">${text}<div class="cc-bubble-time">${time}</div></div>`;
+      }).join('');
+      if (wasAtBottom || msgs.length <= 3) container.scrollTop = container.scrollHeight;
+      ccLoadUnread();
+    }
+
+    document.getElementById('cc-send-btn').addEventListener('click', ccSendMessage);
+    document.getElementById('cc-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ccSendMessage(); }
+    });
+    document.getElementById('cc-input').addEventListener('input', function() {
       this.style.height = 'auto';
       this.style.height = Math.min(this.scrollHeight, 80) + 'px';
     });
 
-    function startChatPoll(orgId) {
-      stopChatPoll();
-      chatPollInterval = setInterval(() => {
-        if (chatActiveOrgId === orgId) loadMessages(orgId);
-      }, 5000);
-      // Refresh sidebar + unread badge every 30s only
-      chatSidebarInterval = setInterval(() => { loadUnreadCount(); }, 30000);
+    async function ccSendMessage() {
+      const input = document.getElementById('cc-input');
+      const text = input.value.trim();
+      if (!text || !ccActiveOrganizerId) return;
+      input.value = ''; input.style.height = 'auto';
+      // Optimistic bubble
+      const container = document.getElementById('cc-messages');
+      const emptyEl = container.querySelector('.cc-empty');
+      if (emptyEl) emptyEl.remove();
+      const time = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+      const bubble = document.createElement('div');
+      bubble.className = 'cc-bubble sent';
+      bubble.innerHTML = `${text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}<div class="cc-bubble-time">${time}</div>`;
+      container.appendChild(bubble);
+      container.scrollTop = container.scrollHeight;
+      try {
+        await fetch('/api/chat/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${ccToken}` },
+          body: JSON.stringify({ receiverId: ccActiveOrganizerId, text })
+        });
+        ccLoadMessages();
+      } catch(e) {}
     }
 
-    function stopChatPoll() {
-      if (chatPollInterval) { clearInterval(chatPollInterval); chatPollInterval = null; }
-      if (chatSidebarInterval) { clearInterval(chatSidebarInterval); chatSidebarInterval = null; }
+    function ccStartPoll() {
+      ccStopPoll();
+      ccPollInterval = setInterval(ccLoadMessages, 5000);
     }
-
-
+    function ccStopPoll() {
+      if (ccPollInterval) { clearInterval(ccPollInterval); ccPollInterval = null; }
+    }
   </script>
 
-
-
-
 </body>
-
-
-
-
 </html>
-
-
-
-
