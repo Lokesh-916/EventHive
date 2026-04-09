@@ -327,112 +327,80 @@
 
 
 
-  <main class="w-[90%] max-w-6xl mx-auto my-24 relative z-10 flex flex-col gap-24 pb-24">
+  <main class="w-[92%] max-w-7xl mx-auto mt-16 mb-24 relative z-10 flex flex-col gap-20 pb-24">
 
 
 
     <!-- HERO SECTION -->
-    <section id="hero" class="flex flex-col md:flex-row items-center gap-14">
+    <section id="hero" class="grid grid-cols-1 lg:grid-cols-5 gap-10 items-start pt-6">
 
-      <div class="flex-1">
+      <!-- Left: Welcome text + CTAs + stats (3/5 width) -->
+      <div class="lg:col-span-3 flex flex-col justify-center py-4">
 
-        <h1 class="text-4xl md:text-6xl font-['Satisfy'] mb-5" style="color:var(--text-primary);">Welcome, Organizer</h1>
+        <h1 class="text-5xl md:text-7xl font-['Satisfy'] mb-6 leading-tight" style="color:var(--text-primary);">Welcome,<br>Organizer</h1>
 
-        <p class="text-lg mb-10 max-w-xl leading-relaxed" style="color:var(--text-secondary);">Create unforgettable experiences, match with clients, and manage your events in one powerful hub.</p>
+        <p class="text-base md:text-lg mb-10 max-w-lg leading-relaxed" style="color:var(--text-secondary);">Create unforgettable experiences, match with clients, and manage your events in one powerful hub.</p>
 
-
-
-        <div class="flex gap-4 mb-12">
-
-          <button onclick="window.location.href='/create-event'" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 rounded-lg hover:shadow-[0_4px_16px_rgba(0,0,0,0.5)] transition-all transform hover:-translate-y-1" style="color:var(--text-primary);">Start New Event</button>
-
-          <button onclick="document.getElementById('offers').scrollIntoView({behavior: 'smooth'})" class="px-6 py-3 font-bold uppercase tracking-wider text-sm bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 transition-all transform hover:-translate-y-1">View Client Offers</button>
-
+        <div class="flex flex-wrap gap-4 mb-14">
+          <button onclick="window.location.href='/create-event'" class="px-7 py-3.5 font-bold uppercase tracking-wider text-sm bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 rounded-xl hover:shadow-[0_4px_16px_rgba(0,0,0,0.5)] transition-all transform hover:-translate-y-1" style="color:var(--text-primary);">Start New Event</button>
+          <button onclick="document.getElementById('offers').scrollIntoView({behavior:'smooth'})" class="px-7 py-3.5 font-bold uppercase tracking-wider text-sm bg-white/10 border border-white/20 rounded-xl hover:bg-white/20 transition-all transform hover:-translate-y-1" style="color:var(--text-primary);">View Client Offers</button>
         </div>
 
-
-
-        <div class="flex gap-10">
-
-          <div>
-
+        <div class="grid grid-cols-3 gap-6">
+          <div class="rounded-2xl p-5 border text-center" style="background:var(--article-bg);border-color:var(--article-border);">
             <span class="block text-3xl font-bold mb-1" style="color:var(--text-primary);">32</span>
-
             <span class="text-xs uppercase tracking-wider font-bold" style="color:var(--text-muted);">Active Organizers</span>
-
           </div>
-
-          <div>
-
+          <div class="rounded-2xl p-5 border text-center" style="background:var(--article-bg);border-color:var(--article-border);">
             <span class="block text-3xl font-bold mb-1" style="color:var(--text-primary);">58</span>
-
             <span class="text-xs uppercase tracking-wider font-bold" style="color:var(--text-muted);">Live Offers</span>
-
           </div>
-
-          <div>
-
+          <div class="rounded-2xl p-5 border text-center" style="background:var(--article-bg);border-color:var(--article-border);">
             <span class="block text-3xl font-bold mb-1" style="color:var(--text-primary);">210+</span>
-
             <span class="text-xs uppercase tracking-wider font-bold" style="color:var(--text-muted);">Events Delivered</span>
-
           </div>
-
         </div>
 
       </div>
 
+      <!-- Right: Quick Snapshot card (2/5 width) -->
+      <div class="lg:col-span-2 backdrop-blur-[32px] rounded-[2rem] p-8 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
 
+        <h3 class="text-xs uppercase tracking-widest font-bold mb-8 pb-4 border-b" style="color:var(--text-muted);border-color:var(--card-border);">Quick Snapshot</h3>
 
-      <div class="backdrop-blur-[32px] rounded-[2rem] p-10 md:w-[360px] border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+        <div class="flex flex-col gap-6">
 
-        <h3 class="text-xs uppercase tracking-widest font-bold mb-8" style="color:var(--text-muted);">Quick Snapshot</h3>
-
-        <ul class="space-y-6">
-
-          <li class="flex items-center gap-5">
-
-            <div class="w-11 h-11 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
-
-            <div>
-
-              <p class="text-sm font-bold" style="color:var(--text-primary);">Pending offers</p>
-
-              <p id="snap-offers" class="text-xs mt-0.5" style="color:var(--text-secondary);">Loading…</p>
-
+          <div class="flex items-center gap-5 p-4 rounded-xl border" style="background:var(--article-bg);border-color:var(--article-border);">
+            <div class="w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </div>
-
-          </li>
-
-          <li class="flex items-center gap-5">
-
-            <div class="w-11 h-11 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>
-
             <div>
-
-              <p class="text-sm font-bold" style="color:var(--text-primary);">Events hosted</p>
-
-              <p id="snap-hosted" class="text-xs mt-0.5" style="color:var(--text-secondary);">Loading…</p>
-
+              <p class="text-sm font-bold" style="color:var(--text-primary);">Pending Offers</p>
+              <p id="snap-offers" class="text-xs mt-1" style="color:var(--text-secondary);">Loading…</p>
             </div>
+          </div>
 
-          </li>
-
-          <li class="flex items-center gap-5">
-
-            <div class="w-11 h-11 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
-
+          <div class="flex items-center gap-5 p-4 rounded-xl border" style="background:var(--article-bg);border-color:var(--article-border);">
+            <div class="w-12 h-12 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
             <div>
-
-              <p class="text-sm font-bold" style="color:var(--text-primary);">Your rating</p>
-
-              <p id="snap-rating" class="text-xs mt-0.5" style="color:var(--text-secondary);">Loading…</p>
-
+              <p class="text-sm font-bold" style="color:var(--text-primary);">Events Hosted</p>
+              <p id="snap-hosted" class="text-xs mt-1" style="color:var(--text-secondary);">Loading…</p>
             </div>
+          </div>
 
-          </li>
+          <div class="flex items-center gap-5 p-4 rounded-xl border" style="background:var(--article-bg);border-color:var(--article-border);">
+            <div class="w-12 h-12 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <div>
+              <p class="text-sm font-bold" style="color:var(--text-primary);">Your Rating</p>
+              <p id="snap-rating" class="text-xs mt-1" style="color:var(--text-secondary);">Loading…</p>
+            </div>
+          </div>
 
-        </ul>
+        </div>
 
       </div>
 
@@ -441,14 +409,11 @@
 
 
     <!-- CLIENT OFFERS SECTION -->
-    <section id="offers" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 md:p-14 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+    <section id="offers" class="backdrop-blur-[32px] rounded-[2.5rem] px-8 md:px-14 py-12 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
 
-      <div class="mb-12 text-center">
-
-        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Client Offers for You</h2>
-
-        <p class="text-sm mt-3 max-w-xl mx-auto leading-relaxed" style="color:var(--text-secondary);">Clients looking for organizers like you. Accept, reject, or mark as completed once the event is done.</p>
-
+      <div class="mb-10 pb-6 border-b" style="border-color:var(--card-border);">
+        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy'] mb-2" style="color:var(--text-primary);">Client Offers for You</h2>
+        <p class="text-sm leading-relaxed max-w-2xl" style="color:var(--text-secondary);">Clients looking for organizers like you. Accept, reject, or mark as completed once the event is done.</p>
       </div>
 
 
@@ -464,14 +429,11 @@
 
 
     <!-- MY EVENTS SECTION -->
-    <section id="my-events" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 md:p-14 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+    <section id="my-events" class="backdrop-blur-[32px] rounded-[2.5rem] px-8 md:px-14 py-12 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
 
-      <div class="mb-12 text-center">
-
-        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Your Created Events</h2>
-
-        <p class="text-sm mt-3 max-w-xl mx-auto leading-relaxed" style="color:var(--text-secondary);">Track the events you've planned with current status and matched offers.</p>
-
+      <div class="mb-10 pb-6 border-b" style="border-color:var(--card-border);">
+        <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy'] mb-2" style="color:var(--text-primary);">Your Created Events</h2>
+        <p class="text-sm leading-relaxed max-w-2xl" style="color:var(--text-secondary);">Track the events you've planned with current status and matched offers.</p>
       </div>
 
 
@@ -493,14 +455,11 @@
 
 
     <!-- VOLUNTEER MANAGEMENT -->
-    <section id="volunteers" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 md:p-14 border reveal" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+    <section id="volunteers" class="backdrop-blur-[32px] rounded-[2.5rem] px-8 md:px-14 py-12 border reveal" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
 
-      <div class="mb-10 border-b pb-6" style="border-color:var(--card-border);">
-
+      <div class="mb-10 pb-6 border-b" style="border-color:var(--card-border);">
         <h2 class="text-3xl font-bold font-['Satisfy'] mb-2" style="color:var(--text-primary);">Volunteer Management</h2>
-
         <p class="text-sm leading-relaxed" style="color:var(--text-secondary);">Approve, assign roles and manage volunteers across your events.</p>
-
       </div>
 
       <div class="overflow-x-auto rounded-xl border" style="border-color:var(--card-border);">
@@ -544,12 +503,10 @@
 
 
     <!-- WHY EVENTHIVE / INFO SECTION -->
-    <section class="backdrop-blur-[32px] rounded-[2.5rem] p-10 md:p-14 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+    <section class="backdrop-blur-[32px] rounded-[2.5rem] px-8 md:px-14 py-12 border" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
 
-      <div class="mb-12 text-center">
-
+      <div class="mb-10 pb-6 border-b" style="border-color:var(--card-border);">
         <h2 class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Why Organize with EventHive?</h2>
-
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
