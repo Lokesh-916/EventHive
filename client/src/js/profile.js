@@ -292,6 +292,15 @@ function buildVolunteerSections(p) {
     sectionWrap({ id:'vol-personal', icon: ICONS.info, title:'Personal Information', subtitle:'Your personal and contact details',  body: persBody   }),
     sectionWrap({ id:'vol-skills',   icon: ICONS.star, title:'Skills',               subtitle:'Your skills and proficiency (out of 5)', body: skillsBody }),
     sectionWrap({ id:'vol-avail',    icon: ICONS.cal,  title:'Weekly Availability',  subtitle:'Days and time slots you are free',  body: availBody  }),
+    `<div class="profile-section" id="section-vol-history">
+      <div class="section-header">
+        <div class="section-icon">${ICONS.cal}</div>
+        <div>
+          <h2 class="section-title">Event History</h2>
+        </div>
+      </div>
+      <div id="vol-history-body"><p class="field-value empty" style="padding:1rem 0;">Loading history…</p></div>
+    </div>`,
   ].join('');
 }
 
@@ -948,6 +957,84 @@ window.handleAvatarUpload = function(input) {
   reader.readAsDataURL(file);
 };
 
+// ====== VOLUNTEER EVENT HISTORY ======
+async function loadVolunteerHistory(token) {
+  const container = document.getElementById('vol-history-body');
+  if (!container) return;
+
+  try {
+    const res = await fetch('/api/applications/my-applications', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    const apps = data.data || [];
+
+    if (!apps.length) {
+      container.innerHTML = `<p class="field-value empty" style="padding:1rem 0;">No events yet. Apply to events to build your history.</p>`;
+      return;
+    }
+
+    // For each app, resolve the role display name:
+    // prefer roleName if it looks like a real name (not a raw ID/index),
+    // otherwise look it up from the event's volunteerRoles array.
+    const looksLikeId = str => !str || /^[a-f0-9]{24}$/.test(str) || /^\d+$/.test(str) || str === str.toLowerCase().replace(/\s/g,'');
+
+    // Fetch event details for apps that need role name resolution
+    const eventCache = {};
+    await Promise.all(apps.map(async a => {
+      const ev = a.eventId || {};
+      const evId = ev._id;
+      if (!evId || eventCache[evId] !== undefined) return;
+      if (!looksLikeId(a.roleName)) return; // roleName is fine, skip fetch
+      try {
+        const r = await fetch(`/api/events/${evId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+        eventCache[evId] = r.ok ? (await r.json()).data : null;
+      } catch { eventCache[evId] = null; }
+    }));
+
+    const statusColor = {
+      approved:  { bg: 'rgba(34,197,94,0.12)',  color: '#4ade80',  border: 'rgba(34,197,94,0.3)'  },
+      completed: { bg: 'rgba(96,165,250,0.12)', color: '#60a5fa',  border: 'rgba(96,165,250,0.3)' },
+      pending:   { bg: 'rgba(234,179,8,0.12)',  color: '#facc15',  border: 'rgba(234,179,8,0.3)'  },
+      rejected:  { bg: 'rgba(239,68,68,0.12)',  color: '#f87171',  border: 'rgba(239,68,68,0.3)'  },
+      withdrawn: { bg: 'rgba(107,114,128,0.12)',color: '#9ca3af',  border: 'rgba(107,114,128,0.3)'},
+    };
+
+    container.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:0.75rem;">
+        ${apps.map(a => {
+          const ev = a.eventId || {};
+          const evId = ev._id || '';
+          const title = ev.title || 'Unnamed Event';
+          const date = ev.schedule?.start ? fmtDate(ev.schedule.start) : null;
+          const city = ev.location?.city || null;
+          const sc = statusColor[a.status] || statusColor.pending;
+
+          // Resolve role name
+          let roleName = a.roleName;
+          if (looksLikeId(roleName)) {
+            const fullEvent = eventCache[evId];
+            const matched = fullEvent?.volunteerRoles?.find(r => r.roleId === a.roleId || r._id === a.roleId);
+            roleName = matched?.title || a.roleName || 'Volunteer';
+          }
+
+          return `
+            <a href="/event-info?id=${evId}" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.85rem 1rem;border-radius:0.85rem;background:var(--article-bg);border:1px solid var(--article-border);text-decoration:none;transition:background 0.2s,border-color 0.2s;" onmouseover="this.style.background='var(--article-hover)';this.style.borderColor='var(--article-border-hover)'" onmouseout="this.style.background='var(--article-bg)';this.style.borderColor='var(--article-border)'">
+              <div style="display:flex;flex-direction:column;gap:0.25rem;min-width:0;">
+                <span style="font-size:0.9rem;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(title)}</span>
+                <span style="font-size:0.75rem;font-weight:600;color:var(--text-secondary);">${esc(roleName)}</span>
+                ${(date || city) ? `<span style="font-size:0.7rem;color:var(--text-muted);">${[date, city ? esc(city) : null].filter(Boolean).join(' &middot; ')}</span>` : ''}
+              </div>
+              <span style="flex-shrink:0;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:0.25rem 0.65rem;border-radius:9999px;background:${sc.bg};color:${sc.color};border:1px solid ${sc.border};">${a.status}</span>
+            </a>`;
+        }).join('')}
+      </div>`;
+  } catch {
+    container.innerHTML = `<p class="field-value empty" style="padding:1rem 0;">Could not load event history.</p>`;
+  }
+}
+
 // ====== INIT ======
 (async function init() {
   // Check if viewing another user's profile via ?id= param
@@ -1012,6 +1099,11 @@ window.handleAvatarUpload = function(input) {
     // Load reputation badge section for volunteers
     if (CURRENT_USER.role === 'volunteer' && typeof loadReputationSection === 'function') {
       loadReputationSection(CURRENT_USER._id);
+    }
+
+    // Load event history for volunteers
+    if (CURRENT_USER.role === 'volunteer' && !window._viewingOther) {
+      loadVolunteerHistory(token);
     }
   } catch (err) {
     renderError('Unable to connect to the server. Please try again later.');

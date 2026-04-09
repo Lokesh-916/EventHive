@@ -621,31 +621,75 @@
 
       // ── Load user profile ──
       async function loadUserProfile() {
-        if (!token) return;
+        if (!token) {
+          showAccessDenied('You must be logged in as a volunteer to report an incident.');
+          return;
+        }
         try {
           const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
-          if (!res.ok) return;
+          if (!res.ok) { showAccessDenied('Session expired. Please log in again.'); return; }
           const data = await res.json();
           const u = data.data;
+
+          // Only volunteers can access this page
+          if (u.role !== 'volunteer') {
+            showAccessDenied('Only volunteers can report incidents.');
+            return;
+          }
+
+          // Must have an eventId in the URL
+          if (!eId) {
+            showAccessDenied('No event specified. Please access this page from your event.');
+            return;
+          }
+
+          // Check if volunteer has an approved application for this event
+          const appRes = await fetch('/api/applications/my-applications', { headers: { Authorization: `Bearer ${token}` } });
+          if (!appRes.ok) { showAccessDenied('Could not verify your event enrollment.'); return; }
+          const appData = await appRes.json();
+          const isApproved = appData.data?.some(a => a.eventId?._id === eId && a.status === 'approved');
+          if (!isApproved) {
+            showAccessDenied('You can only report incidents for events you are an approved volunteer in.');
+            return;
+          }
+
           const displayName = u.profile?.fullName || u.profile?.orgName || u.profile?.clientName || u.username;
           if (displayName) document.getElementById('dropdownName').textContent = displayName;
-          const roleLabel = u.role ? u.role.charAt(0).toUpperCase() + u.role.slice(1) : 'User';
-          document.getElementById('dropdownRole').textContent = roleLabel;
+          document.getElementById('dropdownRole').textContent = 'Volunteer';
 
           const homeLink = document.getElementById('homeLink');
-          if (u.role === 'organizer') homeLink.href = '/organiser-home';
-          else if (u.role === 'client') homeLink.href = '/client-home';
-          else homeLink.href = '/home';
+          homeLink.href = '/home';
 
           const pic = u.profile?.profilePic;
           if (pic) {
             const img = document.createElement('img');
-            img.src = pic; img.alt = 'Profile';
+            img.src = pic; img.alt = '';
             img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+            img.onerror = () => { avatarBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted)"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/></svg>`; };
             avatarBtn.innerHTML = ''; avatarBtn.appendChild(img);
           }
-        } catch(e) {}
+        } catch(e) {
+          showAccessDenied('Something went wrong. Please try again.');
+        }
       }
+
+      function showAccessDenied(message) {
+        const main = document.querySelector('main') || document.body;
+        main.innerHTML = `
+          <div style="min-height:60vh;display:flex;align-items:center;justify-content:center;padding:2rem;">
+            <div style="max-width:420px;width:100%;text-align:center;">
+              <div style="width:64px;height:64px;border-radius:50%;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:28px;height:28px;color:#f87171;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                </svg>
+              </div>
+              <h2 style="font-family:'Satisfy',cursive;font-size:1.8rem;color:var(--text-primary);margin-bottom:.75rem;">Access Restricted</h2>
+              <p style="color:var(--text-secondary);font-size:.9rem;margin-bottom:2rem;">${message}</p>
+              <button onclick="history.back()" style="padding:.7rem 1.5rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--text-primary);border-radius:.75rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;">Go Back</button>
+            </div>
+          </div>`;
+      }
+
       loadUserProfile();
     </script>
 </body>
