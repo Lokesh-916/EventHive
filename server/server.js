@@ -58,6 +58,7 @@ const organizerRoutes = require('./routes/organizer');
 const offerRoutes = require('./routes/offers');
 const reputationRoutes = require('./routes/reputation');
 const analyticsRoutes  = require('./routes/analytics');
+const chatRoutes       = require('./routes/chat');
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/applications', applicationRoutes);
@@ -66,6 +67,7 @@ app.use('/api', organizerRoutes);
 app.use('/api/offers', offerRoutes);
 app.use('/api/reputation', reputationRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Static file setup for uploads and client
 app.use('/uploads', express.static(path.join(__dirname, '../client/public/uploads')));
@@ -134,6 +136,10 @@ app.get('/profile', (req, res) => {
 
 app.get('/analytics', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/analytics.html'));
+});
+
+app.get('/test-chat', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/test-chat.html'));
 });
 
 // Generic 404 handler for API vs Front-end
