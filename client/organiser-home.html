@@ -599,41 +599,74 @@
 
     const token = sessionStorage.getItem('token');
 
-
-
-    // ★★ Auth guard: must be logged in as organizer ★★
-
-    (async function checkAuth() {
-
+    // ★★ Auth guard + single profile fetch ★★
+    (async function init() {
       if (!token) return showUnauthorized('not-logged-in');
-
       try {
-
         const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
-
         if (!res.ok) return showUnauthorized('not-logged-in');
-
         const data = await res.json();
-
-        if (data.data?.role !== 'organizer') return showUnauthorized(data.data?.role || 'unknown');
-
-        // Auth confirmed — populate name/avatar
         const u = data.data;
+        if (u?.role !== 'organizer') return showUnauthorized(u?.role || 'unknown');
+
+        // Populate dropdown name
+        const nameEl = document.getElementById('dropdownName');
         const name = u.profile?.orgName || u.username;
-        if (name) { const el = document.getElementById('dropdownName'); if (el) el.textContent = name; }
+        if (nameEl && name) nameEl.textContent = name;
+
+        // Populate avatar
         const pic = u.profile?.logo || u.profile?.profilePic;
-        if (pic) {
-          const avatarBtn = document.getElementById('profileAvatarBtn');
-          if (avatarBtn) {
-            const img = document.createElement('img');
-            img.src = pic; img.alt = 'Profile';
-            img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
-            avatarBtn.innerHTML = ''; avatarBtn.appendChild(img);
-          }
+        const avatarBtnEl = document.getElementById('profileAvatarBtn');
+        if (pic && avatarBtnEl) {
+          const img = document.createElement('img');
+          img.src = pic; img.alt = 'Profile';
+          img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+          avatarBtnEl.innerHTML = ''; avatarBtnEl.appendChild(img);
         }
 
-      } catch { showUnauthorized('not-logged-in'); }
+        // Snapshot from same profile call — no extra fetch needed
+        const snapHosted = document.getElementById('snap-hosted');
+        const snapRating = document.getElementById('snap-rating');
+        if (snapHosted) snapHosted.textContent = `${u.eventsHosted || 0} completed`;
+        if (snapRating) snapRating.textContent = u.ratingAvg > 0
+          ? `${u.ratingAvg.toFixed(1)} ★ (${u.ratings?.length || 0} reviews)`
+          : 'No ratings yet';
 
+        // Wire up profile dropdown (only after auth confirmed, DOM is intact)
+        const avatarBtn = document.getElementById('profileAvatarBtn');
+        const dropdown  = document.getElementById('profileDropdown');
+        if (avatarBtn && dropdown) {
+          avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('open'); });
+          document.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target) && e.target !== avatarBtn) dropdown.classList.remove('open');
+          });
+        }
+
+        // Theme toggle
+        const bgImage = document.getElementById('bgImage');
+        const themeToggle = document.getElementById('themeToggle');
+        function applyTheme(dark) {
+          document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+          if (bgImage) bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
+          if (themeToggle) themeToggle.checked = dark;
+          localStorage.setItem('theme', dark ? 'dark' : 'light');
+        }
+        applyTheme(localStorage.getItem('theme') !== 'light');
+        if (themeToggle) themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
+
+        // Logout
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) logoutBtn.addEventListener('click', () => {
+          sessionStorage.removeItem('token');
+          window.location.href = '/';
+        });
+
+        // Load all data
+        loadOffers();
+        loadMyEvents();
+        loadApplications();
+
+      } catch(e) { console.error('Init error:', e); showUnauthorized('not-logged-in'); }
     })();
 
 
@@ -724,109 +757,11 @@
 
 
 
-    // ★★ Profile Avatar Dropdown ★★
-
-    const avatarBtn = document.getElementById('profileAvatarBtn');
-
-    const dropdown  = document.getElementById('profileDropdown');
-
-    avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('open'); });
-
-    document.addEventListener('click', (e) => {
-
-      if (!dropdown.contains(e.target) && e.target !== avatarBtn) dropdown.classList.remove('open');
-
-    });
-
-    // ★★ Theme toggle ★★
-
-    const bgImage = document.getElementById('bgImage');
-
-    const themeToggle = document.getElementById('themeToggle');
-
-    function applyTheme(dark) {
-
-      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-
-      bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
-
-      themeToggle.checked = dark;
-
-      localStorage.setItem('theme', dark ? 'dark' : 'light');
-
-    }
-
-    applyTheme(localStorage.getItem('theme') !== 'light');
-
-    themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
-
-
-
-    // ★★ Load organizer name into dropdown ★★
-
-    (async function() {
-
-      try {
-
-        const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
-
-        if (!res.ok) return;
-
-        const data = await res.json();
-
-        const u = data.data;
-
-        const name = u.profile?.orgName || u.username;
-
-        if (name) document.getElementById('dropdownName').textContent = name;
-
-        const pic = u.profile?.profilePic;
-
-        if (pic) {
-
-          const img = document.createElement('img');
-
-          img.src = pic; img.alt = 'Profile';
-
-          img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
-
-          avatarBtn.innerHTML = ''; avatarBtn.appendChild(img);
-
-        }
-
-      } catch(e) {}
-
-    })();
-
-
-
-    // ★★ Load organizer profile for snapshot ★★★★★★★★★★★★★★★★★★★★
-
-    async function loadSnapshot() {
-
-      if (!token) return;
-
-      try {
-
-        const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
-
-        if (!res.ok) return;
-
-        const data = await res.json();
-
-        const user = data.data;
-
-        document.getElementById('snap-hosted').textContent = `${user.eventsHosted || 0} completed`;
-
-        document.getElementById('snap-rating').textContent = user.ratingAvg > 0 ? `${user.ratingAvg.toFixed(1)} ★ (${user.ratings?.length || 0} reviews)` : 'No ratings yet';
-
-      } catch (e) { console.error(e); }
-
-    }
-
-
-
     // ★★ Load Incoming Offers ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+
+    function esc(str) {
+      return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
 
     async function loadOffers() {
 
@@ -896,9 +831,9 @@
 
                 <div class="flex-1 min-w-0">
 
-                  <h3 class="font-bold text-base mb-1" style="color:var(--text-primary);">${offer.title}</h3>
+                  <h3 class="font-bold text-base mb-1" style="color:var(--text-primary);">${esc(offer.title)}</h3>
 
-                  <p class="text-sm" style="color:var(--text-muted);">From: <span style="color:var(--text-secondary);">${clientName}</span></p>
+                  <p class="text-sm" style="color:var(--text-muted);">From: <span style="color:var(--text-secondary);">${esc(clientName)}</span></p>
 
                   <div class="flex flex-wrap gap-4 mt-2 text-xs" style="color:var(--text-muted);">
 
@@ -1060,7 +995,7 @@
                   advanceHtml = `<div class="mt-4 p-4 rounded-xl border border-red-500/20 bg-red-500/5">
                     <div class="flex justify-between items-center mb-2">
                       <span class="text-sm font-bold text-red-400">Negotiation Request: ₹${adv.requestedAmount}</span>
-                      <button onclick="openAdvanceModal('${offer._id}')" class="px-4 py-2 text-xs font-bold uppercase tracking-widest bg-red-600/20 hover:bg-red-600/40 text-red-300 rounded-lg transition-all">Review & Set New</button>
+                      <button onclick="openAdvanceModal('${offer._id}', '${adv.requestedAmount}')" class="px-4 py-2 text-xs font-bold uppercase tracking-widest bg-red-600/20 hover:bg-red-600/40 text-red-300 rounded-lg transition-all">Review & Set New</button>
                     </div>
                     <p class="text-xs italic text-red-300/80 bg-black/20 p-2 rounded">"${adv.negotiationMessage}"</p>
                   </div>`;
@@ -1110,7 +1045,7 @@
 
                     <div class="flex items-center gap-3 mb-2">
 
-                      <h3 class="font-bold text-xl" style="color:var(--text-primary);">${offer.title}</h3>
+                      <h3 class="font-bold text-xl" style="color:var(--text-primary);">${esc(offer.title)}</h3>
 
                       ${isCompleted ? `<span class="px-3 py-1 bg-green-500/20 text-green-400 border border-green-500/30 rounded-full text-xs font-bold">Completed</span>` : `<span class="px-3 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-xs font-bold">Active</span>`}
 
@@ -1175,8 +1110,6 @@
 
         loadOffers();
 
-        loadSnapshot();
-
       } else { alert(data.error || 'Failed to accept offer'); }
 
     }
@@ -1204,8 +1137,6 @@
       if (data.success) {
 
         loadOffers();
-
-        loadSnapshot();
 
       } else { alert(data.error || 'Failed to mark complete'); }
 
@@ -1607,14 +1538,6 @@
 
 
 
-    loadSnapshot();
-
-    loadOffers();
-
-    loadMyEvents();
-
-    loadApplications();
-
     // ★★ Payment features ★★
     async function issueRefund(id) {
       if (!confirm('Issue refund of excess advance to the client?')) return;
@@ -1833,8 +1756,8 @@
         chatCurrentUserId = d.data?._id || d.data?.id;
         document.getElementById('chat-fab').style.display = 'flex';
         loadUnreadCount();
-        // Poll for new messages every 10s even when window is closed
-        setInterval(loadUnreadCount, 10000);
+        // Poll for new messages every 10s, but pause when tab is hidden
+        setInterval(() => { if (!document.hidden) loadUnreadCount(); }, 10000);
       } catch(e) {}
     })();
 
@@ -2119,12 +2042,13 @@
     function startChatPoll(id, isEvent = false) {
       stopChatPoll();
       chatPollInterval = setInterval(() => {
+        if (document.hidden) return; // pause when tab not visible
         if (chatActiveClientId === id) {
           if (isEvent) loadEventMessages(id);
           else loadMessages(id);
         }
       }, 5000);
-      chatSidebarInterval = setInterval(() => { loadUnreadCount(); }, 30000);
+      chatSidebarInterval = setInterval(() => { if (!document.hidden) loadUnreadCount(); }, 30000);
     }
 
     function stopChatPoll() {
@@ -2132,6 +2056,7 @@
       if (chatSidebarInterval) { clearInterval(chatSidebarInterval); chatSidebarInterval = null; }
     }
 
+    let _dropdownListenerActive = false;
     async function showContactsDropdown() {
       const dropdown = document.getElementById('chat-contacts-dropdown');
       
@@ -2164,15 +2089,17 @@
         
         dropdown.style.display = 'block';
         
-        // Close dropdown when clicking outside
-        setTimeout(() => {
+        // Single outside-click listener — only add if not already active
+        if (!_dropdownListenerActive) {
+          _dropdownListenerActive = true;
           document.addEventListener('click', function closeDropdown(e) {
-            if (!dropdown.contains(e.target) && !document.getElementById('chat-contacts-btn').contains(e.target)) {
+            if (!dropdown.contains(e.target) && !document.getElementById('chat-contacts-btn')?.contains(e.target)) {
               dropdown.style.display = 'none';
+              _dropdownListenerActive = false;
               document.removeEventListener('click', closeDropdown);
             }
           });
-        }, 0);
+        }
         
       } catch(e) {
         dropdown.innerHTML = '<div style="padding: 12px; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.7rem;">Failed to load</div>';
