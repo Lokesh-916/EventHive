@@ -132,6 +132,7 @@ function initOrganizerFlow() {
         if (validateStep(currentStep, 'org')) {
             
             // Build FormData
+            const organizerForm = document.getElementById('org-reg-form');
             const formObj = new FormData(organizerForm);
             // Some specific inputs are easier grabbed this way since form might contain different shapes:
             const apiData = new FormData();
