@@ -6,34 +6,59 @@ const Application = require('../models/Application');
 const { protect } = require('../middleware/auth');
 
 // GET /api/chat/conversations
-// Returns list of users the current user has chatted with + last message + unread count
+// Returns: direct conversations (grouped by user) + event group chats (grouped by eventId)
 router.get('/conversations', protect, async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Find all messages involving this user
-    const messages = await Message.find({
-      $or: [{ senderId: userId }, { receiverId: userId }]
+    // --- Direct messages (messageType: 'direct', or legacy docs without messageType/eventId) ---
+    const directMessages = await Message.find({
+      $and: [
+        { $or: [{ senderId: userId }, { receiverId: userId }] },
+        { $or: [{ messageType: 'direct' }, { messageType: { $exists: false } }, { eventId: null }, { eventId: { $exists: false } }] }
+      ]
     })
       .sort({ createdAt: -1 })
-      .populate('senderId', 'username profile.orgName profile.clientName profile.leadName role')
-      .populate('receiverId', 'username profile.orgName profile.clientName profile.leadName role');
+      .populate('senderId', 'username profile.orgName profile.clientName profile.fullName profile.leadName role')
+      .populate('receiverId', 'username profile.orgName profile.clientName profile.fullName profile.leadName role');
 
-    // Build conversation map keyed by the other user's id
-    const convMap = new Map();
-    for (const msg of messages) {
+    const directMap = new Map();
+    for (const msg of directMessages) {
       const other = msg.senderId._id.toString() === userId ? msg.receiverId : msg.senderId;
       const otherId = other._id.toString();
-      if (!convMap.has(otherId)) {
-        convMap.set(otherId, { user: other, lastMessage: msg, unread: 0 });
+      if (!directMap.has(otherId)) {
+        directMap.set(otherId, { type: 'direct', user: other, lastMessage: msg, unread: 0 });
       }
-      // Count unread messages sent TO current user
       if (msg.receiverId._id.toString() === userId && !msg.read) {
-        convMap.get(otherId).unread++;
+        directMap.get(otherId).unread++;
       }
     }
 
-    res.json({ success: true, data: Array.from(convMap.values()) });
+    // --- Event group chats (messageType: 'event') ---
+    const eventMessages = await Message.find({
+      $or: [{ senderId: userId }, { receiverId: userId }],
+      messageType: 'event'
+    })
+      .sort({ createdAt: -1 })
+      .populate('eventId', 'title');
+
+    const eventMap = new Map();
+    for (const msg of eventMessages) {
+      if (!msg.eventId) continue;
+      const evId = msg.eventId._id.toString();
+      if (!eventMap.has(evId)) {
+        eventMap.set(evId, { type: 'event', event: msg.eventId, lastMessage: msg, unread: 0 });
+      }
+      if (msg.receiverId.toString() === userId && !msg.read) {
+        eventMap.get(evId).unread++;
+      }
+    }
+
+    res.json({
+      success: true,
+      data: Array.from(directMap.values()),
+      eventChats: Array.from(eventMap.values())
+    });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

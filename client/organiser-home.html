@@ -1628,6 +1628,7 @@
     const chatToken = localStorage.getItem('token');
     let chatCurrentUserId = null;
     let chatActiveClientId = null;
+    let chatActiveType = 'direct'; // 'direct' or 'event'
     let chatPollInterval = null;
     let chatSidebarInterval = null;
     let chatIsMinimized = false;
@@ -1732,48 +1733,111 @@
         const r = await fetch('/api/chat/conversations', { headers: { Authorization: `Bearer ${chatToken}` } });
         const d = await r.json();
         const convs = d.data || [];
-        if (!convs.length) {
+        const eventChats = d.eventChats || [];
+
+        if (!convs.length && !eventChats.length) {
           sidebar.innerHTML = '<div style="font-size:0.65rem;color:rgba(255,255,255,0.25);text-align:center;padding:12px;">No messages yet</div>';
-          // Reset header when no conversations
-          document.getElementById('chat-header-name').textContent = 'Client Messages';
-          document.getElementById('chat-header-sub').textContent = 'Chat with your clients';
+          document.getElementById('chat-header-name').textContent = 'Messages';
+          document.getElementById('chat-header-sub').textContent = 'Clients & Event Groups';
           return;
         }
-        sidebar.innerHTML = convs.map(c => {
-          const name = c.user.profile?.clientName || c.user.username || 'Client';
-          const initial = name[0].toUpperCase();
-          const isActive = c.user._id === selectId;
-          const unreadBadge = c.unread > 0 ? `<span class="chat-unread-badge">${c.unread > 9 ? '9+' : c.unread}</span>` : '';
-          return `<div class="chat-sidebar-item ${isActive ? 'active' : ''}" onclick="selectConversation('${c.user._id}', '${name.replace(/'/g,"\\'")}')">
-            <div class="chat-sidebar-avatar">${initial}</div>
-            <div class="chat-sidebar-name">${name}</div>
-            ${unreadBadge}
-          </div>`;
-        }).join('');
-        
-        // Auto-select conversation if specified or if none is active but conversations exist
-        if (selectId) {
-          const selectedConv = convs.find(c => c.user._id === selectId);
-          if (selectedConv) {
-            const clientName = selectedConv.user.profile?.clientName || selectedConv.user.username || 'Client';
-            selectConversation(selectId, clientName);
-          }
-        } else if (!chatActiveClientId && convs.length > 0) {
-          // Auto-select first conversation if none is active
-          const firstConv = convs[0];
-          const clientName = firstConv.user.profile?.clientName || firstConv.user.username || 'Client';
-          selectConversation(firstConv.user._id, clientName);
+
+        let html = '';
+
+        // Event group chats section
+        if (eventChats.length) {
+          html += `<div style="font-size:0.55rem;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.25);padding:8px 8px 4px;">Group Chats</div>`;
+          html += eventChats.map(c => {
+            const name = c.event?.title || 'Event Chat';
+            const initial = name[0].toUpperCase();
+            const isActive = c.event?._id === chatActiveClientId;
+            const unreadBadge = c.unread > 0 ? `<span class="chat-unread-badge">${c.unread > 9 ? '9+' : c.unread}</span>` : '';
+            return `<div class="chat-sidebar-item ${isActive ? 'active' : ''}" onclick="selectEventChat('${c.event._id}', '${name.replace(/'/g,"\\'")}')">
+              <div class="chat-sidebar-avatar" style="background:linear-gradient(135deg,#3b82f6,#6366f1);">${initial}</div>
+              <div class="chat-sidebar-name">${name}</div>
+              ${unreadBadge}
+            </div>`;
+          }).join('');
         }
-      } catch(e) { 
-        sidebar.innerHTML = '<div class="chat-loading">Failed</div>'; 
-        // Reset header on error
-        document.getElementById('chat-header-name').textContent = 'Client Messages';
-        document.getElementById('chat-header-sub').textContent = 'Chat with your clients';
+
+        // Direct client messages section
+        if (convs.length) {
+          html += `<div style="font-size:0.55rem;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.25);padding:8px 8px 4px;${eventChats.length ? 'margin-top:4px;border-top:1px solid rgba(255,255,255,0.06);' : ''}">Direct</div>`;
+          html += convs.map(c => {
+            const name = c.user.profile?.clientName || c.user.username || 'Client';
+            const initial = name[0].toUpperCase();
+            const isActive = c.user._id === chatActiveClientId;
+            const unreadBadge = c.unread > 0 ? `<span class="chat-unread-badge">${c.unread > 9 ? '9+' : c.unread}</span>` : '';
+            return `<div class="chat-sidebar-item ${isActive ? 'active' : ''}" onclick="selectConversation('${c.user._id}', '${name.replace(/'/g,"\\'")}')">
+              <div class="chat-sidebar-avatar">${initial}</div>
+              <div class="chat-sidebar-name">${name}</div>
+              ${unreadBadge}
+            </div>`;
+          }).join('');
+        }
+
+        sidebar.innerHTML = html;
+
+        // Auto-select
+        if (selectId) {
+          const selConv = convs.find(c => c.user._id === selectId);
+          if (selConv) selectConversation(selectId, selConv.user.profile?.clientName || selConv.user.username);
+        } else if (!chatActiveClientId) {
+          if (eventChats.length) selectEventChat(eventChats[0].event._id, eventChats[0].event?.title || 'Event Chat');
+          else if (convs.length) selectConversation(convs[0].user._id, convs[0].user.profile?.clientName || convs[0].user.username);
+        }
+      } catch(e) {
+        sidebar.innerHTML = '<div class="chat-loading">Failed</div>';
       }
+    }
+
+    function selectEventChat(eventId, eventName) {
+      chatActiveClientId = eventId;
+      chatActiveType = 'event';
+      document.querySelectorAll('.chat-sidebar-item').forEach(el => el.classList.remove('active'));
+      const activeItem = document.querySelector(`[onclick*="${eventId}"]`);
+      if (activeItem) activeItem.classList.add('active');
+      document.getElementById('chat-header-name').textContent = eventName;
+      document.getElementById('chat-header-sub').textContent = 'Group Chat';
+      document.getElementById('chat-no-selection').style.display = 'none';
+      document.getElementById('chat-messages').style.display = 'flex';
+      document.getElementById('chat-input-row').style.display = 'flex';
+      loadEventMessages(eventId);
+      startChatPoll(eventId, true);
+    }
+
+    async function loadEventMessages(eventId) {
+      const container = document.getElementById('chat-messages');
+      container.innerHTML = '<div class="chat-loading">Loading…</div>';
+      try {
+        const r = await fetch(`/api/chat/event/${eventId}/messages`, { headers: { Authorization: `Bearer ${chatToken}` } });
+        const d = await r.json();
+        renderEventMessages(d.data || []);
+      } catch(e) {}
+    }
+
+    function renderEventMessages(msgs) {
+      const container = document.getElementById('chat-messages');
+      if (!msgs.length) {
+        container.innerHTML = '<div class="chat-empty-state"><svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><span>No messages yet</span></div>';
+        return;
+      }
+      container.innerHTML = msgs.map(msg => {
+        const senderId = msg.senderId?._id?.toString() || msg.senderId?.toString();
+        const isSent = senderId === chatCurrentUserId;
+        const senderName = msg.senderId?.profile?.fullName || msg.senderId?.profile?.orgName || msg.senderId?.username || '';
+        const time = new Date(msg.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        return `<div class="chat-bubble ${isSent ? 'sent' : 'received'}">
+          ${!isSent && senderName ? `<div style="font-size:0.6rem;font-weight:700;color:rgba(255,255,255,0.45);margin-bottom:3px;">${escapeHtml(senderName)}</div>` : ''}
+          ${escapeHtml(msg.text)}<div class="chat-bubble-time">${time}</div>
+        </div>`;
+      }).join('');
+      container.scrollTop = container.scrollHeight;
     }
 
     function selectConversation(clientId, clientName) {
       chatActiveClientId = clientId;
+      chatActiveType = 'direct';
       document.querySelectorAll('.chat-sidebar-item').forEach(el => el.classList.remove('active'));
       
       // Update header to show the selected client name
@@ -1839,12 +1903,21 @@
       container.appendChild(bubble);
       container.scrollTop = container.scrollHeight;
       try {
-        await fetch('/api/chat/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${chatToken}` },
-          body: JSON.stringify({ receiverId: chatActiveClientId, text })
-        });
-        loadMessages(chatActiveClientId);
+        if (chatActiveType === 'event') {
+          await fetch(`/api/chat/event/${chatActiveClientId}/messages`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${chatToken}` },
+            body: JSON.stringify({ text })
+          });
+          loadEventMessages(chatActiveClientId);
+        } else {
+          await fetch('/api/chat/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${chatToken}` },
+            body: JSON.stringify({ receiverId: chatActiveClientId, text })
+          });
+          loadMessages(chatActiveClientId);
+        }
       } catch(e) {}
     }
 
@@ -1853,9 +1926,14 @@
       this.style.height = Math.min(this.scrollHeight, 80) + 'px';
     });
 
-    function startChatPoll(id) {
+    function startChatPoll(id, isEvent = false) {
       stopChatPoll();
-      chatPollInterval = setInterval(() => { if (chatActiveClientId === id) loadMessages(id); }, 5000);
+      chatPollInterval = setInterval(() => {
+        if (chatActiveClientId === id) {
+          if (isEvent) loadEventMessages(id);
+          else loadMessages(id);
+        }
+      }, 5000);
       chatSidebarInterval = setInterval(() => { loadUnreadCount(); }, 30000);
     }
 
