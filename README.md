@@ -1,158 +1,142 @@
-# EventHive
+<div align="center">
 
-Operations-First Event Platform connecting event organizers, volunteers, and clients. Comprehensive tools for managing events, registering volunteers, tracking applications, and orchestrating flawless experiences.
+<img src="landing.png" alt="EventHive Landing" width="100%" style="border-radius:12px;" />
 
-## Project Structure
+<br/><br/>
 
-```
-EventHive/
-├── client/                  # Frontend (HTML, Tailwind CSS, Vanilla JS)
-│   ├── src/js/              # JavaScript modules per page
-│   ├── src/styles/          # Tailwind input/output CSS
-│   └── public/              # Static assets (images, videos)
-├── server/                  # Express.js backend
-│   ├── models/              # Mongoose schemas
-│   ├── routes/              # API route handlers
-│   ├── middleware/          # Auth, upload middleware
-│   ├── services/            # Reputation, badge logic
-│   ├── seed.js              # Seed events & organizer
-│   └── seed-analytics.js    # Seed analytics data
-└── README.md
-```
+<h1>
+  <img src="https://readme-typing-svg.demolab.com?font=Satisfy&size=52&pause=1000&color=026670&center=true&vCenter=true&width=600&lines=EventHive" alt="EventHive" />
+</h1>
 
-## Features
+<p><strong><em>Where events come alive — and the people behind them get the credit they deserve.</em></strong></p>
 
-### Volunteer
-- Browse ongoing, upcoming, and past events
-- Enroll for specific roles in events (duplicate prevention)
-- View application status (pending / approved / rejected)
-- Reputation & badge system — earn XP and ranks by completing events
-- Full profile page with edit support, skills, availability, and badges
+<br/>
 
-### Organizer
-- Create and manage events with full scheduling, location, and volunteer role setup
-- Organizer Home — client offers, created events, volunteer management
-- Organizer Dashboard — event stats, manage events table, analytics link
-- Volunteer Management — approve applications, view volunteer profiles
-- Analytics page — KPI cards, per-event deep dive, volunteer trends, event mix charts
-- Expense tracking per accepted offer
-- Rate and complete volunteer applications (awards XP)
+![Node.js](https://img.shields.io/badge/Node.js-026670?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express-0a0f14?style=for-the-badge&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-026670?style=for-the-badge&logo=mongodb&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind-0a0f14?style=for-the-badge&logo=tailwindcss&logoColor=38bdf8)
+![JWT](https://img.shields.io/badge/JWT_Auth-026670?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 
-### Client
-- Browse and filter verified organizers
-- Send offers with budget, date, city, and description
-- Track bookings and rate organizers after event completion
+</div>
 
-### General
-- JWT-based authentication with role-specific auth guards
-- Theme toggle (dark/light) consistent across all pages
-- Access restricted page with back navigation for wrong-role access
-- Report incident from event info page
-- Bird's Eye View (event overview) for each event
+---
 
-## Pages & Routes
+<div align="center">
+<h2>What is EventHive?</h2>
+<p>
+A full-stack event operations platform built for three kinds of people —<br/>
+<strong>organizers</strong> who run the show, <strong>volunteers</strong> who make it happen,<br/>
+and <strong>clients</strong> who need it done right.
+</p>
+</div>
 
-| Route | Description | Access |
-|---|---|---|
-| `/` | Landing page | Public |
-| `/register` | Registration (`?type=volunteer\|organizer\|client`) | Public |
-| `/home` | Volunteer event browser | Volunteer |
-| `/event-info` | Event details + enroll | Volunteer |
-| `/event-overview` | Bird's Eye View of event | All |
-| `/profile` | User profile (view/edit, supports `?id=` for read-only) | Authenticated |
-| `/organiser-home` | Organizer home — offers, events, volunteers | Organizer |
-| `/organiser` | Organizer dashboard — stats, events table | Organizer |
-| `/analytics` | Analytics — KPIs, charts, event deep dive | Organizer |
-| `/create-event` | Create/edit event | Organizer |
-| `/client-home` | Client home — browse organizers, bookings | Client |
-| `/organiser-profile` | Public organizer profile | All |
-| `/rate-organizer` | Rate an organizer after event | Client |
-| `/report-incident` | Report an incident | Authenticated |
-| `/all-events` | All events listing | Public |
-| `/support` | Support & FAQ | Public |
+---
 
-## API Endpoints
+## The Platform, in Plain English
 
-| Method | Route | Description |
-|---|---|---|
-| POST | `/api/auth/register` | Register user |
-| POST | `/api/auth/login` | Login |
-| GET | `/api/auth/profile` | Get own profile |
-| PUT | `/api/auth/profile` | Update profile |
-| GET | `/api/auth/profile/:id` | Get any user profile (read-only) |
-| GET | `/api/events` | All events |
-| GET | `/api/events/my` | Organizer's events |
-| POST | `/api/events` | Create event |
-| GET | `/api/events/:id` | Single event |
-| POST | `/api/applications` | Apply for event role |
-| GET | `/api/applications/my-applications` | Volunteer's applications |
-| GET | `/api/applications/event/:eventId` | Applications for an event |
-| POST | `/api/applications/:id/approve` | Approve application |
-| POST | `/api/applications/:id/complete` | Complete + award XP |
-| GET | `/api/reputation/:volunteerId` | Volunteer reputation |
-| GET | `/api/reputation/catalog` | Badge catalog |
-| GET | `/api/analytics/overview` | Portfolio KPIs |
-| GET | `/api/analytics/events` | Per-event analytics |
-| GET | `/api/offers` | Offers (organizer/client) |
-| POST | `/api/offers` | Send offer |
-| GET | `/api/organizers` | All organizers |
+**For Volunteers**
+- Browse live, upcoming, and past events — all in one feed
+- Pick a role, write a cover letter, and enroll in one click
+- Track your application status in real time
+- Build a profile with skills, availability, and your event history
+- Earn reputation and badges as you complete events
 
-## Technology Stack
+**For Organizers**
+- Create events with full scheduling, venue, and role configuration
+- Manage incoming client offers and negotiate terms
+- Approve volunteers, view their profiles and reputation at a glance
+- Deep analytics — KPI cards, event mix charts, volunteer trends
+- Track expenses per accepted offer
 
-- **Frontend**: HTML5, Vanilla JavaScript, Tailwind CSS
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB Atlas (Mongoose)
-- **Auth**: JWT (jsonwebtoken, bcryptjs)
-- **Fonts**: Google Fonts (Inter, Satisfy)
+**For Clients**
+- Browse verified organizers with composite ratings
+- Send offers with budget, date, city, and brief
+- Rate organizers after event completion
+
+---
+
+## Built Different
+
+> No React. No Next.js. No framework crutch.
+
+Pure **Vanilla JS** on the frontend — every page is hand-crafted HTML with dynamic rendering driven by fetch calls and DOM manipulation. The UI is fast, the code is readable, and nothing is over-engineered.
+
+The backend is **Express + MongoDB** with JWT auth, role-based access control on every route, and a clean REST API that the frontend talks to directly.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | HTML5, Vanilla JavaScript, Tailwind CSS |
+| Backend | Node.js, Express.js |
+| Database | MongoDB Atlas (Mongoose ODM) |
+| Auth | JWT + bcryptjs |
+| Fonts | Google Fonts — Inter, Satisfy |
+
+---
 
 ## Getting Started
 
-### Prerequisites
-- Node.js v14+
-- npm
-- MongoDB Atlas cluster URI
-
-### Environment Setup
-
-Create `server/.env`:
-```env
-MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/eventhive?retryWrites=true&w=majority
-JWT_SECRET=your_jwt_secret_key
-PORT=5000
-```
-
-### Installation
+**Prerequisites:** Node.js v14+, npm, MongoDB Atlas URI
 
 ```bash
-# Install server dependencies
+# Clone
+git clone https://github.com/Lokesh-916/EventHive.git
+cd EventHive
+
+# Install server deps
 cd server && npm install
 
-# Install client dependencies (Tailwind)
+# Install client deps (Tailwind)
 cd ../client && npm install
 ```
 
-### Running
+Create `server/.env`:
+```env
+MONGODB_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/eventhive
+JWT_SECRET=your_secret_key
+PORT=5000
+```
 
 ```bash
-# Terminal 1 — Start server (from root)
+# Run the server
 node server/server.js
 
-# Terminal 2 — Watch Tailwind (from client/)
+# In a separate terminal — watch Tailwind
 cd client && npm run dev
 ```
 
 Open `http://localhost:5000`
 
-### Seeding Data
-
 ```bash
-# Seed events and system organizer
+# Seed sample events and organizer data
 node server/seed.js
-
-# Seed analytics data (run after seed.js)
 node server/seed-analytics.js
 ```
 
-## License
+---
 
-All rights reserved © 2026 EventHive
+## Pages at a Glance
+
+| Route | Who | What |
+|---|---|---|
+| `/` | Public | Landing page |
+| `/home` | Volunteer | Event discovery feed |
+| `/event-info` | Volunteer | Event detail + enroll |
+| `/profile` | All | View / edit profile |
+| `/organiser-home` | Organizer | Offers, events, volunteers |
+| `/organiser` | Organizer | Dashboard + stats |
+| `/analytics` | Organizer | Charts, KPIs, deep dive |
+| `/create-event` | Organizer | Create / edit event |
+| `/client-home` | Client | Browse organizers, bookings |
+| `/report-incident` | All | Report an issue at an event |
+| `/all-events` | Public | Full event listing |
+
+---
+
+<div align="center">
+<sub>Built with focus. © 2026 EventHive — All rights reserved.</sub>
+</div>
