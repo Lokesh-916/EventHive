@@ -8,6 +8,7 @@ const BADGES = [
   {
     id: 'first_step',
     name: 'First Step',
+    icon: '🎖️',
     description: 'Awarded for completing your first volunteer event.',
     criterionLabel: 'Complete 1 event',
     svgPath: `<path fill="#026670" d="M14 6c0-2.21 1.79-4 4-4s4 1.79 4 4-1.79 4-4 4-4-1.79-4-4zm-4 14c0-2.21 1.79-4 4-4s4 1.79 4 4-1.79 4-4 4-4-1.79-4-4zm10 2c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2v-1c0-2.76 2.24-5 5-5h2c.34 0 .67.04 1 .1V14c0-2.76 2.24-5 5-5h1c1.1 0 2 .9 2 2v1c0 2.76-2.24 5-5 5h-.1c.06.33.1.66.1 1v1z"/>`,
@@ -15,6 +16,7 @@ const BADGES = [
   {
     id: 'team_player',
     name: 'Team Player',
+    icon: '🤝',
     description: 'Awarded for completing 5 volunteer events.',
     criterionLabel: 'Complete 5 events',
     svgPath: `<circle cx="16" cy="8" r="4" fill="#439093"/>
@@ -26,6 +28,7 @@ const BADGES = [
   {
     id: 'dedicated',
     name: 'Dedicated',
+    icon: '🛡️',
     description: 'Awarded for completing 10 volunteer events.',
     criterionLabel: 'Complete 10 events',
     svgPath: `<path fill="#026670" d="M16 2L4 7v9c0 6.08 5.14 11.74 12 13 6.86-1.26 12-6.92 12-13V7L16 2z"/>
@@ -34,6 +37,7 @@ const BADGES = [
   {
     id: 'centurion',
     name: 'Centurion',
+    icon: '⚔️',
     description: 'Awarded for reaching 100 XP.',
     criterionLabel: 'Reach 100 XP',
     svgPath: `<path fill="#D6843C" d="M16 2c-1.5 0-3 .5-4 1.5L9 6H7c-1.1 0-2 .9-2 2v2c0 3.5 2 6.5 5 8.2V20h8v-1.8c3-1.7 5-4.7 5-8.2V8c0-1.1-.9-2-2-2h-2l-3-2.5C15.5 2.2 15.75 2 16 2z"/>
@@ -45,6 +49,7 @@ const BADGES = [
   {
     id: 'rising_star',
     name: 'Rising Star',
+    icon: '⭐',
     description: 'Awarded for reaching 300 XP.',
     criterionLabel: 'Reach 300 XP',
     svgPath: `<polygon fill="#D6843C" points="16,3 19.5,12 29,12 21.5,17.5 24.5,27 16,21.5 7.5,27 10.5,17.5 3,12 12.5,12"/>
@@ -54,6 +59,7 @@ const BADGES = [
   {
     id: 'veteran',
     name: 'Veteran',
+    icon: '🏅',
     description: 'Awarded for reaching 600 XP.',
     criterionLabel: 'Reach 600 XP',
     svgPath: `<circle cx="16" cy="12" r="7" fill="#D6843C"/>
@@ -65,6 +71,7 @@ const BADGES = [
   {
     id: 'top_rated',
     name: 'Top Rated',
+    icon: '💎',
     description: 'Awarded for receiving 3 five-star ratings.',
     criterionLabel: 'Receive 3 five-star ratings',
     svgPath: `<path fill="#D6843C" d="M5 12h22v2c0 1.1-.9 2-2 2H7c-1.1 0-2-.9-2-2v-2z"/>
@@ -77,6 +84,7 @@ const BADGES = [
   {
     id: 'consistent',
     name: 'Consistent',
+    icon: '📅',
     description: 'Awarded for completing events across 3 different calendar months.',
     criterionLabel: 'Active across 3 months',
     svgPath: `<rect fill="#026670" x="3" y="5" width="26" height="22" rx="3"/>
@@ -92,6 +100,7 @@ const BADGES = [
   {
     id: 'legend',
     name: 'Legend',
+    icon: '👑',
     description: 'Awarded for reaching 2000 XP.',
     criterionLabel: 'Reach 2000 XP',
     svgPath: `<path fill="#D6843C" d="M16 2c0 0-2 4-2 8 0 1.5.5 3 1 4-1-.5-3-2-3-5 0 0-4 4-4 9 0 5.52 4.48 10 10 10s10-4.48 10-10c0-7-6-12-6-12-1 3-2 4-3 5 .5-1 1-2.5 1-4 0-3-4-5-4-5z"/>

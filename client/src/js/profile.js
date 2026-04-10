@@ -292,6 +292,16 @@ function buildVolunteerSections(p) {
     sectionWrap({ id:'vol-personal', icon: ICONS.info, title:'Personal Information', subtitle:'Your personal and contact details',  body: persBody   }),
     sectionWrap({ id:'vol-skills',   icon: ICONS.star, title:'Skills',               subtitle:'Your skills and proficiency (out of 5)', body: skillsBody }),
     sectionWrap({ id:'vol-avail',    icon: ICONS.cal,  title:'Weekly Availability',  subtitle:'Days and time slots you are free',  body: availBody  }),
+    `<div class="profile-section" id="section-vol-reputation">
+      <div class="section-header">
+        <div class="section-icon">${ICONS.star}</div>
+        <div class="section-title-wrap">
+          <h2>Reputation &amp; Badges</h2>
+          <p>Your standing on EventHive</p>
+        </div>
+      </div>
+      <div id="vol-reputation-body"><p class="field-value empty" style="padding:1rem 0;">Loading reputation…</p></div>
+    </div>`,
     `<div class="profile-section" id="section-vol-history">
       <div class="section-header">
         <div class="section-icon">${ICONS.cal}</div>
@@ -1097,10 +1107,9 @@ async function loadVolunteerHistory(token) {
     }
 
     // Load reputation badge section for volunteers
-    if (CURRENT_USER.role === 'volunteer' && typeof loadReputationSection === 'function') {
-      loadReputationSection(CURRENT_USER._id);
+    if (CURRENT_USER.role === 'volunteer') {
+      loadReputationSection(CURRENT_USER._id, token);
     }
-
     // Load event history for volunteers
     if (CURRENT_USER.role === 'volunteer' && !window._viewingOther) {
       loadVolunteerHistory(token);
@@ -1109,3 +1118,72 @@ async function loadVolunteerHistory(token) {
     renderError('Unable to connect to the server. Please try again later.');
   }
 })();
+
+// ====== REPUTATION SECTION ======
+async function loadReputationSection(userId, token) {
+  const container = document.getElementById('vol-reputation-body');
+  if (!container) return;
+
+  const RANK_ORDER = ['Newcomer', 'Rising Star', 'Reliable', 'Veteran', 'Elite', 'Legend'];
+  const RANK_XP    = { 'Newcomer': 0, 'Rising Star': 100, 'Reliable': 300, 'Veteran': 600, 'Elite': 1000, 'Legend': 2000 };
+
+  try {
+    const res = await fetch(`/api/reputation/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error('Failed to fetch reputation');
+    const d = await res.json();
+    if (!d.success) throw new Error('No reputation data');
+
+    const { xp = 0, rank = 'Newcomer', eventsCompleted = 0, badges = [] } = d.data;
+
+    // XP progress to next rank
+    const rankIdx  = RANK_ORDER.indexOf(rank);
+    const nextRank = RANK_ORDER[rankIdx + 1] || null;
+    const nextXp   = nextRank ? RANK_XP[nextRank] : null;
+    const curMin   = RANK_XP[rank] || 0;
+    const pct      = nextXp ? Math.min(100, Math.round(((xp - curMin) / (nextXp - curMin)) * 100)) : 100;
+
+    const progressHtml = nextRank
+      ? `<div style="margin-top:0.5rem;">
+          <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:0.3rem;color:var(--text-muted);">
+            <span>${rank}</span><span>${nextRank} at ${nextXp} XP</span>
+          </div>
+          <div style="height:6px;border-radius:9999px;background:var(--card-border);overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#026670,#439093);border-radius:9999px;transition:width 0.8s ease;"></div>
+          </div>
+        </div>`
+      : `<p style="font-size:0.7rem;color:var(--text-muted);margin-top:0.4rem;">Maximum rank achieved</p>`;
+
+    const badgesHtml = badges.length
+      ? badges.map(b => `
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;padding:0.75rem;border-radius:1rem;background:var(--article-bg);border:1px solid var(--article-border);min-width:80px;text-align:center;">
+            <span style="font-size:1.75rem;">${esc(b.icon || '★')}</span>
+            <span style="font-size:0.65rem;font-weight:700;color:var(--text-primary);">${esc(b.name)}</span>
+            <span style="font-size:0.6rem;color:var(--text-muted);">${b.awardedAt ? new Date(b.awardedAt).toLocaleDateString('en-IN',{month:'short',year:'numeric'}) : ''}</span>
+          </div>`).join('')
+      : `<p class="field-value empty">No badges earned yet — complete events to earn your first.</p>`;
+
+    container.innerHTML = `
+      <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+        <div style="text-align:center;">
+          <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.25rem;">Rank</div>
+          <div style="font-size:1.1rem;font-weight:800;color:#facc15;">${esc(rank)}</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.25rem;">XP</div>
+          <div style="font-size:1.1rem;font-weight:800;color:var(--text-primary);">${xp}</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.25rem;">Events Done</div>
+          <div style="font-size:1.1rem;font-weight:800;color:var(--text-primary);">${eventsCompleted}</div>
+        </div>
+        <div style="flex:1;min-width:160px;">${progressHtml}</div>
+      </div>
+      <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.75rem;">Badges</div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">${badgesHtml}</div>`;
+
+  } catch {
+    container.innerHTML = `<p class="field-value empty">Reputation data unavailable.</p>`;
+  }
+}

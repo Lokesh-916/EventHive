@@ -21,19 +21,36 @@ router.get('/:volunteerId', protect, async (req, res) => {
     );
 
     if (!user || user.role !== 'volunteer') {
-      return res.status(404).json({ message: 'Volunteer not found' });
+      return res.status(404).json({ success: false, message: 'Volunteer not found' });
     }
 
     const rep = user.reputation || {};
     const { xp = 0, rank = 'Newcomer', eventsCompleted = 0, badges = [] } = rep;
-    const response = {
-      xp, rank, eventsCompleted, badges,
-      fullName: user.profile?.fullName,
-      profilePic: user.profile?.profilePic,
-      skills: user.profile?.skills,
-    };
 
-    res.status(200).json(response);
+    // Enrich stored badge references with catalog data (name + icon)
+    const enrichedBadges = badges.map(b => {
+      const def = BADGES.find(c => c.id === b.badgeId);
+      return {
+        badgeId:   b.badgeId,
+        name:      def ? def.name        : b.badgeId,
+        icon:      def ? def.icon        : '★',
+        svgPath:   def ? def.svgPath     : null,
+        awardedAt: b.awardedAt,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        xp,
+        rank,
+        eventsCompleted,
+        badges: enrichedBadges,
+        fullName:   user.profile?.fullName,
+        profilePic: user.profile?.profilePic,
+        skills:     user.profile?.skills,
+      }
+    });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
