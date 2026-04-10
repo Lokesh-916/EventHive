@@ -2392,10 +2392,10 @@
 
 
 
-      const birdsEyeBtn = type !== 'past'
+      const liveOpsBtn = type !== 'past'
 
 
-        ? `<span onclick="event.preventDefault();event.stopPropagation();window.location.href='/event-overview?id=${eventId}'" style="display:inline-block;margin-top:0.5rem;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:0.25rem 0.7rem;border-radius:9999px;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.3);color:#c084fc;cursor:pointer;">Bird's Eye View</span>`
+        ? `<span onclick="event.preventDefault();event.stopPropagation();window.location.href='/event-overview?id=${eventId}'" style="display:inline-block;margin-top:0.5rem;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:0.25rem 0.7rem;border-radius:9999px;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.3);color:#c084fc;cursor:pointer;">LiveOps</span>`
 
 
         : '';
@@ -2425,7 +2425,7 @@
           ${tagChips ? `<div class="event-meta">${tagChips}</div>` : ''}
 
 
-          ${birdsEyeBtn}
+          ${liveOpsBtn}
 
 
         </a>`;

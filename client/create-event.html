@@ -324,6 +324,35 @@
         .btn-remove-role:hover {
             color: #ff6b6b;
         }
+
+        /* Schedule Item Card */
+        .schedule-item-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        .schedule-item-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .day-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .day-header {
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
     </style>
 </head>
 
@@ -352,10 +381,14 @@
             </div>
             <div class="step-node" data-step="3">
                 <div class="step-circle">3</div>
-                <div class="step-text">Volunteers</div>
+                <div class="step-text">Schedule</div>
             </div>
             <div class="step-node" data-step="4">
                 <div class="step-circle">4</div>
+                <div class="step-text">Volunteers</div>
+            </div>
+            <div class="step-node" data-step="5">
+                <div class="step-circle">5</div>
                 <div class="step-text">Media</div>
             </div>
         </div>
@@ -468,8 +501,27 @@
                 </div>
             </div>
 
-            <!-- Step 3: Volunteer Requirements -->
+            <!-- Step 3: Schedule -->
             <div class="step-pane" id="pane-3">
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold">Event Timetable</h3>
+                            <p class="text-xs text-white/40">Outline the activities for each day of your event.</p>
+                        </div>
+                    </div>
+                    
+                    <div id="schedule-days-container" class="space-y-8">
+                        <!-- Days will be dynamically injected here based on date range -->
+                        <div class="text-center py-10 border border-dashed border-white/10 rounded-2xl bg-white/5">
+                            <p class="text-sm opacity-50">Please set the Start and End dates in the "Location" step first.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Volunteer Requirements -->
+            <div class="step-pane" id="pane-4">
                 <div class="space-y-6">
 
                     <!-- Overall Volunteer Info -->
@@ -557,8 +609,8 @@
                 </div>
             </div>
 
-            <!-- Step 4: Media -->
-            <div class="step-pane" id="pane-4">
+            <!-- Step 5: Media -->
+            <div class="step-pane" id="pane-5">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="md:col-span-2">
                         <label class="eh-label">Event Banner</label>

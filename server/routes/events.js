@@ -18,6 +18,7 @@ router.post('/', protect, authorize('organizer'), upload.single('banner'), async
     if(req.body.volunteerRequirements) eventData.volunteerRequirements = JSON.parse(req.body.volunteerRequirements);
     if(req.body.volunteerRoles) eventData.volunteerRoles = JSON.parse(req.body.volunteerRoles);
     if(req.body.media) eventData.media = JSON.parse(req.body.media);
+    if(req.body.timetable) eventData.timetable = JSON.parse(req.body.timetable);
     
     if (req.file) {
       eventData.banner = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
@@ -111,6 +112,25 @@ router.patch('/:id/role-notes', protect, authorize('organizer'), async (req, res
     const role = event.volunteerRoles.find(r => r.roleId === roleId);
     if (!role) return res.status(404).json({ success: false, error: 'Role not found' });
     role.notes = notes;
+    await event.save();
+    res.status(200).json({ success: true, data: event });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// @route   PATCH /api/events/:id/timetable
+// @desc    Update event timetable (organizer only)
+// @access  Private (Organizer)
+router.patch('/:id/timetable', protect, authorize('organizer'), async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).json({ success: false, error: 'Event not found' });
+    if (event.organizerId.toString() !== req.user.id) {
+      return res.status(403).json({ success: false, error: 'Not authorized' });
+    }
+    
+    event.timetable = req.body.timetable;
     await event.save();
     res.status(200).json({ success: true, data: event });
   } catch (err) {
