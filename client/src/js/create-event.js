@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     let currentStep = 1;
-    const totalSteps = 4;
+    const totalSteps = 5;
 
     const panes = document.querySelectorAll('.step-pane');
     const nodes = document.querySelectorAll('.step-node');
@@ -105,6 +105,109 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Schedule / Timetable Logic ---
+    const scheduleDaysContainer = document.getElementById('schedule-days-container');
+    const eventStartInput = document.getElementById('event-start');
+    const eventEndInput = document.getElementById('event-end');
+
+    function updateScheduleDays() {
+        if (!scheduleDaysContainer) return;
+        
+        const start = new Date(eventStartInput.value);
+        const end = new Date(eventEndInput.value);
+
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            scheduleDaysContainer.innerHTML = `
+                <div class="text-center py-10 border border-dashed border-white/10 rounded-2xl bg-white/5">
+                    <p class="text-sm opacity-50">Please set the Start and End dates in the "Location" step first.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Calculate number of days
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
+        
+        // Ensure at least 1 day if start and end are on the same day but end > start
+        const totalDays = end.getDate() === start.getDate() && end.getMonth() === start.getMonth() && end.getFullYear() === start.getFullYear() ? 1 : diffDays + 1;
+
+        // I'll use a simpler 'totalDays' logic for now: difference in dates + 1
+        const startDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+        const endDay = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+        const daysCount = Math.round((endDay - startDay) / (1000 * 60 * 60 * 24)) + 1;
+
+        if (daysCount <= 0) {
+             scheduleDaysContainer.innerHTML = `
+                <div class="text-center py-10 border border-dashed border-white/10 rounded-2xl bg-white/5">
+                    <p class="text-sm opacity-50 text-red-400">End date must be after Start date.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Keep existing data if possible (simplified for now: just re-render)
+        scheduleDaysContainer.innerHTML = '';
+        
+        for (let i = 1; i <= daysCount; i++) {
+            const daySection = document.createElement('div');
+            daySection.className = 'day-section';
+            daySection.dataset.day = i;
+            daySection.innerHTML = `
+                <div class="day-header">
+                    <span class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center text-sm font-bold">${i}</span>
+                    <span>Day ${i} Schedule</span>
+                </div>
+                <div class="schedule-items-list space-y-4" id="day-${i}-items">
+                    <!-- Schedule items for this day -->
+                </div>
+                <button type="button" class="btn-add-role mt-4 w-full justify-center" onclick="addScheduleItem(${i})">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Activity
+                </button>
+            `;
+            scheduleDaysContainer.appendChild(daySection);
+            // Add initial item
+            addScheduleItem(i);
+        }
+    }
+
+    window.addScheduleItem = (day) => {
+        const container = document.getElementById(`day-${day}-items`);
+        if (!container) return;
+
+        const itemCard = document.createElement('div');
+        itemCard.className = 'schedule-item-card';
+        itemCard.innerHTML = `
+            <div class="flex items-start justify-between gap-4 mb-3">
+                <div class="grid grid-cols-2 gap-4 flex-1">
+                    <div>
+                        <label class="eh-label">Start Time</label>
+                        <input type="time" class="eh-input-dark item-start" placeholder="10:00 AM">
+                    </div>
+                    <div>
+                        <label class="eh-label">End Time</label>
+                        <input type="time" class="eh-input-dark item-end" placeholder="11:00 AM">
+                    </div>
+                </div>
+                <button type="button" class="btn-remove-role pt-6" onclick="this.closest('.schedule-item-card').remove()">&times;</button>
+            </div>
+            <div class="mb-3">
+                <input type="text" class="eh-input-dark item-title" placeholder="Activity Title (e.g. Keynote Speech)">
+            </div>
+            <div>
+                <textarea rows="2" class="eh-input-dark item-desc" placeholder="Brief description of the activity..."></textarea>
+            </div>
+        `;
+        container.appendChild(itemCard);
+    };
+
+    // Listen for date changes to update schedule days
+    eventStartInput?.addEventListener('change', updateScheduleDays);
+    eventEndInput?.addEventListener('change', updateScheduleDays);
+
     // Volunteer Role Add/Remove Logic
     let roleCount = 1;
     const rolesContainer = document.getElementById('volunteer-roles-container');
@@ -208,6 +311,26 @@ document.addEventListener('DOMContentLoaded', () => {
             socials
         };
         formData.append('media', JSON.stringify(media));
+        
+        // Timetable collection
+        const timetable = [];
+        document.querySelectorAll('.day-section').forEach(daySec => {
+            const day = daySec.dataset.day;
+            daySec.querySelectorAll('.schedule-item-card').forEach(itemCard => {
+                const title = itemCard.querySelector('.item-title')?.value;
+                if (title) {
+                    timetable.push({
+                        day: parseInt(day),
+                        startTime: itemCard.querySelector('.item-start')?.value,
+                        endTime: itemCard.querySelector('.item-end')?.value,
+                        title: title,
+                        description: itemCard.querySelector('.item-desc')?.value
+                    });
+                }
+            });
+        });
+        formData.append('timetable', JSON.stringify(timetable));
+
         formData.append('status', 'published');
 
         const token = localStorage.getItem('token');

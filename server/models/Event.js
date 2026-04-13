@@ -16,6 +16,14 @@ const eventSchema = new mongoose.Schema({
     timezone: String,
     applicationDeadline: Date
   },
+
+  timetable: [{
+    day: Number,
+    startTime: String,
+    endTime: String,
+    title: String,
+    description: String
+  }],
   
   location: {
     venueName: String,

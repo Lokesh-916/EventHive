@@ -374,6 +374,18 @@
         </div>
       </section>
 
+      <!-- MANAGE SCHEDULE -->
+      <section id="schedule" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-1" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="text-2xl font-bold font-['Satisfy']" style="color:var(--text-primary);">Manage Schedule</h2>
+          <button class="edit-mode-btn primary" onclick="saveTimetable()">Save Timetable</button>
+        </div>
+        
+        <div id="overview-schedule-container" class="space-y-8">
+           <!-- Dynamically filled -->
+        </div>
+      </section>
+
       <!-- PROGRESS TIMELINE -->
       <section class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-2" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
         <h2 class="text-2xl font-bold font-['Satisfy'] mb-8 text-center" style="color:var(--text-primary);">Event Progress</h2>
@@ -799,12 +811,104 @@
         // Render roles & volunteers
         renderRoles(event, applications);
         renderVolunteersTable(applications, roles);
+        renderTimetableEditor(event);
 
       } catch(err) {
         console.error(err);
         document.getElementById('loading-state').classList.add('hidden');
         document.getElementById('error-state').classList.remove('hidden');
       }
+    }
+
+    // ── Timetable Editor Logic ──
+    function renderTimetableEditor(event) {
+      const container = document.getElementById('overview-schedule-container');
+      const timetable = event.timetable || [];
+      const start = new Date(event.schedule?.start);
+      const end = new Date(event.schedule?.end);
+      
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        container.innerHTML = '<p class="text-sm italic text-center" style="color:var(--text-muted);">Please set event dates to manage schedule.</p>';
+        return;
+      }
+
+      const startDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+      const endDay = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+      const daysCount = Math.round((endDay - startDay) / (1000 * 60 * 60 * 24)) + 1;
+
+      container.innerHTML = '';
+      for (let i = 1; i <= daysCount; i++) {
+        const dayTimetable = timetable.filter(t => t.day === i);
+        const daySection = document.createElement('div');
+        daySection.className = 'day-section-overview';
+        daySection.innerHTML = `
+          <div class="flex items-center gap-3 mb-4">
+            <span class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold" style="color:var(--text-primary);">D${i}</span>
+            <h3 class="text-sm font-bold uppercase tracking-widest" style="color:var(--text-muted);">Day ${i}</h3>
+          </div>
+          <div id="day-editor-${i}" class="space-y-3 pl-4 border-l border-white/5 ml-4">
+             ${dayTimetable.map((item, idx) => createItemRowHtml(i, item)).join('')}
+             ${dayTimetable.length === 0 ? createItemRowHtml(i) : ''}
+          </div>
+          <button class="edit-mode-btn mt-4 ml-8" style="font-size:0.6rem;padding:0.4rem 0.8rem;" onclick="addItemRow(${i})">+ Add Activity</button>
+        `;
+        container.appendChild(daySection);
+      }
+    }
+
+    function createItemRowHtml(day, item = {}) {
+      return `
+        <div class="schedule-edit-row flex flex-col md:flex-row gap-3 p-4 rounded-xl border border-white/5 bg-white/5 relative group" data-day="${day}">
+           <div class="flex gap-2">
+             <input type="time" class="notes-input" style="min-height:unset;width:100px;" value="${item.startTime || ''}" placeholder="Start">
+             <input type="time" class="notes-input" style="min-height:unset;width:100px;" value="${item.endTime || ''}" placeholder="End">
+           </div>
+           <div class="flex-1">
+             <input type="text" class="notes-input mb-2" style="min-height:unset;" value="${item.title || ''}" placeholder="Activity Title">
+             <textarea class="notes-input" style="min-height:40px;font-size:0.75rem;" placeholder="Description">${item.description || ''}</textarea>
+           </div>
+           <button class="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity absolute top-2 right-2" onclick="this.closest('.schedule-edit-row').remove()">&times;</button>
+        </div>
+      `;
+    }
+
+    window.addItemRow = (day) => {
+      const container = document.getElementById(`day-editor-${day}`);
+      const div = document.createElement('div');
+      div.innerHTML = createItemRowHtml(day);
+      container.appendChild(div.firstElementChild);
+    };
+
+    async function saveTimetable() {
+      const timetable = [];
+      document.querySelectorAll('.schedule-edit-row').forEach(row => {
+        const day = parseInt(row.dataset.day);
+        const inputs = row.querySelectorAll('input, textarea');
+        const title = inputs[2].value;
+        if (title) {
+          timetable.push({
+            day,
+            startTime: inputs[0].value,
+            endTime: inputs[1].value,
+            title,
+            description: inputs[3].value
+          });
+        }
+      });
+
+      try {
+        const res = await fetch(`/api/events/${eventId}/timetable`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ timetable })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('Timetable saved successfully!');
+        } else {
+          alert(data.error || 'Failed to save');
+        }
+      } catch(e) { alert('Network error'); }
     }
 
     // ── Init ──

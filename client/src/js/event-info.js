@@ -204,6 +204,41 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <p class="text-white/60 text-sm leading-relaxed">${esc(ev.description || 'No description provided.')}</p>
                     </div>
 
+                    <!-- Event Schedule -->
+                    ${ev.timetable && ev.timetable.length > 0 ? `
+                    <div class="glass-card p-6 md:p-8 animate-in delay-2">
+                        <h2 class="text-lg font-bold mb-6 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Event Schedule
+                        </h2>
+                        <div class="space-y-8">
+                            ${[...new Set(ev.timetable.map(t => t.day))].sort((a,b) => a-b).map(dayNum => `
+                                <div class="day-group">
+                                    <h3 class="text-sm font-bold uppercase tracking-widest text-white/40 mb-4 flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] text-white">D${dayNum}</span>
+                                        Day ${dayNum}
+                                    </h3>
+                                    <div class="space-y-4 border-l-2 border-white/5 ml-3 pl-6">
+                                        ${ev.timetable.filter(t => t.day === dayNum).map(item => `
+                                            <div class="relative">
+                                                <div class="absolute -left-[31px] top-1.5 w-2 h-2 rounded-full bg-white/20"></div>
+                                                <div class="flex flex-col md:flex-row md:items-start gap-1 md:gap-4">
+                                                    <span class="text-[10px] font-bold text-white/30 whitespace-nowrap mt-0.5">${esc(item.startTime || '')} - ${esc(item.endTime || '')}</span>
+                                                    <div>
+                                                        <h4 class="text-sm font-bold text-white/80">${esc(item.title)}</h4>
+                                                        <p class="text-xs text-white/40 mt-1">${esc(item.description || '')}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>` : ''}
+
                     <!-- Date & Venue -->
                     <div class="glass-card p-6 md:p-8 animate-in delay-3">
                         <h2 class="text-lg font-bold mb-5 flex items-center gap-2">
