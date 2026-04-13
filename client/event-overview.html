@@ -1,185 +1,367 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Event Overview — EventHive</title>
-  <meta name="description" content="Bird's eye view of your event — track volunteers, status, and progress at a glance.">
-  <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
-  <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="src/styles/output.css">
-  <style>
-    :root {
-      --bg-overlay: rgba(255,255,255,0.72);
-      --section-bg: rgba(255,255,255,0.6);
-      --card-border: rgba(0,0,0,0.08);
-      --text-primary: #1a1a2e;
-      --text-secondary: rgba(20,20,40,0.6);
-      --text-muted: rgba(20,20,40,0.4);
-      --nav-bg: rgba(255,255,255,0.65);
-      --nav-border: rgba(0,0,0,0.08);
-      --article-bg: rgba(255,255,255,0.5);
-      --article-border: rgba(0,0,0,0.06);
-      --shadow: 0 8px 32px rgba(0,0,0,0.1);
-      --dropdown-bg: rgba(255,255,255,0.92);
-      --dropdown-border: rgba(0,0,0,0.1);
-      --dropdown-hover: rgba(0,0,0,0.05);
-      --footer-text: rgba(20,20,40,0.4);
-      --input-bg: rgba(255,255,255,0.5);
-    }
-    [data-theme="dark"] {
-      --bg-overlay: rgba(10,15,20,0.80);
-      --section-bg: rgba(10,15,20,0.85);
-      --card-border: rgba(255,255,255,0.08);
-      --text-primary: #ffffff;
-      --text-secondary: rgba(255,255,255,0.6);
-      --text-muted: rgba(255,255,255,0.4);
-      --nav-bg: rgba(15,15,35,0.65);
-      --nav-border: rgba(255,255,255,0.12);
-      --article-bg: rgba(255,255,255,0.05);
-      --article-border: rgba(255,255,255,0.08);
-      --shadow: 0 20px 50px rgba(0,0,0,0.6);
-      --dropdown-bg: rgba(20,25,35,0.96);
-      --dropdown-border: rgba(255,255,255,0.12);
-      --dropdown-hover: rgba(255,255,255,0.08);
-      --footer-text: rgba(255,255,255,0.4);
-      --input-bg: rgba(255,255,255,0.06);
-    }
-
-    /* Profile */
-    .profile-wrapper { position: relative; }
-    .profile-avatar {
-      width: 40px; height: 40px; border-radius: 50%;
-      border: 2px solid var(--card-border); cursor: pointer;
-      background: var(--article-bg);
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    .profile-avatar:hover { border-color: var(--text-primary); box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
-    .profile-avatar svg, .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .profile-dropdown {
-      position: absolute; top: calc(100% + 12px); right: 0; min-width: 200px;
-      background: var(--dropdown-bg); border: 1px solid var(--dropdown-border);
-      border-radius: 1rem; box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-      backdrop-filter: blur(20px); padding: 0.5rem;
-      opacity: 0; pointer-events: none; transform: translateY(-8px);
-      transition: opacity 0.2s ease, transform 0.2s ease; z-index: 100;
-    }
-    .profile-dropdown.open { opacity: 1; pointer-events: all; transform: translateY(0); }
-    .dropdown-header { padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--dropdown-border); margin-bottom: 0.4rem; }
-    .dropdown-header p { margin: 0; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); }
-    .dropdown-header span { font-size: 0.65rem; color: var(--text-muted); }
-    .dropdown-item {
-      display: flex; align-items: center; gap: 0.65rem;
-      padding: 0.6rem 0.85rem; border-radius: 0.6rem;
-      font-size: 0.8rem; color: var(--text-primary); cursor: pointer;
-      transition: background 0.2s; text-decoration: none; user-select: none;
-    }
-    .dropdown-item:hover { background: var(--dropdown-hover); }
-    .dropdown-item svg { flex-shrink: 0; opacity: 0.6; }
-    .dropdown-item.danger { color: #e53e3e; }
-    .theme-toggle-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.5rem 0.85rem; border-radius: 0.6rem; cursor: pointer; transition: background 0.2s;
-    }
-    .theme-toggle-row:hover { background: var(--dropdown-hover); }
-    .theme-toggle-label { display: flex; align-items: center; gap: 0.65rem; font-size: 0.8rem; color: var(--text-primary); }
-    .theme-toggle-label svg { opacity: 0.6; }
-    .toggle-switch { position: relative; width: 36px; height: 20px; }
-    .toggle-switch input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider { position: absolute; inset: 0; border-radius: 20px; background: rgba(0,0,0,0.15); transition: background 0.3s; cursor: pointer; }
-    .toggle-slider:before { content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--text-primary); top: 3px; left: 3px; transition: transform 0.3s; }
-    input:checked + .toggle-slider { background: rgba(0,0,0,0.35); }
-    input:checked + .toggle-slider:before { transform: translateX(16px); }
-
-    /* Timeline */
-    .timeline { display: flex; align-items: center; gap: 0; width: 100%; }
-    .timeline-step {
-      flex: 1; display: flex; flex-direction: column; align-items: center; position: relative;
-    }
-    .timeline-step::before {
-      content: '';
-      position: absolute; top: 18px; left: -50%; right: 50%;
-      height: 3px; background: var(--card-border); z-index: 0;
-    }
-    .timeline-step:first-child::before { display: none; }
-    .timeline-step.active::before { background: linear-gradient(90deg, #3b82f6, #06b6d4); }
-    .timeline-step.completed::before { background: #10b981; }
-    .timeline-dot {
-      width: 36px; height: 36px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.8rem; font-weight: 700; z-index: 1;
-      border: 2px solid var(--card-border);
-      background: var(--article-bg); color: var(--text-muted);
-      transition: all 0.3s;
-    }
-    .timeline-step.active .timeline-dot {
-      border-color: #3b82f6; background: rgba(59,130,246,0.2); color: #60a5fa;
-      box-shadow: 0 0 20px rgba(59,130,246,0.3);
-    }
-    .timeline-step.completed .timeline-dot {
-      border-color: #10b981; background: rgba(16,185,129,0.2); color: #34d399;
-    }
-    .timeline-label {
-      margin-top: 0.5rem; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em;
-      font-weight: 700; color: var(--text-muted);
-    }
-    .timeline-step.active .timeline-label { color: #60a5fa; }
-    .timeline-step.completed .timeline-label { color: #34d399; }
-
-    /* Role card */
-    .role-card {
-      background: var(--article-bg); border: 1px solid var(--article-border);
-      border-radius: 1.25rem; padding: 1.5rem;
-      transition: background 0.2s, transform 0.3s, box-shadow 0.2s;
-    }
-    .role-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
-
-    /* Volunteer chip */
-    .vol-chip {
-      display: flex; align-items: center; gap: 0.75rem;
-      padding: 0.65rem 0.85rem; border-radius: 0.85rem;
-      background: var(--section-bg); border: 1px solid var(--card-border);
-      transition: background 0.2s;
-    }
-    .vol-chip:hover { background: var(--dropdown-hover); }
-    .vol-avatar {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: linear-gradient(135deg, #6366f1, #06b6d4);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.7rem; font-weight: 700; color: #fff; flex-shrink: 0;
-      overflow: hidden;
-    }
-    .vol-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-
-    /* Status badges */
-    .status-badge {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      padding: 0.35rem 0.9rem; border-radius: 9999px;
-      font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
-    }
-    .status-draft { background: rgba(107,114,128,0.15); color: #9ca3af; border: 1px solid rgba(107,114,128,0.3); }
-    .status-published { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
-    .status-ongoing { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
-    .status-completed { background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.3); }
-    .status-cancelled { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
-
-    /* Loading skeleton */
-    @keyframes shimmer { 0%{background-position:200% 0}100%{background-position:-200% 0} }
-    .skeleton {
-      background: linear-gradient(90deg, var(--article-bg) 25%, var(--card-border) 50%, var(--article-bg) 75%);
-      background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 1rem;
-    }
-
-    /* Organizer edit controls */
-    .edit-mode-btn {
-      padding: 0.5rem 1.2rem; font-size: 0.7rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.08em;
-      border: 1px solid var(--card-border); border-radius: 0.75rem;
-      cursor: pointer; transition: all 0.2s;
-      background: var(--article-bg); color: var(--text-primary);
-    }
+<!DOCTYPE html>
+
+<html lang="en" data-theme="dark">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Event Overview — EventHive</title>
+
+  <meta name="description" content="Bird's eye view of your event — track volunteers, status, and progress at a glance.">
+
+  <link rel="icon" type="image/svg" href="public/assets/images/logo-colored.svg?v=2">
+
+  <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="src/styles/output.css">
+
+  <style>
+
+    :root {
+
+      --bg-overlay: rgba(255,255,255,0.72);
+
+      --section-bg: rgba(255,255,255,0.6);
+
+      --card-border: rgba(0,0,0,0.08);
+
+      --text-primary: #1a1a2e;
+
+      --text-secondary: rgba(20,20,40,0.6);
+
+      --text-muted: rgba(20,20,40,0.4);
+
+      --nav-bg: rgba(255,255,255,0.65);
+
+      --nav-border: rgba(0,0,0,0.08);
+
+      --article-bg: rgba(255,255,255,0.5);
+
+      --article-border: rgba(0,0,0,0.06);
+
+      --shadow: 0 8px 32px rgba(0,0,0,0.1);
+
+      --dropdown-bg: rgba(255,255,255,0.92);
+
+      --dropdown-border: rgba(0,0,0,0.1);
+
+      --dropdown-hover: rgba(0,0,0,0.05);
+
+      --footer-text: rgba(20,20,40,0.4);
+
+      --input-bg: rgba(255,255,255,0.5);
+
+    }
+
+    [data-theme="dark"] {
+
+      --bg-overlay: rgba(10,15,20,0.80);
+
+      --section-bg: rgba(10,15,20,0.85);
+
+      --card-border: rgba(255,255,255,0.08);
+
+      --text-primary: #ffffff;
+
+      --text-secondary: rgba(255,255,255,0.6);
+
+      --text-muted: rgba(255,255,255,0.4);
+
+      --nav-bg: rgba(15,15,35,0.65);
+
+      --nav-border: rgba(255,255,255,0.12);
+
+      --article-bg: rgba(255,255,255,0.05);
+
+      --article-border: rgba(255,255,255,0.08);
+
+      --shadow: 0 20px 50px rgba(0,0,0,0.6);
+
+      --dropdown-bg: rgba(20,25,35,0.96);
+
+      --dropdown-border: rgba(255,255,255,0.12);
+
+      --dropdown-hover: rgba(255,255,255,0.08);
+
+      --footer-text: rgba(255,255,255,0.4);
+
+      --input-bg: rgba(255,255,255,0.06);
+
+    }
+
+
+
+    /* Profile */
+
+    .profile-wrapper { position: relative; }
+
+    .profile-avatar {
+
+      width: 40px; height: 40px; border-radius: 50%;
+
+      border: 2px solid var(--card-border); cursor: pointer;
+
+      background: var(--article-bg);
+
+      display: flex; align-items: center; justify-content: center;
+
+      overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s;
+
+    }
+
+    .profile-avatar:hover { border-color: var(--text-primary); box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
+
+    .profile-avatar svg, .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .profile-dropdown {
+
+      position: absolute; top: calc(100% + 12px); right: 0; min-width: 200px;
+
+      background: var(--dropdown-bg); border: 1px solid var(--dropdown-border);
+
+      border-radius: 1rem; box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+
+      backdrop-filter: blur(20px); padding: 0.5rem;
+
+      opacity: 0; pointer-events: none; transform: translateY(-8px);
+
+      transition: opacity 0.2s ease, transform 0.2s ease; z-index: 100;
+
+    }
+
+    .profile-dropdown.open { opacity: 1; pointer-events: all; transform: translateY(0); }
+
+    .dropdown-header { padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--dropdown-border); margin-bottom: 0.4rem; }
+
+    .dropdown-header p { margin: 0; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); }
+
+    .dropdown-header span { font-size: 0.65rem; color: var(--text-muted); }
+
+    .dropdown-item {
+
+      display: flex; align-items: center; gap: 0.65rem;
+
+      padding: 0.6rem 0.85rem; border-radius: 0.6rem;
+
+      font-size: 0.8rem; color: var(--text-primary); cursor: pointer;
+
+      transition: background 0.2s; text-decoration: none; user-select: none;
+
+    }
+
+    .dropdown-item:hover { background: var(--dropdown-hover); }
+
+    .dropdown-item svg { flex-shrink: 0; opacity: 0.6; }
+
+    .dropdown-item.danger { color: #e53e3e; }
+
+    .theme-toggle-row {
+
+      display: flex; align-items: center; justify-content: space-between;
+
+      padding: 0.5rem 0.85rem; border-radius: 0.6rem; cursor: pointer; transition: background 0.2s;
+
+    }
+
+    .theme-toggle-row:hover { background: var(--dropdown-hover); }
+
+    .theme-toggle-label { display: flex; align-items: center; gap: 0.65rem; font-size: 0.8rem; color: var(--text-primary); }
+
+    .theme-toggle-label svg { opacity: 0.6; }
+
+    .toggle-switch { position: relative; width: 36px; height: 20px; }
+
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+    .toggle-slider { position: absolute; inset: 0; border-radius: 20px; background: rgba(0,0,0,0.15); transition: background 0.3s; cursor: pointer; }
+
+    .toggle-slider:before { content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--text-primary); top: 3px; left: 3px; transition: transform 0.3s; }
+
+    input:checked + .toggle-slider { background: rgba(0,0,0,0.35); }
+
+    input:checked + .toggle-slider:before { transform: translateX(16px); }
+
+
+
+    /* Timeline */
+
+    .timeline { display: flex; align-items: center; gap: 0; width: 100%; }
+
+    .timeline-step {
+
+      flex: 1; display: flex; flex-direction: column; align-items: center; position: relative;
+
+    }
+
+    .timeline-step::before {
+
+      content: '';
+
+      position: absolute; top: 18px; left: -50%; right: 50%;
+
+      height: 3px; background: var(--card-border); z-index: 0;
+
+    }
+
+    .timeline-step:first-child::before { display: none; }
+
+    .timeline-step.active::before { background: linear-gradient(90deg, #3b82f6, #06b6d4); }
+
+    .timeline-step.completed::before { background: #10b981; }
+
+    .timeline-dot {
+
+      width: 36px; height: 36px; border-radius: 50%;
+
+      display: flex; align-items: center; justify-content: center;
+
+      font-size: 0.8rem; font-weight: 700; z-index: 1;
+
+      border: 2px solid var(--card-border);
+
+      background: var(--article-bg); color: var(--text-muted);
+
+      transition: all 0.3s;
+
+    }
+
+    .timeline-step.active .timeline-dot {
+
+      border-color: #3b82f6; background: rgba(59,130,246,0.2); color: #60a5fa;
+
+      box-shadow: 0 0 20px rgba(59,130,246,0.3);
+
+    }
+
+    .timeline-step.completed .timeline-dot {
+
+      border-color: #10b981; background: rgba(16,185,129,0.2); color: #34d399;
+
+    }
+
+    .timeline-label {
+
+      margin-top: 0.5rem; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em;
+
+      font-weight: 700; color: var(--text-muted);
+
+    }
+
+    .timeline-step.active .timeline-label { color: #60a5fa; }
+
+    .timeline-step.completed .timeline-label { color: #34d399; }
+
+
+
+    /* Role card */
+
+    .role-card {
+
+      background: var(--article-bg); border: 1px solid var(--article-border);
+
+      border-radius: 1.25rem; padding: 1.5rem;
+
+      transition: background 0.2s, transform 0.3s, box-shadow 0.2s;
+
+    }
+
+    .role-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+
+
+
+    /* Volunteer chip */
+
+    .vol-chip {
+
+      display: flex; align-items: center; gap: 0.75rem;
+
+      padding: 0.65rem 0.85rem; border-radius: 0.85rem;
+
+      background: var(--section-bg); border: 1px solid var(--card-border);
+
+      transition: background 0.2s;
+
+    }
+
+    .vol-chip:hover { background: var(--dropdown-hover); }
+
+    .vol-avatar {
+
+      width: 34px; height: 34px; border-radius: 50%;
+
+      background: linear-gradient(135deg, #6366f1, #06b6d4);
+
+      display: flex; align-items: center; justify-content: center;
+
+      font-size: 0.7rem; font-weight: 700; color: #fff; flex-shrink: 0;
+
+      overflow: hidden;
+
+    }
+
+    .vol-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+
+
+    /* Status badges */
+
+    .status-badge {
+
+      display: inline-flex; align-items: center; gap: 0.4rem;
+
+      padding: 0.35rem 0.9rem; border-radius: 9999px;
+
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+
+    }
+
+    .status-draft { background: rgba(107,114,128,0.15); color: #9ca3af; border: 1px solid rgba(107,114,128,0.3); }
+
+    .status-published { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+
+    .status-ongoing { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+
+    .status-completed { background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.3); }
+
+    .status-cancelled { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+
+
+
+    /* Loading skeleton */
+
+    @keyframes shimmer { 0%{background-position:200% 0}100%{background-position:-200% 0} }
+
+    .skeleton {
+
+      background: linear-gradient(90deg, var(--article-bg) 25%, var(--card-border) 50%, var(--article-bg) 75%);
+
+      background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 1rem;
+
+    }
+
+
+
+    /* Organizer edit controls */
+
+    .edit-mode-btn {
+
+      padding: 0.5rem 1.2rem; font-size: 0.7rem; font-weight: 700;
+
+      text-transform: uppercase; letter-spacing: 0.08em;
+
+      border: 1px solid var(--card-border); border-radius: 0.75rem;
+
+      cursor: pointer; transition: all 0.2s;
+
+      background: var(--article-bg); color: var(--text-primary);
+
+    }
+
     .edit-mode-btn:hover { background: var(--dropdown-hover); }
     select.edit-mode-btn {
       appearance: none; -webkit-appearance: none;
@@ -187,638 +369,2264 @@
       background-repeat: no-repeat; background-position: right 0.75rem center;
       padding-right: 2rem; color-scheme: dark; cursor: pointer;
     }
-    select.edit-mode-btn option { background: #1a1f2e; color: #ffffff; }
-    .edit-mode-btn.primary {
-      background: rgba(59,130,246,0.2); border-color: rgba(59,130,246,0.3); color: #60a5fa;
-    }
-    .edit-mode-btn.primary:hover { background: rgba(59,130,246,0.35); }
-    .edit-mode-btn.success {
-      background: rgba(16,185,129,0.2); border-color: rgba(16,185,129,0.3); color: #34d399;
-    }
-    .edit-mode-btn.success:hover { background: rgba(16,185,129,0.35); }
-    .edit-mode-btn.danger {
-      background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.3); color: #f87171;
-    }
-    .edit-mode-btn.danger:hover { background: rgba(239,68,68,0.35); }
-
-    /* Role notes input */
-    .notes-input {
-      width: 100%; padding: 0.6rem 0.85rem; font-size: 0.8rem;
-      border: 1px solid var(--card-border); border-radius: 0.75rem;
-      background: var(--input-bg); color: var(--text-primary);
-      resize: vertical; min-height: 60px; font-family: 'Inter', sans-serif;
-      transition: border-color 0.2s;
-    }
-    .notes-input:focus { outline: none; border-color: rgba(59,130,246,0.5); }
-
-    /* Section entrance */
-    @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
-    .fade-up { animation: fadeUp 0.5s ease-out both; }
-    .fade-up-1 { animation-delay: 0.05s; }
-    .fade-up-2 { animation-delay: 0.15s; }
-    .fade-up-3 { animation-delay: 0.25s; }
-    .fade-up-4 { animation-delay: 0.35s; }
-
-    /* Breadcrumb */
-    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--text-muted); }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
-    .breadcrumb a:hover { color: var(--text-primary); }
-    .breadcrumb svg { width: 12px; height: 12px; opacity: 0.4; }
-  </style>
-</head>
-<body class="font-['Inter'] min-h-screen relative overflow-x-hidden" style="color:var(--text-primary);">
-
-  <!-- Background -->
-  <div class="fixed inset-0 z-[-2]">
-    <img id="bgImage" src="public/images/dark.avif" alt="Background" class="w-full h-full object-cover">
-  </div>
-  <div class="bg-overlay" style="position:fixed;inset:0;z-index:-1;background:var(--bg-overlay);transition:background 0.4s ease;"></div>
-
-  <!-- NAVBAR -->
-  <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center backdrop-blur-[18px] rounded-[50px] z-50 border shadow-[0_18px_40px_rgba(0,0,0,0.5)]" style="background:var(--nav-bg);border-color:var(--nav-border);">
-    <div class="font-bold text-2xl font-['Satisfy'] cursor-pointer" style="color:var(--text-primary);" id="navLogo">
-      Event<span>Hive</span>
-    </div>
-    <ul class="flex gap-6 list-none m-0 p-0">
-      <li><a href="#overview" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Overview<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-      <li><a href="#roles" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Roles<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-      <li><a href="#volunteers" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Volunteers<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
-    </ul>
-    <div class="flex gap-4 items-center">
-      <li class="profile-wrapper" style="list-style:none;">
-        <div class="profile-avatar" id="profileAvatarBtn" title="Account options">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);">
-            <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/>
-          </svg>
-        </div>
-        <div class="profile-dropdown" id="profileDropdown">
-          <div class="dropdown-header">
-            <p id="dropdownName">User</p>
-            <span id="dropdownRole">—</span>
-          </div>
-          <div class="theme-toggle-row">
-            <div class="theme-toggle-label">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-              </svg>
-              Dark Mode
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" id="themeToggle" checked>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <a class="dropdown-item" id="homeLink" href="/home">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            Home
-          </a>
-          <div class="dropdown-item danger" id="logoutBtn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-            Logout
-          </div>
-        </div>
-      </li>
-    </div>
-  </nav>
-
-  <main class="w-[90%] max-w-6xl mx-auto my-10 relative z-10 flex flex-col gap-10 pb-20">
-
-    <!-- Breadcrumb -->
-    <div class="breadcrumb fade-up fade-up-1" id="breadcrumb">
-      <a href="/home">Home</a>
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-      <span id="breadcrumb-title" style="color:var(--text-primary);">Event Overview</span>
-    </div>
-
-    <!-- Loading State -->
-    <div id="loading-state" class="flex flex-col gap-6">
-      <div class="skeleton" style="height:280px;"></div>
-      <div class="skeleton" style="height:160px;"></div>
-      <div class="skeleton" style="height:300px;"></div>
-    </div>
-
-    <!-- Error State -->
-    <div id="error-state" class="hidden text-center py-20">
-      <p class="text-4xl mb-4">😕</p>
-      <h2 class="text-xl font-bold mb-2" style="color:var(--text-primary);">Event Not Found</h2>
-      <p class="text-sm mb-6" style="color:var(--text-muted);">The event you're looking for doesn't exist or has been removed.</p>
-      <a href="/home" class="edit-mode-btn primary">Back to Home</a>
-    </div>
-
-    <!-- Main Content (hidden until loaded) -->
-    <div id="main-content" class="hidden flex flex-col gap-10">
-
-      <!-- HERO / Overview Section -->
-      <section id="overview" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-1" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-        <div class="flex flex-col lg:flex-row gap-8">
-          <!-- Event Banner -->
-          <div id="event-banner-wrap" class="lg:w-[320px] flex-shrink-0 rounded-[1.5rem] overflow-hidden" style="background:var(--article-bg);border:1px solid var(--article-border);">
-            <div id="event-banner" class="w-full h-[200px] lg:h-full flex items-center justify-center" style="color:var(--text-muted);">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            </div>
-          </div>
-
-          <!-- Event Info -->
-          <div class="flex-1">
-            <div class="flex flex-wrap items-center gap-3 mb-3">
-              <h1 id="event-title" class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">—</h1>
-              <span id="event-status-badge" class="status-badge status-draft">Draft</span>
-            </div>
-            <p id="event-tagline" class="text-sm mb-4" style="color:var(--text-secondary);"></p>
-            <p id="event-description" class="text-sm mb-6 leading-relaxed" style="color:var(--text-muted);"></p>
-
-            <!-- Meta Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div class="rounded-xl p-3 border" style="background:var(--article-bg);border-color:var(--article-border);">
-                <p class="text-xs uppercase tracking-widest font-bold mb-1" style="color:var(--text-muted);">Date</p>
-                <p id="event-date" class="text-sm font-bold" style="color:var(--text-primary);">—</p>
-              </div>
-              <div class="rounded-xl p-3 border" style="background:var(--article-bg);border-color:var(--article-border);">
-                <p class="text-xs uppercase tracking-widest font-bold mb-1" style="color:var(--text-muted);">Location</p>
-                <p id="event-location" class="text-sm font-bold" style="color:var(--text-primary);">—</p>
-              </div>
-              <div class="rounded-xl p-3 border" style="background:var(--article-bg);border-color:var(--article-border);">
-                <p class="text-xs uppercase tracking-widest font-bold mb-1" style="color:var(--text-muted);">Type</p>
-                <p id="event-type" class="text-sm font-bold" style="color:var(--text-primary);">—</p>
-              </div>
-              <div class="rounded-xl p-3 border" style="background:var(--article-bg);border-color:var(--article-border);">
-                <p class="text-xs uppercase tracking-widest font-bold mb-1" style="color:var(--text-muted);">Organizer</p>
-                <p id="event-organizer" class="text-sm font-bold" style="color:var(--text-primary);">—</p>
-              </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex flex-wrap gap-3 mt-4">
-              <div id="organizer-controls" class="hidden flex flex-wrap gap-3">
-                <select id="status-select" class="edit-mode-btn" style="background:var(--input-bg);">
-                  <option value="draft">Draft</option>
-                  <option value="published">Published</option>
-                  <option value="ongoing">Ongoing</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-                <button id="update-status-btn" class="edit-mode-btn primary" onclick="updateEventStatus()">Update Status</button>
-                <a id="edit-event-btn" class="edit-mode-btn" href="#">Edit Event</a>
-                <a id="manage-event-btn" class="edit-mode-btn" href="#">Manage Dashboard</a>
-              </div>
-              
-              <a id="report-incident-btn" class="edit-mode-btn danger flex items-center gap-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                Report Issue
-              </a>
-
-              <div id="viewer-badge" class="hidden">
-                <span class="text-xs uppercase tracking-widest font-bold px-3 py-1 rounded-full border" style="background:var(--article-bg);border-color:var(--article-border);color:var(--text-muted);">
-                  👁 View Only
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- PROGRESS TIMELINE -->
-      <section class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-2" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-        <h2 class="text-2xl font-bold font-['Satisfy'] mb-8 text-center" style="color:var(--text-primary);">Event Progress</h2>
-        <div class="timeline" id="event-timeline">
-          <div class="timeline-step" id="step-draft">
-            <div class="timeline-dot">1</div>
-            <span class="timeline-label">Draft</span>
-          </div>
-          <div class="timeline-step" id="step-published">
-            <div class="timeline-dot">2</div>
-            <span class="timeline-label">Published</span>
-          </div>
-          <div class="timeline-step" id="step-ongoing">
-            <div class="timeline-dot">3</div>
-            <span class="timeline-label">Live</span>
-          </div>
-          <div class="timeline-step" id="step-completed">
-            <div class="timeline-dot">4</div>
-            <span class="timeline-label">Completed</span>
-          </div>
-        </div>
-        <!-- Summary Stats -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-          <div class="text-center rounded-xl p-4 border" style="background:var(--article-bg);border-color:var(--article-border);">
-            <p id="stat-total-roles" class="text-2xl font-bold" style="color:var(--text-primary);">0</p>
-            <p class="text-xs uppercase tracking-widest font-bold" style="color:var(--text-muted);">Roles</p>
-          </div>
-          <div class="text-center rounded-xl p-4 border" style="background:var(--article-bg);border-color:var(--article-border);">
-            <p id="stat-needed" class="text-2xl font-bold" style="color:var(--text-primary);">0</p>
-            <p class="text-xs uppercase tracking-widest font-bold" style="color:var(--text-muted);">Slots Needed</p>
-          </div>
-          <div class="text-center rounded-xl p-4 border" style="background:var(--article-bg);border-color:var(--article-border);">
-            <p id="stat-approved" class="text-2xl font-bold text-green-400">0</p>
-            <p class="text-xs uppercase tracking-widest font-bold" style="color:var(--text-muted);">Approved</p>
-          </div>
-          <div class="text-center rounded-xl p-4 border" style="background:var(--article-bg);border-color:var(--article-border);">
-            <p id="stat-pending" class="text-2xl font-bold text-yellow-400">0</p>
-            <p class="text-xs uppercase tracking-widest font-bold" style="color:var(--text-muted);">Pending</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- ROLES BREAKDOWN -->
-      <section id="roles" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-3" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-        <h2 class="text-2xl font-bold font-['Satisfy'] mb-2 text-center" style="color:var(--text-primary);">Volunteer Roles & Assignments</h2>
-        <p class="text-sm text-center mb-8" style="color:var(--text-secondary);">Each role shows the volunteers currently assigned from the database.</p>
-        <div id="roles-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-        <div id="roles-empty" class="hidden text-center py-10 italic" style="color:var(--text-muted);">No volunteer roles defined for this event.</div>
-      </section>
-
-      <!-- ALL VOLUNTEERS TABLE -->
-      <section id="volunteers" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-4" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
-        <h2 class="text-2xl font-bold font-['Satisfy'] mb-2 text-center" style="color:var(--text-primary);">All Volunteers</h2>
-        <p class="text-sm text-center mb-8" style="color:var(--text-secondary);">Complete list of all volunteer applications for this event.</p>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm whitespace-nowrap">
-            <thead class="uppercase tracking-wider text-xs font-bold border-b" style="color:var(--text-muted);border-color:var(--card-border);">
-              <tr>
-                <th class="px-4 py-4">Volunteer</th>
-                <th class="px-4 py-4">Role</th>
-                <th class="px-4 py-4">Skills</th>
-                <th class="px-4 py-4">Status</th>
-                <th class="px-4 py-4">Applied</th>
-              </tr>
-            </thead>
-            <tbody id="volunteers-table" style="color:var(--text-secondary);"></tbody>
-          </table>
-        </div>
-        <div id="volunteers-empty" class="hidden text-center py-10 italic" style="color:var(--text-muted);">No volunteer applications for this event yet.</div>
-      </section>
-
-    </div>
-  </main>
-
-  <footer class="mt-auto py-8 text-center text-sm" style="color:var(--footer-text);">
-    <p>&copy; 2026 EventHive. All rights reserved.</p>
-  </footer>
-
-  <script>
-    const token = localStorage.getItem('token');
-    const urlParams = new URLSearchParams(window.location.search);
-    const eventId = urlParams.get('id');
-    let currentUserRole = null;
-    let currentUserId = null;
-    let isOrganizer = false;
-    let eventData = null;
-
-    // ── Theme ──
-    const bgImage = document.getElementById('bgImage');
-    const themeToggle = document.getElementById('themeToggle');
-    function applyTheme(dark) {
-      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-      bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
-      themeToggle.checked = dark;
-      localStorage.setItem('theme', dark ? 'dark' : 'light');
-    }
-    applyTheme(localStorage.getItem('theme') !== 'light');
-    themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
-
-    // ── Profile Dropdown ──
-    const avatarBtn = document.getElementById('profileAvatarBtn');
-    const dropdown = document.getElementById('profileDropdown');
-    avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('open'); });
-    document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target) && e.target !== avatarBtn) dropdown.classList.remove('open');
-    });
-
-    // ── Logout ──
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('token'); localStorage.removeItem('user');
-      window.location.href = '/';
-    });
-
-    // ── Load user profile ──
-    async function loadUserProfile() {
-      if (!token) return;
-      try {
-        const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!data.success) return;
-        const u = data.data;
-        currentUserRole = u.role;
-        currentUserId = u._id;
-        const displayName = u.profile?.fullName || u.profile?.name || u.profile?.orgName || u.profile?.clientName || u.username;
-        if (displayName) document.getElementById('dropdownName').textContent = displayName;
-        const roleLabel = u.role ? u.role.charAt(0).toUpperCase() + u.role.slice(1) : '—';
-        document.getElementById('dropdownRole').textContent = roleLabel;
-
-        // Update home link based on role
-        const homeLink = document.getElementById('homeLink');
-        if (u.role === 'organizer') homeLink.href = '/organiser-home';
-        else if (u.role === 'client') homeLink.href = '/client-home';
-        else homeLink.href = '/home';
-
-        // NavLogo link
-        document.getElementById('navLogo').onclick = () => window.location.href = homeLink.href;
-
-        // Profile pic
-        const pic = u.profile?.profilePic;
-        if (pic) {
-          const img = document.createElement('img');
-          img.src = pic; img.alt = 'Profile';
-          img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
-          avatarBtn.innerHTML = ''; avatarBtn.appendChild(img);
-        }
-      } catch(e) {}
-    }
-
-    // ── Date formatting ──
-    function fmtDate(d) {
-      if (!d) return '—';
-      return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-    }
-
-    // ── Status badge class ──
-    function statusClass(s) {
-      const map = { draft:'status-draft', published:'status-published', ongoing:'status-ongoing', completed:'status-completed', cancelled:'status-cancelled' };
-      return map[s] || 'status-draft';
-    }
-
-    // ── Render timeline ──
-    function renderTimeline(status) {
-      const order = ['draft', 'published', 'ongoing', 'completed'];
-      const idx = order.indexOf(status);
-      order.forEach((step, i) => {
-        const el = document.getElementById(`step-${step}`);
-        if (!el) return;
-        el.classList.remove('active', 'completed');
-        if (i < idx) el.classList.add('completed');
-        else if (i === idx) el.classList.add('active');
-      });
-      if (status === 'cancelled') {
-        order.forEach(step => {
-          const el = document.getElementById(`step-${step}`);
-          el.classList.remove('active', 'completed');
-        });
-        document.getElementById('step-draft').classList.add('active');
-      }
-    }
-
-    // ── Render Role Cards ──
-    function renderRoles(event, applications) {
-      const grid = document.getElementById('roles-grid');
-      const roles = event.volunteerRoles || [];
-
-      if (!roles.length) {
-        document.getElementById('roles-empty').classList.remove('hidden');
-        grid.innerHTML = '';
-        return;
-      }
-
-      grid.innerHTML = roles.map(role => {
-        const roleApps = applications.filter(a => a.roleId === role.roleId);
-        const approved = roleApps.filter(a => a.status === 'approved');
-        const pending = roleApps.filter(a => a.status === 'pending');
-        const fillPercent = role.count ? Math.min(100, Math.round((approved.length / role.count) * 100)) : 0;
-
-        const volunteersHtml = approved.length
-          ? approved.map(a => {
-              const vol = a.volunteerId || {};
-              const name = vol.profile?.fullName || vol.username || 'Unknown';
-              const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-              const pic = vol.profile?.profilePic;
-              const avatarInner = pic
-                ? `<img src="${pic}" alt="${name}">`
-                : initials;
-              const skills = (vol.profile?.skills || []).slice(0, 3).map(s => s.name || s).join(', ');
-              return `
-                <div class="vol-chip">
-                  <div class="vol-avatar">${avatarInner}</div>
-                  <div class="flex-1 min-w-0">
-                    <p class="text-sm font-bold truncate" style="color:var(--text-primary);">${name}</p>
-                    <p class="text-xs truncate" style="color:var(--text-muted);">${skills || 'No skills listed'}</p>
-                  </div>
-                  <span class="text-xs font-bold px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);">Active</span>
-                </div>`;
-            }).join('')
-          : `<p class="text-xs italic py-2" style="color:var(--text-muted);">No volunteers assigned yet.</p>`;
-
-        const pendingHtml = pending.length
-          ? `<p class="text-xs mt-2" style="color:var(--text-muted);">${pending.length} pending application${pending.length > 1 ? 's' : ''}</p>`
-          : '';
-
-        // Organizer: editable notes
-        const notesHtml = isOrganizer
-          ? `<div class="mt-4 pt-3 border-t" style="border-color:var(--card-border);">
-               <label class="text-xs uppercase tracking-widest font-bold block mb-2" style="color:var(--text-muted);">Role Notes</label>
-               <textarea class="notes-input" id="notes-${role.roleId}" placeholder="Add instructions or notes for this role...">${role.notes || ''}</textarea>
-               <button class="edit-mode-btn primary mt-2" style="font-size:0.65rem;padding:0.35rem 0.85rem;" onclick="saveRoleNotes('${role.roleId}')">Save Notes</button>
-             </div>`
-          : (role.notes ? `<div class="mt-4 pt-3 border-t" style="border-color:var(--card-border);"><p class="text-xs" style="color:var(--text-muted);"><strong>Notes:</strong> ${role.notes}</p></div>` : '');
-
-        return `
-          <div class="role-card">
-            <div class="flex items-center justify-between mb-4">
-              <div>
-                <h3 class="text-base font-bold" style="color:var(--text-primary);">${role.title || 'Unnamed Role'}</h3>
-                <p class="text-xs" style="color:var(--text-muted);">Need ${role.count || '?'} volunteers</p>
-              </div>
-              <div class="text-right">
-                <p class="text-sm font-bold" style="color:var(--text-primary);">${approved.length}/${role.count || '?'}</p>
-                <p class="text-xs" style="color:var(--text-muted);">Filled</p>
-              </div>
-            </div>
-            <!-- Progress bar -->
-            <div class="w-full h-2 rounded-full mb-4" style="background:var(--card-border);">
-              <div class="h-full rounded-full transition-all duration-500" style="width:${fillPercent}%;background:${fillPercent >= 100 ? '#10b981' : fillPercent > 50 ? '#3b82f6' : '#f59e0b'};"></div>
-            </div>
-            <!-- Assigned volunteers -->
-            <div class="flex flex-col gap-2">
-              ${volunteersHtml}
-            </div>
-            ${pendingHtml}
-            ${notesHtml}
-          </div>`;
-      }).join('');
-    }
-
-    // ── Render Volunteers Table ──
-    function renderVolunteersTable(applications, roles) {
-      const tbody = document.getElementById('volunteers-table');
-      if (!applications.length) {
-        document.getElementById('volunteers-empty').classList.remove('hidden');
-        tbody.innerHTML = '';
-        return;
-      }
-
-      tbody.innerHTML = applications.map(app => {
-        const vol = app.volunteerId || {};
-        const name = vol.profile?.fullName || vol.username || 'Unknown';
-        const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-        const pic = vol.profile?.profilePic;
-        const role = roles.find(r => r.roleId === app.roleId);
-        const roleTitle = role?.title || app.roleId || '—';
-        const skills = (vol.profile?.skills || []).slice(0, 4).map(s => s.name || s);
-        const statusMap = {
-          approved: { cls: 'text-green-400', label: 'Approved' },
-          pending: { cls: 'text-yellow-400', label: 'Pending' },
-          rejected: { cls: 'text-red-400', label: 'Rejected' },
-          withdrawn: { cls: 'text-gray-400', label: 'Withdrawn' }
-        };
-        const st = statusMap[app.status] || statusMap.pending;
-        const applied = app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('en-IN', { day:'numeric', month:'short' }) : '—';
-
-        return `
-          <tr class="border-b hover:opacity-90 transition-colors" style="border-color:var(--card-border);">
-            <td class="px-4 py-4">
-              <div class="flex items-center gap-3">
-                <div class="vol-avatar" style="width:30px;height:30px;font-size:0.6rem;">${pic ? `<img src="${pic}" alt="${name}">` : initials}</div>
-                <div>
-                  <p class="font-bold text-sm" style="color:var(--text-primary);">${name}</p>
-                  <p class="text-xs" style="color:var(--text-muted);">${vol.email || ''}</p>
-                </div>
-              </div>
-            </td>
-            <td class="px-4 py-4" style="color:var(--text-secondary);">${roleTitle}</td>
-            <td class="px-4 py-4">
-              <div class="flex flex-wrap gap-1">
-                ${skills.length ? skills.map(s => `<span class="text-xs px-2 py-0.5 rounded-full" style="background:var(--article-bg);border:1px solid var(--article-border);color:var(--text-muted);">${s}</span>`).join('') : '<span class="text-xs" style="color:var(--text-muted);">—</span>'}
-              </div>
-            </td>
-            <td class="px-4 py-4 font-bold ${st.cls}">${st.label}</td>
-            <td class="px-4 py-4" style="color:var(--text-muted);">${applied}</td>
-          </tr>`;
-      }).join('');
-    }
-
-    // ── Update Event Status (organizer) ──
-    async function updateEventStatus() {
-      const newStatus = document.getElementById('status-select').value;
-      const btn = document.getElementById('update-status-btn');
-      btn.disabled = true; btn.textContent = 'Updating…';
-      try {
-        const res = await fetch(`/api/events/${eventId}/status`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ status: newStatus })
-        });
-        const data = await res.json();
-        if (data.success) {
-          document.getElementById('event-status-badge').className = `status-badge ${statusClass(newStatus)}`;
-          document.getElementById('event-status-badge').textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-          renderTimeline(newStatus);
-          btn.textContent = '✓ Updated';
-          setTimeout(() => { btn.textContent = 'Update Status'; btn.disabled = false; }, 1500);
-        } else {
-          alert(data.error || 'Failed to update status');
-          btn.textContent = 'Update Status'; btn.disabled = false;
-        }
-      } catch(e) {
-        alert('Network error'); btn.textContent = 'Update Status'; btn.disabled = false;
-      }
-    }
-
-    // ── Save Role Notes (organizer) ──
-    async function saveRoleNotes(roleId) {
-      const notes = document.getElementById(`notes-${roleId}`).value;
-      try {
-        const res = await fetch(`/api/events/${eventId}/role-notes`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ roleId, notes })
-        });
-        const data = await res.json();
-        if (data.success) {
-          alert('Notes saved!');
-        } else {
-          alert(data.error || 'Failed to save');
-        }
-      } catch(e) { alert('Network error'); }
-    }
-
-    // ── Main Load ──
-    async function loadOverview() {
-      if (!eventId) {
-        document.getElementById('loading-state').classList.add('hidden');
-        document.getElementById('error-state').classList.remove('hidden');
-        return;
-      }
-
-      try {
-        const res = await fetch(`/api/events/${eventId}/overview`);
-        if (!res.ok) throw new Error('Not found');
-        const result = await res.json();
-        if (!result.success) throw new Error('Failed');
-
-        const { event, applications } = result.data;
-        eventData = event;
-
-        // Check if current user is the organizer
-        isOrganizer = currentUserRole === 'organizer' && currentUserId === (event.organizerId?._id || event.organizerId);
-
-        // Hide loading, show content
-        document.getElementById('loading-state').classList.add('hidden');
-        document.getElementById('main-content').classList.remove('hidden');
-
-        // Breadcrumb
-        document.getElementById('breadcrumb-title').textContent = event.title || 'Event Overview';
-
-        // Banner
-        if (event.banner) {
-          document.getElementById('event-banner').innerHTML = `<img src="${event.banner}" alt="${event.title}" class="w-full h-full object-cover">`;
-        }
-
-        // Event Info
-        document.getElementById('event-title').textContent = event.title || 'Untitled Event';
-        document.getElementById('event-tagline').textContent = event.tagline || '';
-        document.getElementById('event-description').textContent = event.description || '';
-        document.getElementById('event-date').textContent = fmtDate(event.schedule?.start);
-        document.getElementById('event-location').textContent = event.location?.city || event.location?.venueName || '—';
-        document.getElementById('event-type').textContent = (event.type || '—').charAt(0).toUpperCase() + (event.type || '—').slice(1);
-        document.getElementById('event-organizer').textContent = event.organizerId?.profile?.orgName || event.organizerId?.username || '—';
-
-        // Status
-        const status = event.status || 'draft';
-        document.getElementById('event-status-badge').className = `status-badge ${statusClass(status)}`;
-        document.getElementById('event-status-badge').textContent = status.charAt(0).toUpperCase() + status.slice(1);
-        document.getElementById('status-select').value = status;
-        renderTimeline(status);
-
-        // Stats
-        const roles = event.volunteerRoles || [];
-        const totalNeeded = roles.reduce((s, r) => s + (r.count || 0), 0);
-        const approvedApps = applications.filter(a => a.status === 'approved');
-        const pendingApps = applications.filter(a => a.status === 'pending');
-        document.getElementById('stat-total-roles').textContent = roles.length;
-        document.getElementById('stat-needed').textContent = totalNeeded;
-        document.getElementById('stat-approved').textContent = approvedApps.length;
-        document.getElementById('stat-pending').textContent = pendingApps.length;
-
-        // Action buttons
-        document.getElementById('report-incident-btn').href = `/report-incident?eventId=${event._id}`;
-
-        if (isOrganizer) {
-          document.getElementById('organizer-controls').classList.remove('hidden');
-          document.getElementById('edit-event-btn').href = `/create-event?id=${event._id}`;
-          document.getElementById('manage-event-btn').href = `/organiser?eventId=${event._id}`;
-        } else {
-          document.getElementById('viewer-badge').classList.remove('hidden');
-        }
-
-        // Render roles & volunteers
-        renderRoles(event, applications);
-        renderVolunteersTable(applications, roles);
-
-      } catch(err) {
-        console.error(err);
-        document.getElementById('loading-state').classList.add('hidden');
-        document.getElementById('error-state').classList.remove('hidden');
-      }
-    }
-
-    // ── Init ──
-    (async () => {
-      await loadUserProfile();
-      await loadOverview();
-    })();
-  </script>
-</body>
-</html>
+    select.edit-mode-btn option { background: #1a1f2e; color: #ffffff; }
+
+    .edit-mode-btn.primary {
+
+      background: rgba(59,130,246,0.2); border-color: rgba(59,130,246,0.3); color: #60a5fa;
+
+    }
+
+    .edit-mode-btn.primary:hover { background: rgba(59,130,246,0.35); }
+
+    .edit-mode-btn.success {
+
+      background: rgba(16,185,129,0.2); border-color: rgba(16,185,129,0.3); color: #34d399;
+
+    }
+
+    .edit-mode-btn.success:hover { background: rgba(16,185,129,0.35); }
+
+    .edit-mode-btn.danger {
+
+      background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.3); color: #f87171;
+
+    }
+
+    .edit-mode-btn.danger:hover { background: rgba(239,68,68,0.35); }
+
+
+
+    /* Role notes input */
+
+    .notes-input {
+
+      width: 100%; padding: 0.6rem 0.85rem; font-size: 0.8rem;
+
+      border: 1px solid var(--card-border); border-radius: 0.75rem;
+
+      background: var(--input-bg); color: var(--text-primary);
+
+      resize: vertical; min-height: 60px; font-family: 'Inter', sans-serif;
+
+      transition: border-color 0.2s;
+
+    }
+
+    .notes-input:focus { outline: none; border-color: rgba(59,130,246,0.5); }
+
+
+
+    /* Section entrance */
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+
+    .fade-up { animation: fadeUp 0.5s ease-out both; }
+
+    .fade-up-1 { animation-delay: 0.05s; }
+
+    .fade-up-2 { animation-delay: 0.15s; }
+
+    .fade-up-3 { animation-delay: 0.25s; }
+
+    .fade-up-4 { animation-delay: 0.35s; }
+
+
+
+    /* Breadcrumb */
+
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--text-muted); }
+
+    .breadcrumb a { color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
+
+    .breadcrumb a:hover { color: var(--text-primary); }
+
+    .breadcrumb svg { width: 12px; height: 12px; opacity: 0.4; }
+
+
+
+    /* Event Chat Styles */
+
+    .chat-overlay {
+
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);
+
+      z-index: 1000; opacity: 0; pointer-events: none;
+
+      transition: opacity 0.3s ease;
+
+    }
+
+    .chat-overlay.open { opacity: 1; pointer-events: all; }
+
+
+
+    .chat-window {
+
+      position: fixed; bottom: 20px; right: 20px;
+
+      width: 380px; height: 500px;
+
+      background: var(--section-bg); border: 1px solid var(--card-border);
+
+      border-radius: 1.5rem; box-shadow: var(--shadow);
+
+      backdrop-filter: blur(20px); z-index: 1001;
+
+      transform: translateY(100%) scale(0.8); opacity: 0;
+
+      transition: all 0.3s ease; overflow: hidden;
+
+      display: flex; flex-direction: column;
+
+    }
+
+    .chat-window.open { transform: translateY(0) scale(1); opacity: 1; }
+
+    .chat-window.fullscreen {
+
+      top: 20px; left: 20px; right: 20px; bottom: 20px;
+
+      width: auto; height: auto; border-radius: 1.5rem;
+
+    }
+
+
+
+    .chat-header {
+
+      padding: 1rem 1.25rem; border-bottom: 1px solid var(--card-border);
+
+      display: flex; align-items: center; justify-content: between;
+
+      background: var(--article-bg); flex-shrink: 0;
+
+    }
+
+    .chat-title { font-weight: 700; font-size: 0.9rem; color: var(--text-primary); flex: 1; }
+
+    .chat-controls { display: flex; gap: 0.5rem; }
+
+    .chat-control-btn {
+
+      width: 28px; height: 28px; border-radius: 50%;
+
+      background: var(--input-bg); border: 1px solid var(--card-border);
+
+      display: flex; align-items: center; justify-content: center;
+
+      cursor: pointer; transition: all 0.2s;
+
+    }
+
+    .chat-control-btn:hover { background: var(--dropdown-hover); }
+
+    .chat-control-btn svg { width: 14px; height: 14px; color: var(--text-muted); }
+
+
+
+    .chat-body {
+
+      display: flex; flex: 1; overflow: hidden;
+
+    }
+
+    .chat-sidebar {
+
+      width: 200px; background: var(--article-bg);
+
+      border-right: 1px solid var(--card-border);
+
+      padding: 1rem; overflow-y: auto; flex-shrink: 0;
+
+    }
+
+    .chat-sidebar.hidden { display: none; }
+
+    .chat-main { flex: 1; display: flex; flex-direction: column; }
+
+
+
+    .chat-messages {
+
+      flex: 1; padding: 1rem; overflow-y: auto;
+
+      display: flex; flex-direction: column; gap: 0.75rem;
+
+    }
+
+    .chat-message {
+
+      display: flex; gap: 0.75rem; align-items: flex-start;
+
+    }
+
+    .chat-message.own { flex-direction: row-reverse; }
+
+    .chat-avatar {
+
+      width: 32px; height: 32px; border-radius: 50%;
+
+      background: linear-gradient(135deg, #6366f1, #06b6d4);
+
+      display: flex; align-items: center; justify-content: center;
+
+      font-size: 0.7rem; font-weight: 700; color: #fff; flex-shrink: 0;
+
+      overflow: hidden;
+
+    }
+
+    .chat-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .chat-bubble {
+
+      max-width: 70%; padding: 0.75rem 1rem; border-radius: 1rem;
+
+      background: var(--input-bg); border: 1px solid var(--card-border);
+
+      font-size: 0.85rem; line-height: 1.4; color: var(--text-primary);
+
+    }
+
+    .chat-message.own .chat-bubble {
+
+      background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.3);
+
+    }
+
+    .chat-sender {
+
+      font-size: 0.7rem; font-weight: 600; color: var(--text-muted);
+
+      margin-bottom: 0.25rem;
+
+    }
+
+    .chat-time {
+
+      font-size: 0.65rem; color: var(--text-muted);
+
+      margin-top: 0.25rem; opacity: 0.7;
+
+    }
+
+
+
+    .chat-input-area {
+
+      padding: 1rem; border-top: 1px solid var(--card-border);
+
+      background: var(--article-bg); flex-shrink: 0;
+
+    }
+
+    .chat-input-wrapper {
+
+      display: flex; gap: 0.75rem; align-items: flex-end;
+
+    }
+
+    .chat-input {
+
+      flex: 1; padding: 0.75rem 1rem; border-radius: 1.25rem;
+
+      border: 1px solid var(--card-border); background: var(--input-bg);
+
+      color: var(--text-primary); font-size: 0.85rem; resize: none;
+
+      max-height: 100px; min-height: 42px; font-family: 'Inter', sans-serif;
+
+      transition: border-color 0.2s;
+
+    }
+
+    .chat-input:focus { outline: none; border-color: rgba(59,130,246,0.5); }
+
+    .chat-send-btn {
+
+      width: 42px; height: 42px; border-radius: 50%;
+
+      background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.3);
+
+      color: #60a5fa; display: flex; align-items: center; justify-content: center;
+
+      cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+
+    }
+
+    .chat-send-btn:hover { background: rgba(59,130,246,0.35); }
+
+    .chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .chat-send-btn svg { width: 18px; height: 18px; }
+
+
+
+    .participant-group {
+
+      margin-bottom: 1.5rem;
+
+    }
+
+    .participant-group-title {
+
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+
+      letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.75rem;
+
+    }
+
+    .participant-item {
+
+      display: flex; align-items: center; gap: 0.75rem;
+
+      padding: 0.5rem; border-radius: 0.75rem; cursor: pointer;
+
+      transition: background 0.2s; margin-bottom: 0.5rem;
+
+    }
+
+    .participant-item:hover { background: var(--dropdown-hover); }
+
+    .participant-avatar {
+
+      width: 28px; height: 28px; border-radius: 50%;
+
+      background: linear-gradient(135deg, #6366f1, #06b6d4);
+
+      display: flex; align-items: center; justify-content: center;
+
+      font-size: 0.65rem; font-weight: 700; color: #fff; flex-shrink: 0;
+
+      overflow: hidden;
+
+    }
+
+    .participant-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .participant-info { flex: 1; min-width: 0; }
+
+    .participant-name {
+
+      font-size: 0.75rem; font-weight: 600; color: var(--text-primary);
+
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+
+    }
+
+    .participant-role {
+
+      font-size: 0.65rem; color: var(--text-muted);
+
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+
+    }
+
+
+
+    .chat-empty {
+
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+
+      justify-content: center; color: var(--text-muted); text-align: center;
+
+    }
+
+    .chat-empty svg { width: 48px; height: 48px; opacity: 0.3; margin-bottom: 1rem; }
+
+    .chat-empty h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+
+    .chat-empty p { font-size: 0.8rem; opacity: 0.7; }
+
+
+
+    @media (max-width: 768px) {
+
+      .chat-window {
+
+        width: calc(100vw - 40px); height: calc(100vh - 40px);
+
+        top: 20px; left: 20px; right: 20px; bottom: 20px;
+
+      }
+
+      .chat-sidebar { width: 160px; }
+
+    }
+
+  </style>
+
+</head>
+
+<body class="font-['Inter'] min-h-screen relative overflow-x-hidden" style="color:var(--text-primary);">
+
+
+
+  <!-- Background -->
+
+  <div class="fixed inset-0 z-[-2]">
+
+    <img id="bgImage" src="public/images/dark.avif" alt="Background" class="w-full h-full object-cover">
+
+  </div>
+
+  <div class="bg-overlay" style="position:fixed;inset:0;z-index:-1;background:var(--bg-overlay);transition:background 0.4s ease;"></div>
+
+
+
+  <!-- NAVBAR -->
+
+  <nav class="sticky top-5 mx-auto w-[90%] max-w-6xl px-8 py-3 flex justify-between items-center backdrop-blur-[18px] rounded-[50px] z-50 border shadow-[0_18px_40px_rgba(0,0,0,0.5)]" style="background:var(--nav-bg);border-color:var(--nav-border);">
+
+    <div class="font-bold text-2xl font-['Satisfy'] cursor-pointer" style="color:var(--text-primary);" id="navLogo">
+
+      Event<span>Hive</span>
+
+    </div>
+
+    <ul class="flex gap-6 list-none m-0 p-0">
+
+      <li><a href="#overview" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Overview<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+
+      <li><a href="#roles" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Roles<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+
+      <li><a href="#volunteers" class="relative text-sm uppercase tracking-widest opacity-80 hover:opacity-100 group transition-opacity" style="color:var(--text-primary);">Volunteers<span class="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-white to-gray-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+
+    </ul>
+
+    <div class="flex gap-4 items-center">
+
+      <li class="profile-wrapper" style="list-style:none;">
+
+        <div class="profile-avatar" id="profileAvatarBtn" title="Account options">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);">
+
+            <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/>
+
+          </svg>
+
+        </div>
+
+        <div class="profile-dropdown" id="profileDropdown">
+
+          <div class="dropdown-header">
+
+            <p id="dropdownName">User</p>
+
+            <span id="dropdownRole">—</span>
+
+          </div>
+
+          <div class="theme-toggle-row">
+
+            <div class="theme-toggle-label">
+
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+                <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+
+                <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+
+              </svg>
+
+              Dark Mode
+
+            </div>
+
+            <label class="toggle-switch">
+
+              <input type="checkbox" id="themeToggle" checked>
+
+              <span class="toggle-slider"></span>
+
+            </label>
+
+          </div>
+
+          <a class="dropdown-item" id="homeLink" href="/home">
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+
+            Home
+
+          </a>
+
+          <div class="dropdown-item danger" id="logoutBtn">
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+
+            </svg>
+
+            Logout
+
+          </div>
+
+        </div>
+
+      </li>
+
+    </div>
+
+  </nav>
+
+
+
+  <main class="w-[90%] max-w-6xl mx-auto my-10 relative z-10 flex flex-col gap-10 pb-20">
+
+
+
+    <!-- Breadcrumb -->
+
+    <div class="breadcrumb fade-up fade-up-1" id="breadcrumb">
+
+      <a href="/home">Home</a>
+
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+
+      <span id="breadcrumb-title" style="color:var(--text-primary);">Event Overview</span>
+
+    </div>
+
+
+
+    <!-- Loading State -->
+
+    <div id="loading-state" class="flex flex-col gap-6">
+
+      <div class="skeleton" style="height:280px;"></div>
+
+      <div class="skeleton" style="height:160px;"></div>
+
+      <div class="skeleton" style="height:300px;"></div>
+
+    </div>
+
+
+
+    <!-- Error State -->
+
+    <div id="error-state" class="hidden text-center py-20">
+
+      <p class="text-4xl mb-4">😕</p>
+
+      <h2 class="text-xl font-bold mb-2" style="color:var(--text-primary);">Event Not Found</h2>
+
+      <p class="text-sm mb-6" style="color:var(--text-muted);">The event you're looking for doesn't exist or has been removed.</p>
+
+      <a href="/home" class="edit-mode-btn primary">Back to Home</a>
+
+    </div>
+
+
+
+    <!-- Main Content (hidden until loaded) -->
+
+    <div id="main-content" class="hidden flex flex-col gap-10">
+
+
+
+      <!-- HERO / Overview Section -->
+
+      <section id="overview" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-1" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+
+        <div class="flex flex-col lg:flex-row gap-8">
+
+          <!-- Event Banner -->
+
+          <div id="event-banner-wrap" class="lg:w-[320px] flex-shrink-0 rounded-[1.5rem] overflow-hidden" style="background:var(--article-bg);border:1px solid var(--article-border);">
+
+            <div id="event-banner" class="w-full h-[200px] lg:h-full flex items-center justify-center" style="color:var(--text-muted);">
+
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+
+            </div>
+
+          </div>
+
+
+
+          <!-- Event Info -->
+
+          <div class="flex-1">
+
+            <div class="flex flex-wrap items-center gap-3 mb-3">
+
+              <h1 id="event-title" class="text-3xl md:text-4xl font-bold font-['Satisfy']" style="color:var(--text-primary);">—</h1>
+
+              <span id="event-status-badge" class="status-badge status-draft">Draft</span>
+
+            </div>
+
+            <p id="event-tagline" class="text-sm mb-4" style="color:var(--text-secondary);"></p>
+
+            <p id="event-description" class="text-sm mb-6 leading-relaxed" style="color:var(--text-muted);"></p>
+
+
+
+            <!-- Meta Grid -->
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+
+              <div class="rounded-xl p-3 border" style="background:var(--article-bg);border-color:var(--article-border);">
+
+                <p class="text-xs uppercase tracking-widest font-bold mb-1" style="color:var(--text-muted);">Date</p>
+
+                <p id="event-date" class="text-sm font-bold" style="color:var(--text-primary);">—</p>
+
+              </div>
+
+              <div class="rounded-xl p-3 border" style="background:var(--article-bg);border-color:var(--article-border);">
+
+                <p class="text-xs uppercase tracking-widest font-bold mb-1" style="color:var(--text-muted);">Location</p>
+
+                <p id="event-location" class="text-sm font-bold" style="color:var(--text-primary);">—</p>
+
+              </div>
+
+              <div class="rounded-xl p-3 border" style="background:var(--article-bg);border-color:var(--article-border);">
+
+                <p class="text-xs uppercase tracking-widest font-bold mb-1" style="color:var(--text-muted);">Type</p>
+
+                <p id="event-type" class="text-sm font-bold" style="color:var(--text-primary);">—</p>
+
+              </div>
+
+              <div class="rounded-xl p-3 border" style="background:var(--article-bg);border-color:var(--article-border);">
+
+                <p class="text-xs uppercase tracking-widest font-bold mb-1" style="color:var(--text-muted);">Organizer</p>
+
+                <p id="event-organizer" class="text-sm font-bold" style="color:var(--text-primary);">—</p>
+
+              </div>
+
+            </div>
+
+
+
+            <!-- Action Buttons -->
+
+            <div class="flex flex-wrap gap-3 mt-4">
+
+              <div id="organizer-controls" class="hidden flex flex-wrap gap-3">
+
+                <select id="status-select" class="edit-mode-btn" style="background:var(--input-bg);">
+
+                  <option value="draft">Draft</option>
+
+                  <option value="published">Published</option>
+
+                  <option value="ongoing">Ongoing</option>
+
+                  <option value="completed">Completed</option>
+
+                  <option value="cancelled">Cancelled</option>
+
+                </select>
+
+                <button id="update-status-btn" class="edit-mode-btn primary" onclick="updateEventStatus()">Update Status</button>
+
+                <a id="edit-event-btn" class="edit-mode-btn" href="#">Edit Event</a>
+
+                <a id="manage-event-btn" class="edit-mode-btn" href="#">Manage Dashboard</a>
+
+              </div>
+
+              
+
+              <a id="report-incident-btn" class="edit-mode-btn danger flex items-center gap-2" href="#">
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+
+                Report Issue
+
+              </a>
+
+
+              <button id="event-chat-btn" class="edit-mode-btn primary flex items-center gap-2" onclick="openEventChat()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+                Event Chat
+              </button>
+
+
+              <div id="viewer-badge" class="hidden">
+
+                <span class="text-xs uppercase tracking-widest font-bold px-3 py-1 rounded-full border" style="background:var(--article-bg);border-color:var(--article-border);color:var(--text-muted);">
+
+                  👁 View Only
+
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- PROGRESS TIMELINE -->
+
+      <section class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-2" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+
+        <h2 class="text-2xl font-bold font-['Satisfy'] mb-8 text-center" style="color:var(--text-primary);">Event Progress</h2>
+
+        <div class="timeline" id="event-timeline">
+
+          <div class="timeline-step" id="step-draft">
+
+            <div class="timeline-dot">1</div>
+
+            <span class="timeline-label">Draft</span>
+
+          </div>
+
+          <div class="timeline-step" id="step-published">
+
+            <div class="timeline-dot">2</div>
+
+            <span class="timeline-label">Published</span>
+
+          </div>
+
+          <div class="timeline-step" id="step-ongoing">
+
+            <div class="timeline-dot">3</div>
+
+            <span class="timeline-label">Live</span>
+
+          </div>
+
+          <div class="timeline-step" id="step-completed">
+
+            <div class="timeline-dot">4</div>
+
+            <span class="timeline-label">Completed</span>
+
+          </div>
+
+        </div>
+
+        <!-- Summary Stats -->
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+
+          <div class="text-center rounded-xl p-4 border" style="background:var(--article-bg);border-color:var(--article-border);">
+
+            <p id="stat-total-roles" class="text-2xl font-bold" style="color:var(--text-primary);">0</p>
+
+            <p class="text-xs uppercase tracking-widest font-bold" style="color:var(--text-muted);">Roles</p>
+
+          </div>
+
+          <div class="text-center rounded-xl p-4 border" style="background:var(--article-bg);border-color:var(--article-border);">
+
+            <p id="stat-needed" class="text-2xl font-bold" style="color:var(--text-primary);">0</p>
+
+            <p class="text-xs uppercase tracking-widest font-bold" style="color:var(--text-muted);">Slots Needed</p>
+
+          </div>
+
+          <div class="text-center rounded-xl p-4 border" style="background:var(--article-bg);border-color:var(--article-border);">
+
+            <p id="stat-approved" class="text-2xl font-bold text-green-400">0</p>
+
+            <p class="text-xs uppercase tracking-widest font-bold" style="color:var(--text-muted);">Approved</p>
+
+          </div>
+
+          <div class="text-center rounded-xl p-4 border" style="background:var(--article-bg);border-color:var(--article-border);">
+
+            <p id="stat-pending" class="text-2xl font-bold text-yellow-400">0</p>
+
+            <p class="text-xs uppercase tracking-widest font-bold" style="color:var(--text-muted);">Pending</p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- ROLES BREAKDOWN -->
+
+      <section id="roles" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-3" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+
+        <h2 class="text-2xl font-bold font-['Satisfy'] mb-2 text-center" style="color:var(--text-primary);">Volunteer Roles & Assignments</h2>
+
+        <p class="text-sm text-center mb-8" style="color:var(--text-secondary);">Each role shows the volunteers currently assigned from the database.</p>
+
+        <div id="roles-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+
+        <div id="roles-empty" class="hidden text-center py-10 italic" style="color:var(--text-muted);">No volunteer roles defined for this event.</div>
+
+      </section>
+
+
+
+      <!-- ALL VOLUNTEERS TABLE -->
+
+      <section id="volunteers" class="backdrop-blur-[32px] rounded-[2.5rem] p-10 border fade-up fade-up-4" style="background:var(--section-bg);border-color:var(--card-border);box-shadow:var(--shadow);">
+
+        <h2 class="text-2xl font-bold font-['Satisfy'] mb-2 text-center" style="color:var(--text-primary);">All Volunteers</h2>
+
+        <p class="text-sm text-center mb-8" style="color:var(--text-secondary);">Complete list of all volunteer applications for this event.</p>
+
+        <div class="overflow-x-auto">
+
+          <table class="w-full text-left text-sm whitespace-nowrap">
+
+            <thead class="uppercase tracking-wider text-xs font-bold border-b" style="color:var(--text-muted);border-color:var(--card-border);">
+
+              <tr>
+
+                <th class="px-4 py-4">Volunteer</th>
+
+                <th class="px-4 py-4">Role</th>
+
+                <th class="px-4 py-4">Skills</th>
+
+                <th class="px-4 py-4">Status</th>
+
+                <th class="px-4 py-4">Applied</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="volunteers-table" style="color:var(--text-secondary);"></tbody>
+
+          </table>
+
+        </div>
+
+        <div id="volunteers-empty" class="hidden text-center py-10 italic" style="color:var(--text-muted);">No volunteer applications for this event yet.</div>
+
+      </section>
+
+
+
+    </div>
+
+  </main>
+
+
+
+  <footer class="mt-auto py-8 text-center text-sm" style="color:var(--footer-text);">
+
+    <p>&copy; 2026 EventHive. All rights reserved.</p>
+
+  </footer>
+
+
+
+  <script>
+
+    const token = localStorage.getItem('token');
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    const eventId = urlParams.get('id');
+
+    let currentUserRole = null;
+
+    let currentUserId = null;
+
+    let isOrganizer = false;
+
+    let eventData = null;
+
+
+
+    // ── Theme ──
+
+    const bgImage = document.getElementById('bgImage');
+
+    const themeToggle = document.getElementById('themeToggle');
+
+    function applyTheme(dark) {
+
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+
+      bgImage.src = dark ? 'public/images/dark.avif' : 'public/images/light.jpeg';
+
+      themeToggle.checked = dark;
+
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+
+    }
+
+    applyTheme(localStorage.getItem('theme') !== 'light');
+
+    themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
+
+
+
+    // ── Profile Dropdown ──
+
+    const avatarBtn = document.getElementById('profileAvatarBtn');
+
+    const dropdown = document.getElementById('profileDropdown');
+
+    avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('open'); });
+
+    document.addEventListener('click', (e) => {
+
+      if (!dropdown.contains(e.target) && e.target !== avatarBtn) dropdown.classList.remove('open');
+
+    });
+
+
+
+    // ── Logout ──
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+
+      localStorage.removeItem('token'); localStorage.removeItem('user');
+
+      window.location.href = '/';
+
+    });
+
+
+
+    // ── Load user profile ──
+
+    async function loadUserProfile() {
+
+      if (!token) return;
+
+      try {
+
+        const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        if (!data.success) return;
+
+        const u = data.data;
+
+        currentUserRole = u.role;
+
+        currentUserId = u._id;
+
+        const displayName = u.profile?.fullName || u.profile?.name || u.profile?.orgName || u.profile?.clientName || u.username;
+
+        if (displayName) document.getElementById('dropdownName').textContent = displayName;
+
+        const roleLabel = u.role ? u.role.charAt(0).toUpperCase() + u.role.slice(1) : '—';
+
+        document.getElementById('dropdownRole').textContent = roleLabel;
+
+
+
+        // Update home link based on role
+
+        const homeLink = document.getElementById('homeLink');
+
+        if (u.role === 'organizer') homeLink.href = '/organiser-home';
+
+        else if (u.role === 'client') homeLink.href = '/client-home';
+
+        else homeLink.href = '/home';
+
+
+
+        // NavLogo link
+
+        document.getElementById('navLogo').onclick = () => window.location.href = homeLink.href;
+
+
+
+        // Profile pic
+
+        const pic = u.profile?.profilePic;
+
+        if (pic) {
+
+          const img = document.createElement('img');
+
+          img.src = pic; img.alt = 'Profile';
+
+          img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+
+          avatarBtn.innerHTML = ''; avatarBtn.appendChild(img);
+
+        }
+
+      } catch(e) {}
+
+    }
+
+
+
+    // ── Date formatting ──
+
+    function fmtDate(d) {
+
+      if (!d) return '—';
+
+      return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    }
+
+
+
+    // ── Status badge class ──
+
+    function statusClass(s) {
+
+      const map = { draft:'status-draft', published:'status-published', ongoing:'status-ongoing', completed:'status-completed', cancelled:'status-cancelled' };
+
+      return map[s] || 'status-draft';
+
+    }
+
+
+
+    // ── Render timeline ──
+
+    function renderTimeline(status) {
+
+      const order = ['draft', 'published', 'ongoing', 'completed'];
+
+      const idx = order.indexOf(status);
+
+      order.forEach((step, i) => {
+
+        const el = document.getElementById(`step-${step}`);
+
+        if (!el) return;
+
+        el.classList.remove('active', 'completed');
+
+        if (i < idx) el.classList.add('completed');
+
+        else if (i === idx) el.classList.add('active');
+
+      });
+
+      if (status === 'cancelled') {
+
+        order.forEach(step => {
+
+          const el = document.getElementById(`step-${step}`);
+
+          el.classList.remove('active', 'completed');
+
+        });
+
+        document.getElementById('step-draft').classList.add('active');
+
+      }
+
+    }
+
+
+
+    // ── Render Role Cards ──
+
+    function renderRoles(event, applications) {
+
+      const grid = document.getElementById('roles-grid');
+
+      const roles = event.volunteerRoles || [];
+
+
+
+      if (!roles.length) {
+
+        document.getElementById('roles-empty').classList.remove('hidden');
+
+        grid.innerHTML = '';
+
+        return;
+
+      }
+
+
+
+      grid.innerHTML = roles.map(role => {
+
+        const roleApps = applications.filter(a => a.roleId === role.roleId);
+
+        const approved = roleApps.filter(a => a.status === 'approved');
+
+        const pending = roleApps.filter(a => a.status === 'pending');
+
+        const fillPercent = role.count ? Math.min(100, Math.round((approved.length / role.count) * 100)) : 0;
+
+
+
+        const volunteersHtml = approved.length
+
+          ? approved.map(a => {
+
+              const vol = a.volunteerId || {};
+
+              const name = vol.profile?.fullName || vol.username || 'Unknown';
+
+              const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+
+              const pic = vol.profile?.profilePic;
+
+              const avatarInner = pic
+
+                ? `<img src="${pic}" alt="${name}">`
+
+                : initials;
+
+              const skills = (vol.profile?.skills || []).slice(0, 3).map(s => s.name || s).join(', ');
+
+              return `
+
+                <div class="vol-chip">
+
+                  <div class="vol-avatar">${avatarInner}</div>
+
+                  <div class="flex-1 min-w-0">
+
+                    <p class="text-sm font-bold truncate" style="color:var(--text-primary);">${name}</p>
+
+                    <p class="text-xs truncate" style="color:var(--text-muted);">${skills || 'No skills listed'}</p>
+
+                  </div>
+
+                  <span class="text-xs font-bold px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);">Active</span>
+
+                </div>`;
+
+            }).join('')
+
+          : `<p class="text-xs italic py-2" style="color:var(--text-muted);">No volunteers assigned yet.</p>`;
+
+
+
+        const pendingHtml = pending.length
+
+          ? `<p class="text-xs mt-2" style="color:var(--text-muted);">${pending.length} pending application${pending.length > 1 ? 's' : ''}</p>`
+
+          : '';
+
+
+
+        // Organizer: editable notes
+
+        const notesHtml = isOrganizer
+
+          ? `<div class="mt-4 pt-3 border-t" style="border-color:var(--card-border);">
+
+               <label class="text-xs uppercase tracking-widest font-bold block mb-2" style="color:var(--text-muted);">Role Notes</label>
+
+               <textarea class="notes-input" id="notes-${role.roleId}" placeholder="Add instructions or notes for this role...">${role.notes || ''}</textarea>
+
+               <button class="edit-mode-btn primary mt-2" style="font-size:0.65rem;padding:0.35rem 0.85rem;" onclick="saveRoleNotes('${role.roleId}')">Save Notes</button>
+
+             </div>`
+
+          : (role.notes ? `<div class="mt-4 pt-3 border-t" style="border-color:var(--card-border);"><p class="text-xs" style="color:var(--text-muted);"><strong>Notes:</strong> ${role.notes}</p></div>` : '');
+
+
+
+        return `
+
+          <div class="role-card">
+
+            <div class="flex items-center justify-between mb-4">
+
+              <div>
+
+                <h3 class="text-base font-bold" style="color:var(--text-primary);">${role.title || 'Unnamed Role'}</h3>
+
+                <p class="text-xs" style="color:var(--text-muted);">Need ${role.count || '?'} volunteers</p>
+
+              </div>
+
+              <div class="text-right">
+
+                <p class="text-sm font-bold" style="color:var(--text-primary);">${approved.length}/${role.count || '?'}</p>
+
+                <p class="text-xs" style="color:var(--text-muted);">Filled</p>
+
+              </div>
+
+            </div>
+
+            <!-- Progress bar -->
+
+            <div class="w-full h-2 rounded-full mb-4" style="background:var(--card-border);">
+
+              <div class="h-full rounded-full transition-all duration-500" style="width:${fillPercent}%;background:${fillPercent >= 100 ? '#10b981' : fillPercent > 50 ? '#3b82f6' : '#f59e0b'};"></div>
+
+            </div>
+
+            <!-- Assigned volunteers -->
+
+            <div class="flex flex-col gap-2">
+
+              ${volunteersHtml}
+
+            </div>
+
+            ${pendingHtml}
+
+            ${notesHtml}
+
+          </div>`;
+
+      }).join('');
+
+    }
+
+
+
+    // ── Render Volunteers Table ──
+
+    function renderVolunteersTable(applications, roles) {
+
+      const tbody = document.getElementById('volunteers-table');
+
+      if (!applications.length) {
+
+        document.getElementById('volunteers-empty').classList.remove('hidden');
+
+        tbody.innerHTML = '';
+
+        return;
+
+      }
+
+
+
+      tbody.innerHTML = applications.map(app => {
+
+        const vol = app.volunteerId || {};
+
+        const name = vol.profile?.fullName || vol.username || 'Unknown';
+
+        const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+
+        const pic = vol.profile?.profilePic;
+
+        const role = roles.find(r => r.roleId === app.roleId);
+
+        const roleTitle = role?.title || app.roleId || '—';
+
+        const skills = (vol.profile?.skills || []).slice(0, 4).map(s => s.name || s);
+
+        const statusMap = {
+
+          approved: { cls: 'text-green-400', label: 'Approved' },
+
+          pending: { cls: 'text-yellow-400', label: 'Pending' },
+
+          rejected: { cls: 'text-red-400', label: 'Rejected' },
+
+          withdrawn: { cls: 'text-gray-400', label: 'Withdrawn' }
+
+        };
+
+        const st = statusMap[app.status] || statusMap.pending;
+
+        const applied = app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('en-IN', { day:'numeric', month:'short' }) : '—';
+
+
+
+        return `
+
+          <tr class="border-b hover:opacity-90 transition-colors" style="border-color:var(--card-border);">
+
+            <td class="px-4 py-4">
+
+              <div class="flex items-center gap-3">
+
+                <div class="vol-avatar" style="width:30px;height:30px;font-size:0.6rem;">${pic ? `<img src="${pic}" alt="${name}">` : initials}</div>
+
+                <div>
+
+                  <p class="font-bold text-sm" style="color:var(--text-primary);">${name}</p>
+
+                  <p class="text-xs" style="color:var(--text-muted);">${vol.email || ''}</p>
+
+                </div>
+
+              </div>
+
+            </td>
+
+            <td class="px-4 py-4" style="color:var(--text-secondary);">${roleTitle}</td>
+
+            <td class="px-4 py-4">
+
+              <div class="flex flex-wrap gap-1">
+
+                ${skills.length ? skills.map(s => `<span class="text-xs px-2 py-0.5 rounded-full" style="background:var(--article-bg);border:1px solid var(--article-border);color:var(--text-muted);">${s}</span>`).join('') : '<span class="text-xs" style="color:var(--text-muted);">—</span>'}
+
+              </div>
+
+            </td>
+
+            <td class="px-4 py-4 font-bold ${st.cls}">${st.label}</td>
+
+            <td class="px-4 py-4" style="color:var(--text-muted);">${applied}</td>
+
+          </tr>`;
+
+      }).join('');
+
+    }
+
+
+
+    // ── Update Event Status (organizer) ──
+
+    async function updateEventStatus() {
+
+      const newStatus = document.getElementById('status-select').value;
+
+      const btn = document.getElementById('update-status-btn');
+
+      btn.disabled = true; btn.textContent = 'Updating…';
+
+      try {
+
+        const res = await fetch(`/api/events/${eventId}/status`, {
+
+          method: 'PATCH',
+
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+
+          body: JSON.stringify({ status: newStatus })
+
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+
+          document.getElementById('event-status-badge').className = `status-badge ${statusClass(newStatus)}`;
+
+          document.getElementById('event-status-badge').textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+
+          renderTimeline(newStatus);
+
+          btn.textContent = '✓ Updated';
+
+          setTimeout(() => { btn.textContent = 'Update Status'; btn.disabled = false; }, 1500);
+
+        } else {
+
+          alert(data.error || 'Failed to update status');
+
+          btn.textContent = 'Update Status'; btn.disabled = false;
+
+        }
+
+      } catch(e) {
+
+        alert('Network error'); btn.textContent = 'Update Status'; btn.disabled = false;
+
+      }
+
+    }
+
+
+
+    // ── Save Role Notes (organizer) ──
+
+    async function saveRoleNotes(roleId) {
+
+      const notes = document.getElementById(`notes-${roleId}`).value;
+
+      try {
+
+        const res = await fetch(`/api/events/${eventId}/role-notes`, {
+
+          method: 'PATCH',
+
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+
+          body: JSON.stringify({ roleId, notes })
+
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+
+          alert('Notes saved!');
+
+        } else {
+
+          alert(data.error || 'Failed to save');
+
+        }
+
+      } catch(e) { alert('Network error'); }
+
+    }
+
+
+
+    // ── Main Load ──
+
+    async function loadOverview() {
+
+      if (!eventId) {
+
+        document.getElementById('loading-state').classList.add('hidden');
+
+        document.getElementById('error-state').classList.remove('hidden');
+
+        return;
+
+      }
+
+
+
+      try {
+
+        const res = await fetch(`/api/events/${eventId}/overview`);
+
+        if (!res.ok) throw new Error('Not found');
+
+        const result = await res.json();
+
+        if (!result.success) throw new Error('Failed');
+
+
+
+        const { event, applications } = result.data;
+
+        eventData = event;
+
+
+
+        // Check if current user is the organizer
+
+        isOrganizer = currentUserRole === 'organizer' && currentUserId === (event.organizerId?._id || event.organizerId);
+
+
+
+        // Hide loading, show content
+
+        document.getElementById('loading-state').classList.add('hidden');
+
+        document.getElementById('main-content').classList.remove('hidden');
+
+
+
+        // Breadcrumb
+
+        document.getElementById('breadcrumb-title').textContent = event.title || 'Event Overview';
+
+
+
+        // Banner
+
+        if (event.banner) {
+
+          document.getElementById('event-banner').innerHTML = `<img src="${event.banner}" alt="${event.title}" class="w-full h-full object-cover">`;
+
+        }
+
+
+
+        // Event Info
+
+        document.getElementById('event-title').textContent = event.title || 'Untitled Event';
+
+        document.getElementById('event-tagline').textContent = event.tagline || '';
+
+        document.getElementById('event-description').textContent = event.description || '';
+
+        document.getElementById('event-date').textContent = fmtDate(event.schedule?.start);
+
+        document.getElementById('event-location').textContent = event.location?.city || event.location?.venueName || '—';
+
+        document.getElementById('event-type').textContent = (event.type || '—').charAt(0).toUpperCase() + (event.type || '—').slice(1);
+
+        document.getElementById('event-organizer').textContent = event.organizerId?.profile?.orgName || event.organizerId?.username || '—';
+
+
+
+        // Status
+
+        const status = event.status || 'draft';
+
+        document.getElementById('event-status-badge').className = `status-badge ${statusClass(status)}`;
+
+        document.getElementById('event-status-badge').textContent = status.charAt(0).toUpperCase() + status.slice(1);
+
+        document.getElementById('status-select').value = status;
+
+        renderTimeline(status);
+
+
+
+        // Stats
+
+        const roles = event.volunteerRoles || [];
+
+        const totalNeeded = roles.reduce((s, r) => s + (r.count || 0), 0);
+
+        const approvedApps = applications.filter(a => a.status === 'approved');
+
+        const pendingApps = applications.filter(a => a.status === 'pending');
+
+        document.getElementById('stat-total-roles').textContent = roles.length;
+
+        document.getElementById('stat-needed').textContent = totalNeeded;
+
+        document.getElementById('stat-approved').textContent = approvedApps.length;
+
+        document.getElementById('stat-pending').textContent = pendingApps.length;
+
+
+
+        // Action buttons
+
+        document.getElementById('report-incident-btn').href = `/report-incident?eventId=${event._id}`;
+
+
+
+        if (isOrganizer) {
+
+          document.getElementById('organizer-controls').classList.remove('hidden');
+
+          document.getElementById('edit-event-btn').href = `/create-event?id=${event._id}`;
+
+          document.getElementById('manage-event-btn').href = `/organiser?eventId=${event._id}`;
+
+          // Show chat button for organizer
+
+          document.getElementById('event-chat-btn').style.display = 'flex';
+
+        } else {
+
+          document.getElementById('viewer-badge').classList.remove('hidden');
+
+          // Check if current user is an enrolled volunteer
+
+          const isEnrolledVolunteer = applications.some(app => 
+
+            app.volunteerId?._id === currentUserId && app.status === 'approved'
+
+          );
+
+          if (isEnrolledVolunteer) {
+
+            // Show chat button for enrolled volunteers
+
+            document.getElementById('event-chat-btn').style.display = 'flex';
+
+          } else {
+
+            // Hide chat button for non-participants
+
+            document.getElementById('event-chat-btn').style.display = 'none';
+
+          }
+
+        }
+
+
+
+        // Render roles & volunteers
+
+        renderRoles(event, applications);
+
+        renderVolunteersTable(applications, roles);
+
+
+
+      } catch(err) {
+
+        console.error(err);
+
+        document.getElementById('loading-state').classList.add('hidden');
+
+        document.getElementById('error-state').classList.remove('hidden');
+
+      }
+
+    }
+
+
+
+    // ── Init ──
+
+    (async () => {
+
+      await loadUserProfile();
+
+      await loadOverview();
+
+    })();
+
+  </script>
+
+
+  <!-- ============================================================ -->
+  <!-- EVENT CHAT WINDOW -->
+  <!-- ============================================================ -->
+  <style>
+    /* Event Chat Styles */
+    #event-chat-window {
+      position: fixed; bottom: 24px; right: 24px; z-index: 200;
+      display: flex; flex-direction: column; border-radius: 1.5rem; overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.1);
+      background: #0d1117; transition: width 0.3s ease, height 0.3s ease, bottom 0.3s ease, right 0.3s ease, border-radius 0.3s ease;
+      width: 380px; height: 520px;
+    }
+    #event-chat-window.minimized { height: 56px; border-radius: 1rem; }
+    #event-chat-window.fullscreen { width: 100vw !important; height: 100vh !important; bottom: 0 !important; right: 0 !important; border-radius: 0 !important; }
+    #event-chat-window.hidden-chat { display: none !important; }
+
+    .event-chat-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.08); cursor: pointer; flex-shrink: 0; user-select: none; }
+    .event-chat-header-title { flex: 1; font-size: 0.85rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .event-chat-header-sub { font-size: 0.65rem; color: rgba(255,255,255,0.4); }
+    .event-chat-header-btn { background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; padding: 4px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: color 0.2s, background 0.2s; }
+    .event-chat-header-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+
+    .event-chat-body { display: flex; flex: 1; overflow: hidden; }
+
+    /* Sidebar - only shown in fullscreen mode */
+    .event-chat-sidebar { width: 200px; flex-shrink: 0; border-right: 1px solid rgba(255,255,255,0.08); overflow-y: auto; background: rgba(0,0,0,0.2); display: none; flex-direction: column; gap: 4px; padding: 8px; }
+    #event-chat-window.fullscreen .event-chat-sidebar { display: flex; }
+
+    .event-chat-role-group { margin-bottom: 12px; }
+    .event-chat-role-title { font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; padding: 0 8px; }
+    .event-chat-participant { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+    .event-chat-participant:hover { background: rgba(255,255,255,0.08); }
+    .event-chat-participant.organizer { background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); }
+    .event-chat-participant-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #06b6d4); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7rem; color: #fff; flex-shrink: 0; }
+    .event-chat-participant-name { font-size: 0.7rem; color: rgba(255,255,255,0.8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Messages area */
+    .event-chat-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .event-chat-messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; scroll-behavior: smooth; }
+    .event-chat-messages::-webkit-scrollbar { width: 4px; }
+    .event-chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+    .event-chat-bubble { max-width: 75%; padding: 8px 12px; border-radius: 14px; font-size: 0.8rem; line-height: 1.4; word-break: break-word; }
+    .event-chat-bubble.sent { align-self: flex-end; background: rgba(139,92,246,0.3); border: 1px solid rgba(139,92,246,0.4); color: #ede9fe; border-bottom-right-radius: 4px; }
+    .event-chat-bubble.received { align-self: flex-start; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.85); border-bottom-left-radius: 4px; }
+    .event-chat-bubble-sender { font-size: 0.65rem; color: rgba(255,255,255,0.4); margin-bottom: 2px; font-weight: 600; }
+    .event-chat-bubble-time { font-size: 0.6rem; color: rgba(255,255,255,0.3); margin-top: 3px; text-align: right; }
+
+    .event-chat-empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: rgba(255,255,255,0.25); font-size: 0.8rem; gap: 8px; }
+
+    .event-chat-input-row { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2); flex-shrink: 0; }
+    .event-chat-input { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 8px 12px; font-size: 0.8rem; color: #fff; outline: none; resize: none; font-family: inherit; }
+    .event-chat-input:focus { border-color: rgba(139,92,246,0.5); }
+    .event-chat-send-btn { background: rgba(139,92,246,0.3); border: 1px solid rgba(139,92,246,0.4); color: #c4b5fd; border-radius: 10px; padding: 8px 12px; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; }
+    .event-chat-send-btn:hover { background: rgba(139,92,246,0.5); }
+
+    /* Floating Action Button */
+    #event-chat-fab { position: fixed; bottom: 24px; right: 24px; z-index: 199; width: 52px; height: 52px; border-radius: 50%; background: rgba(139,92,246,0.3); border: 1px solid rgba(139,92,246,0.5); color: #c4b5fd; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); transition: background 0.2s, transform 0.2s; }
+    #event-chat-fab:hover { background: rgba(139,92,246,0.5); transform: scale(1.05); }
+    #event-chat-fab-badge { position: absolute; top: -2px; right: -2px; background: #ef4444; color: #fff; font-size: 0.6rem; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center; }
+
+    .event-chat-loading { text-align: center; color: rgba(255,255,255,0.3); font-size: 0.75rem; padding: 16px; }
+  </style>
+
+  <!-- Floating Action Button -->
+  <button id="event-chat-fab" title="Event Chat">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+    </svg>
+    <span id="event-chat-fab-badge"></span>
+  </button>
+
+  <!-- Event Chat Window -->
+  <div id="event-chat-window" class="hidden-chat">
+    <!-- Header -->
+    <div class="event-chat-header" id="event-chat-header-toggle">
+      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="event-chat-header-title" id="event-chat-header-name">Event Chat</div>
+        <div class="event-chat-header-sub" id="event-chat-header-sub">Team communication</div>
+      </div>
+      <button class="event-chat-header-btn" id="event-chat-minimize-btn" title="Minimize">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/></svg>
+      </button>
+      <button class="event-chat-header-btn" id="event-chat-fullscreen-btn" title="Expand">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+      </button>
+      <button class="event-chat-header-btn" id="event-chat-close-btn" title="Close">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Body: sidebar + main -->
+    <div class="event-chat-body" id="event-chat-body">
+      <!-- Sidebar: participants grouped by role (only in fullscreen) -->
+      <div class="event-chat-sidebar" id="event-chat-sidebar">
+        <div class="event-chat-loading" id="event-sidebar-loading">Loading participants…</div>
+      </div>
+
+      <!-- Main chat area -->
+      <div class="event-chat-main" id="event-chat-main">
+        <div class="event-chat-messages" id="event-chat-messages">
+          <div class="event-chat-empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            <span>Event team chat</span>
+          </div>
+        </div>
+        <div class="event-chat-input-row" id="event-chat-input-row">
+          <textarea class="event-chat-input" id="event-chat-input" placeholder="Type a message to the team…" rows="1" maxlength="2000"></textarea>
+          <button class="event-chat-send-btn" id="event-chat-send-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // EVENT CHAT FEATURE
+    // ============================================================
+    const eventChatToken = localStorage.getItem('token');
+    let eventChatCurrentUserId = null;
+    let eventChatEventId = null;
+    let eventChatPollInterval = null;
+    let eventChatIsMinimized = false;
+    let eventChatIsFullscreen = false;
+    let eventChatParticipants = null;
+
+    // Initialize event chat
+    (async function initEventChat() {
+      if (!eventChatToken || !eventId) return;
+      eventChatEventId = eventId;
+      
+      try {
+        const r = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${eventChatToken}` } });
+        if (!r.ok) return;
+        const d = await r.json();
+        eventChatCurrentUserId = d.data?._id || d.data?.id;
+        
+        // Show FAB and load unread count
+        document.getElementById('event-chat-fab').style.display = 'flex';
+        loadEventChatUnreadCount();
+        
+        // Poll for unread count every 15s
+        setInterval(loadEventChatUnreadCount, 15000);
+      } catch(e) {}
+    })();
+
+    async function loadEventChatUnreadCount() {
+      if (!eventChatToken || !eventChatEventId) return;
+      try {
+        const r = await fetch(`/api/chat/event/${eventChatEventId}/unread-count`, { 
+          headers: { Authorization: `Bearer ${eventChatToken}` } 
+        });
+        const d = await r.json();
+        if (d.success) {
+          const badge = document.getElementById('event-chat-fab-badge');
+          if (d.count > 0) {
+            badge.textContent = d.count > 9 ? '9+' : d.count;
+            badge.style.display = 'flex';
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+      } catch(e) {}
+    }
+
+    function openEventChat() {
+      if (!eventChatToken) { alert('Please log in to use event chat.'); return; }
+      console.log('Opening event chat for event:', eventChatEventId);
+      showEventChatWindow();
+      loadEventChatParticipants();
+      loadEventChatMessages();
+    }
+
+    function showEventChatWindow() {
+      const win = document.getElementById('event-chat-window');
+      win.classList.remove('hidden-chat', 'minimized');
+      eventChatIsMinimized = false;
+      document.getElementById('event-chat-fab').style.display = 'none';
+      document.getElementById('event-chat-body').style.display = 'flex';
+    }
+
+    function hideEventChatWindow() {
+      const win = document.getElementById('event-chat-window');
+      win.classList.add('hidden-chat');
+      win.classList.remove('fullscreen', 'minimized');
+      eventChatIsMinimized = false;
+      eventChatIsFullscreen = false;
+      document.getElementById('event-chat-fab').style.display = 'flex';
+      stopEventChatPoll();
+    }
+
+    function minimizeEventChat() {
+      const win = document.getElementById('event-chat-window');
+      if (eventChatIsMinimized) {
+        win.classList.remove('minimized');
+        document.getElementById('event-chat-body').style.display = 'flex';
+        eventChatIsMinimized = false;
+      } else {
+        win.classList.add('minimized');
+        document.getElementById('event-chat-body').style.display = 'none';
+        eventChatIsMinimized = true;
+      }
+    }
+
+    function toggleEventChatFullscreen() {
+      const win = document.getElementById('event-chat-window');
+      if (eventChatIsFullscreen) {
+        win.classList.remove('fullscreen');
+        eventChatIsFullscreen = false;
+      } else {
+        win.classList.add('fullscreen');
+        win.classList.remove('minimized');
+        document.getElementById('event-chat-body').style.display = 'flex';
+        eventChatIsMinimized = false;
+        eventChatIsFullscreen = true;
+        // Load participants when going fullscreen (for sidebar)
+        if (!eventChatParticipants) loadEventChatParticipants();
+      }
+    }
+
+    // Event listeners
+    document.getElementById('event-chat-close-btn').addEventListener('click', (e) => { e.stopPropagation(); hideEventChatWindow(); });
+    document.getElementById('event-chat-minimize-btn').addEventListener('click', (e) => { e.stopPropagation(); minimizeEventChat(); });
+    document.getElementById('event-chat-fullscreen-btn').addEventListener('click', (e) => { e.stopPropagation(); toggleEventChatFullscreen(); });
+    document.getElementById('event-chat-header-toggle').addEventListener('click', () => { if (eventChatIsMinimized) minimizeEventChat(); });
+    document.getElementById('event-chat-fab').addEventListener('click', openEventChat);
+
+    // Load participants (for sidebar in fullscreen mode)
+    async function loadEventChatParticipants() {
+      if (!eventChatToken || !eventChatEventId) return;
+      const sidebar = document.getElementById('event-chat-sidebar');
+      try {
+        const r = await fetch(`/api/chat/event/${eventChatEventId}/participants`, { 
+          headers: { Authorization: `Bearer ${eventChatToken}` } 
+        });
+        const d = await r.json();
+        eventChatParticipants = d.data;
+        
+        if (!d.data) {
+          sidebar.innerHTML = '<div class="event-chat-loading">Failed to load participants</div>';
+          return;
+        }
+
+        let sidebarHtml = '';
+        
+        // Add organizer
+        if (d.data.organizer) {
+          const org = d.data.organizer;
+          const initial = org.name[0].toUpperCase();
+          sidebarHtml += `
+            <div class="event-chat-role-group">
+              <div class="event-chat-role-title">Organizer</div>
+              <div class="event-chat-participant organizer">
+                <div class="event-chat-participant-avatar" style="background: linear-gradient(135deg, #8b5cf6, #ec4899);">${initial}</div>
+                <div class="event-chat-participant-name">${org.name}</div>
+              </div>
+            </div>
+          `;
+        }
+
+        // Add role groups
+        if (d.data.roleGroups && d.data.roleGroups.length > 0) {
+          d.data.roleGroups.forEach(group => {
+            if (group.volunteers.length > 0) {
+              sidebarHtml += `<div class="event-chat-role-group">
+                <div class="event-chat-role-title">${group.title} (${group.volunteers.length})</div>`;
+              
+              group.volunteers.forEach(vol => {
+                const initial = vol.name[0].toUpperCase();
+                sidebarHtml += `
+                  <div class="event-chat-participant">
+                    <div class="event-chat-participant-avatar">${initial}</div>
+                    <div class="event-chat-participant-name">${vol.name}</div>
+                  </div>
+                `;
+              });
+              
+              sidebarHtml += '</div>';
+            }
+          });
+        }
+
+        if (!sidebarHtml) {
+          sidebarHtml = '<div class="event-chat-loading">No participants yet</div>';
+        }
+
+        sidebar.innerHTML = sidebarHtml;
+      } catch(e) {
+        sidebar.innerHTML = '<div class="event-chat-loading">Failed to load</div>';
+      }
+    }
+
+    // Load messages
+    async function loadEventChatMessages() {
+      if (!eventChatToken || !eventChatEventId) return;
+      const container = document.getElementById('event-chat-messages');
+      
+      try {
+        const r = await fetch(`/api/chat/event/${eventChatEventId}/messages`, { 
+          headers: { Authorization: `Bearer ${eventChatToken}` } 
+        });
+        const d = await r.json();
+        renderEventChatMessages(d.data || []);
+        loadEventChatUnreadCount();
+        startEventChatPoll();
+      } catch(e) {
+        container.innerHTML = '<div class="event-chat-loading">Failed to load messages</div>';
+      }
+    }
+
+    function renderEventChatMessages(msgs) {
+      const container = document.getElementById('event-chat-messages');
+      const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 40;
+
+      if (!msgs.length) {
+        container.innerHTML = `
+          <div class="event-chat-empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            <span>Start the conversation!</span>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = msgs.map(msg => {
+        const isSent = msg.senderId._id === eventChatCurrentUserId || msg.senderId === eventChatCurrentUserId;
+        const sender = msg.senderId;
+        const senderName = sender.profile?.fullName || sender.profile?.orgName || sender.profile?.leadName || sender.username;
+        const time = new Date(msg.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        
+        return `
+          <div class="event-chat-bubble ${isSent ? 'sent' : 'received'}">
+            ${!isSent ? `<div class="event-chat-bubble-sender">${escapeHtml(senderName)}</div>` : ''}
+            ${escapeHtml(msg.text)}
+            <div class="event-chat-bubble-time">${time}</div>
+          </div>
+        `;
+      }).join('');
+
+      if (wasAtBottom || container.children.length <= 3) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    // Send message
+    document.getElementById('event-chat-send-btn').addEventListener('click', sendEventChatMessage);
+    document.getElementById('event-chat-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendEventChatMessage(); }
+    });
+
+    async function sendEventChatMessage() {
+      const input = document.getElementById('event-chat-input');
+      const text = input.value.trim();
+      if (!text || !eventChatEventId) return;
+      
+      input.value = '';
+      input.style.height = 'auto';
+
+      // Optimistic UI
+      const container = document.getElementById('event-chat-messages');
+      const time = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+      const bubble = document.createElement('div');
+      bubble.className = 'event-chat-bubble sent';
+      bubble.innerHTML = `${escapeHtml(text)}<div class="event-chat-bubble-time">${time}</div>`;
+      
+      // Remove empty state if present
+      const emptyState = container.querySelector('.event-chat-empty-state');
+      if (emptyState) emptyState.remove();
+      
+      container.appendChild(bubble);
+      container.scrollTop = container.scrollHeight;
+
+      try {
+        await fetch(`/api/chat/event/${eventChatEventId}/messages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${eventChatToken}` },
+          body: JSON.stringify({ text })
+        });
+        // Reload to sync
+        loadEventChatMessages();
+      } catch(e) {}
+    }
+
+    // Auto-resize textarea
+    document.getElementById('event-chat-input').addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 80) + 'px';
+    });
+
+    function startEventChatPoll() {
+      stopEventChatPoll();
+      eventChatPollInterval = setInterval(() => {
+        loadEventChatMessages();
+      }, 6000);
+    }
+
+    function stopEventChatPoll() {
+      if (eventChatPollInterval) { 
+        clearInterval(eventChatPollInterval); 
+        eventChatPollInterval = null; 
+      }
+    }
+  </script>
+</body>
+
+</html>
+
+ow');
+      win.classList.add('hidden-chat');
+      eventChatIsMinimized = false;
+      eventChatIsFullscreen = false;
+      document.getElementById('event-chat-fab').style.display = 'flex';
+      if (eventChatPollInterval) {
+        clearInterval(eventChatPollInterval);
+        eventChatPollInterval = null;
+      }
+    }
+
+    function minimizeEventChat() {
+      const win = document.getElementById('event-chat-window');
+      win.classList.add('minimized');
+      win.classList.remove('fullscreen');
+      eventChatIsMinimized = true;
+      eventChatIsFullscreen = false;
+      document.getElementById('event-chat-body').style.display = 'none';
+    }
+
+    function toggleEventChatFullscreen() {
+      const win = document.getElementById('event-chat-window');
+      if (eventChatIsFullscreen) {
+        win.classList.remove('fullscreen');
+        eventChatIsFullscreen = false;
+      } else {
+        win.classList.add('fullscreen');
+        win.classList.remove('minimized');
+        eventChatIsFullscreen = true;
+        eventChatIsMinimized = false;
+        document.getElementById('event-chat-body').style.display = 'flex';
+      }
+    }
+
+    async function loadEventChatParticipants() {
+      if (!eventChatToken || !eventChatEventId) return;
+      console.log('Loading participants for event:', eventChatEventId);
+      try {
+        const url = `/api/chat/event/${eventChatEventId}/participants`;
+        console.log('Fetching participants from:', url);
+        const r = await fetch(url, {
+          headers: { Authorization: `Bearer ${eventChatToken}` }
+        });
+        console.log('Participants response status:', r.status);
+        const d = await r.json();
+        console.log('Participants response:', d);
+        if (d.success) {
+          eventChatParticipants = d.data;
+          renderEventChatParticipants(d.data);
+        }
+      } catch(e) {
+        console.error('Failed to load participants:', e);
+      }
+    }
+
+    function renderEventChatParticipants(data) {
+      const sidebar = document.getElementById('event-chat-sidebar');
+      if (!data) return;
+
+      let html = '';
+      
+      // Organizer
+      if (data.organizer) {
+        const org = data.organizer;
+        const initials = (org.fullName || org.username || 'O').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+        const avatarHtml = org.profilePic ? `<img src="${org.profilePic}" alt="${org.fullName || org.username}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : initials;
+        
+        html += `
+          <div class="event-chat-role-group">
+            <div class="event-chat-role-title">Organizer</div>
+            <div class="event-chat-participant organizer">
+              <div class="event-chat-participant-avatar">${avatarHtml}</div>
+              <div class="event-chat-participant-name">${org.fullName || org.username}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Volunteer groups
+      if (data.volunteerGroups && Object.keys(data.volunteerGroups).length > 0) {
+        Object.entries(data.volunteerGroups).forEach(([roleName, volunteers]) => {
+          html += `<div class="event-chat-role-group">
+            <div class="event-chat-role-title">${roleName}</div>`;
+          
+          volunteers.forEach(vol => {
+            const initials = (vol.fullName || vol.username || 'V').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+            const avatarHtml = vol.profilePic ? `<img src="${vol.profilePic}" alt="${vol.fullName || vol.username}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : initials;
+            
+            html += `
+              <div class="event-chat-participant">
+                <div class="event-chat-participant-avatar">${avatarHtml}</div>
+                <div class="event-chat-participant-name">${vol.fullName || vol.username}</div>
+              </div>
+            `;
+          });
+          
+          html += '</div>';
+        });
+      }
+
+      sidebar.innerHTML = html;
+    }
+
+    async function loadEventChatMessages() {
+      if (!eventChatToken || !eventChatEventId) return;
+      console.log('Loading messages for event:', eventChatEventId);
+      try {
+        const url = `/api/chat/event/${eventChatEventId}/messages`;
+        console.log('Fetching messages from:', url);
+        const r = await fetch(url, {
+          headers: { Authorization: `Bearer ${eventChatToken}` }
+        });
+        console.log('Messages response status:', r.status);
+        const d = await r.json();
+        console.log('Messages response:', d);
+        if (d.success) {
+          renderEventChatMessages(d.data);
+          // Start polling for new messages
+          if (!eventChatPollInterval) {
+            eventChatPollInterval = setInterval(loadEventChatMessages, 3000);
+          }
+        } else {
+          console.error('Failed to load messages:', d.error);
+        }
+      } catch(e) {
+        console.error('Failed to load messages:', e);
+      }
+    }
+
+    function renderEventChatMessages(messages) {
+      const container = document.getElementById('event-chat-messages');
+      if (!messages || messages.length === 0) {
+        container.innerHTML = `
+          <div class="event-chat-empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            <span>Start the conversation!</span>
+          </div>
+        `;
+        return;
+      }
+
+      const html = messages.map(msg => {
+        const sender = msg.senderId;
+        const isSent = sender._id === eventChatCurrentUserId;
+        const senderName = sender.profile?.fullName || sender.profile?.orgName || sender.username || 'Unknown';
+        const time = new Date(msg.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        
+        return `
+          <div class="event-chat-bubble ${isSent ? 'sent' : 'received'}">
+            ${!isSent ? `<div class="event-chat-bubble-sender">${senderName}</div>` : ''}
+            <div>${msg.text}</div>
+            <div class="event-chat-bubble-time">${time}</div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = html;
+      container.scrollTop = container.scrollHeight;
+    }
+
+    async function sendEventChatMessage() {
+      const input = document.getElementById('event-chat-input');
+      const text = input.value.trim();
+      if (!text || !eventChatToken || !eventChatEventId) return;
+
+      const btn = document.getElementById('event-chat-send-btn');
+      btn.disabled = true;
+
+      try {
+        const r = await fetch(`/api/chat/event/${eventChatEventId}/messages`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${eventChatToken}`
+          },
+          body: JSON.stringify({ text })
+        });
+        
+        const d = await r.json();
+        if (d.success) {
+          input.value = '';
+          loadEventChatMessages(); // Refresh messages
+        } else {
+          alert(d.error || 'Failed to send message');
+        }
+      } catch(e) {
+        alert('Network error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // Event listeners
+    document.getElementById('event-chat-fab').addEventListener('click', openEventChat);
+    document.getElementById('event-chat-close-btn').addEventListener('click', hideEventChatWindow);
+    document.getElementById('event-chat-minimize-btn').addEventListener('click', minimizeEventChat);
+    document.getElementById('event-chat-fullscreen-btn').addEventListener('click', toggleEventChatFullscreen);
+    document.getElementById('event-chat-header-toggle').addEventListener('click', (e) => {
+      if (e.target.closest('.event-chat-header-btn')) return;
+      if (eventChatIsMinimized) {
+        showEventChatWindow();
+      }
+    });
+
+    document.getElementById('event-chat-send-btn').addEventListener('click', sendEventChatMessage);
+    document.getElementById('event-chat-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendEventChatMessage();
+      }
+    });
+
+    // Auto-resize textarea
+    document.getElementById('event-chat-input').addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+    });
+  <script src="src/js/event-chat.js?v=1.0"></script>
+
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        .result { margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 3px; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+    </style>
+</head>
+<body>
+    <h1>Event Chat API Test</h1>
+    
+    <div class="test-section">
+        <h3>Authentication</h3>
+        <button onclick="testAuth()">Test Authentication</button>
+        <div id="auth-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Event ID</h3>
+        <input type="text" id="event-id" placeholder="Enter Event ID" style="width: 300px; padding: 5px;">
+        <button onclick="setEventId()">Set Event ID</button>
+        <div id="event-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Chat Participants</h3>
+        <button onclick="testParticipants()">Load Participants</button>
+        <div id="participants-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Chat Messages</h3>
+        <button onclick="testMessages()">Load Messages</button>
+        <div id="messages-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Send Message</h3>
+        <input type="text" id="message-text" placeholder="Enter message" style="width: 300px; padding: 5px;">
+        <button onclick="testSendMessage()">Send Message</button>
+        <div id="send-result" class="result"></div>
+    </div>
+
+    <script>
+        let token = localStorage.getItem('token');
+        let eventId = null;
+
+        function showResult(elementId, message, isError = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${isError ? 'error' : 'success'}`;
+        }
+
+        async function testAuth() {
+            if (!token) {
+                showResult('auth-result', 'No token found in localStorage', true);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('auth-result', `Authenticated as: ${data.data.username} (${data.data.role})`);
+                } else {
+                    showResult('auth-result', `Auth failed: ${response.status}`, true);
+                }
+            } catch (error) {
+                showResult('auth-result', `Auth error: ${error.message}`, true);
+            }
+        }
+
+        function setEventId() {
+            eventId = document.getElementById('event-id').value.trim();
+            if (eventId) {
+                showResult('event-result', `Event ID set to: ${eventId}`);
+            } else {
+                showResult('event-result', 'Please enter an event ID', true);
+            }
+        }
+
+        async function testParticipants() {
+            if (!token || !eventId) {
+                showResult('participants-result', 'Need token and event ID', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/chat/event/${eventId}/participants`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    const participantCount = Object.keys(data.data.volunteerGroups || {}).length;
+                    showResult('participants-result', `Success! Organizer: ${data.data.organizer?.fullName || data.data.organizer?.username}, Volunteer groups: ${participantCount}`);
+                } else {
+                    showResult('participants-result', `Failed: ${data.error || response.status}`, true);
+                }
+            } catch (error) {
+                showResult('participants-result', `Error: ${error.message}`, true);
+            }
+        }
+
+        async function testMessages() {
+            if (!token || !eventId) {
+                showResult('messages-result', 'Need token and event ID', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/chat/event/${eventId}/messages`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('messages-result', `Success! Found ${data.data.length} messages`);
+                } else {
+                    showResult('messages-result', `Failed: ${data.error || response.status}`, true);
+                }
+            } catch (error) {
+                showResult('messages-result', `Error: ${error.message}`, true);
+            }
+        }
+
+        async function testSendMessage() {
+            const text = document.getElementById('message-text').value.trim();
+            
+            if (!token || !eventId || !text) {
+                showResult('send-result', 'Need token, event ID, and message text', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/chat/event/${eventId}/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ text })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('send-result', 'Message sent successfully!');
+                    document.getElementById('message-text').value = '';
+                } else {
+                    showResult('send-result', `Failed: ${data.error || response.status}`, true);
+                }
+            } catch (error) {
+                showResult('send-result', `Error: ${error.message}`, true);
+            }
+        }
+
+        // Auto-test auth on load
+        window.addEventListener('load', () => {
+            testAuth();
+        });
+    </script>
+</body>
+</html>

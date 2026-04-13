@@ -138,6 +138,10 @@ app.get('/analytics', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/analytics.html'));
 });
 
+app.get('/test-chat', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/test-chat.html'));
+});
+
 // Generic 404 handler for API vs Front-end
 app.use((req, res, next) => {
   if (req.originalUrl.startsWith('/api')) {
