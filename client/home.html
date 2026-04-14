@@ -2318,20 +2318,19 @@
 
 
         const start = ev.schedule?.start ? new Date(ev.schedule.start) : null;
-
-
         const end = ev.schedule?.end ? new Date(ev.schedule.end) : null;
 
 
+        // Explicit terminal statuses always win
+        if (ev.status === 'completed' || ev.status === 'cancelled') { past.push(ev); return; }
+        // If end date has passed, treat as past regardless of status
+        if (end && end < now) { past.push(ev); return; }
+        // Respect ongoing status only if dates agree
+        if (ev.status === 'ongoing') { ongoing.push(ev); return; }
+
+
         if (!start) { upcoming.push(ev); return; }
-
-
-        if (end && end < now) past.push(ev);
-
-
-        else if (start > now) upcoming.push(ev);
-
-
+        if (start > now) upcoming.push(ev);
         else ongoing.push(ev);
 
 

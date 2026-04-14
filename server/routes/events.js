@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Event = require('../models/Event');
+const Application = require('../models/Application');
 const { protect, authorize } = require('../middleware/auth');
 const upload = require('../middleware/upload');
+const { applyReputation } = require('../services/reputation');
 
 // @route   POST /api/events
 // @desc    Create a new event
@@ -90,8 +92,28 @@ router.patch('/:id/status', protect, authorize('organizer'), async (req, res) =>
     if (event.organizerId.toString() !== req.user.id) {
       return res.status(403).json({ success: false, error: 'Not authorized' });
     }
+
+    const prevStatus = event.status;
     event.status = req.body.status;
     await event.save();
+
+    // When event is marked completed, auto-complete all approved volunteer applications
+    if (req.body.status === 'completed' && prevStatus !== 'completed') {
+      const approvedApps = await Application.find({
+        eventId: event._id,
+        status: 'approved',
+        completedAt: null
+      });
+
+      for (const app of approvedApps) {
+        // Award reputation BEFORE setting completedAt (applyReputation checks completedAt is null)
+        await applyReputation(app.volunteerId, app._id, null, event._id);
+        app.status = 'completed';
+        app.completedAt = new Date();
+        await app.save();
+      }
+    }
+
     res.status(200).json({ success: true, data: event });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -146,6 +168,46 @@ router.get('/:id', async (req, res) => {
     const event = await Event.findById(req.params.id).populate('organizerId', 'username profile.orgName profile.organization');
     if (!event) return res.status(404).json({ success: false, error: 'Event not found' });
     res.status(200).json({ success: true, data: event });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// @route   POST /api/events/:id/backfill-reputation
+// @desc    Backfill reputation for all approved volunteers of a completed event
+// @access  Private (Organizer)
+router.post('/:id/backfill-reputation', protect, authorize('organizer'), async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).json({ success: false, error: 'Event not found' });
+    if (event.organizerId.toString() !== req.user.id) {
+      return res.status(403).json({ success: false, error: 'Not authorized' });
+    }
+
+    // Get ALL approved applications for this event (completedAt may or may not be set)
+    const apps = await Application.find({
+      eventId: event._id,
+      status: { $in: ['approved', 'completed'] }
+    });
+
+    let awarded = 0;
+    for (const app of apps) {
+      // Temporarily clear completedAt so applyReputation doesn't skip it
+      const savedCompletedAt = app.completedAt;
+      app.completedAt = null;
+      await app.save();
+
+      const result = await applyReputation(app.volunteerId, app._id, null, event._id);
+
+      // Restore/set completedAt
+      app.status = 'completed';
+      app.completedAt = savedCompletedAt || new Date();
+      await app.save();
+
+      if (result) awarded++;
+    }
+
+    res.json({ success: true, message: `Reputation awarded to ${awarded} volunteer(s)` });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

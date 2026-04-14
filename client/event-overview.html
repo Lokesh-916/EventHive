@@ -728,6 +728,7 @@
                 </select>
                 <button id="update-status-btn" class="edit-mode-btn primary" onclick="updateEventStatus()">Update
                   Status</button>
+                <button id="backfill-rep-btn" class="edit-mode-btn" onclick="backfillReputation()" style="display:none;">Award Reputation</button>
                 <a id="edit-event-btn" class="edit-mode-btn" href="#">Edit Event</a>
                 <a id="manage-event-btn" class="edit-mode-btn" href="#">Manage Dashboard</a>
               </div>
@@ -1269,7 +1270,6 @@
       }).join('');
     }
 
-    // ── Update Event Status (organizer) ──
     async function updateEventStatus() {
       const newStatus = document.getElementById('status-select').value;
       const btn = document.getElementById('update-status-btn');
@@ -1286,6 +1286,9 @@
           document.getElementById('event-status-badge').textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
           renderTimeline(newStatus);
           btn.textContent = '✓ Updated';
+          // Show Award Reputation button for completed events
+          const repBtn = document.getElementById('backfill-rep-btn');
+          if (repBtn) repBtn.style.display = newStatus === 'completed' ? 'inline-flex' : 'none';
           setTimeout(() => { btn.textContent = 'Update Status'; btn.disabled = false; }, 1500);
         } else {
           alert(data.error || 'Failed to update status');
@@ -1293,6 +1296,26 @@
         }
       } catch (e) {
         alert('Network error'); btn.textContent = 'Update Status'; btn.disabled = false;
+      }
+    }
+
+    async function backfillReputation() {
+      const btn = document.getElementById('backfill-rep-btn');
+      btn.disabled = true; btn.textContent = 'Awarding…';
+      try {
+        const res = await fetch(`/api/events/${eventId}/backfill-reputation`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+          btn.textContent = '✓ ' + data.message;
+        } else {
+          alert(data.error || 'Failed to award reputation');
+          btn.textContent = 'Award Reputation'; btn.disabled = false;
+        }
+      } catch (e) {
+        alert('Network error'); btn.textContent = 'Award Reputation'; btn.disabled = false;
       }
     }
 
@@ -1361,6 +1384,9 @@
         document.getElementById('event-status-badge').textContent = status.charAt(0).toUpperCase() + status.slice(1);
         document.getElementById('status-select').value = status;
         renderTimeline(status);
+        // Show Award Reputation button if event is already completed
+        const repBtn = document.getElementById('backfill-rep-btn');
+        if (repBtn && status === 'completed') repBtn.style.display = 'inline-flex';
 
         // Stats
         const roles = event.volunteerRoles || [];

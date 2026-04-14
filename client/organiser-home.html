@@ -287,7 +287,7 @@
 
           </div>
 
-          <a class="dropdown-item" href="/organiser-home">
+          <a class="dropdown-item" href="/organiser">
 
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
 
@@ -421,15 +421,15 @@
 
           </li>
 
-          <li class="flex items-center gap-4">
+          <li class="flex items-center gap-3">
 
-            <div class="w-10 h-10 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="w-7 h-7 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
 
             <div>
 
-              <p class="text-sm font-bold" style="color:var(--text-primary);">Your rating</p>
+              <p class="text-xs font-bold" style="color:var(--text-primary);">Your rating</p>
 
-              <p id="snap-rating" class="text-xs" style="color:var(--text-secondary);">Loading★</p>
+              <p id="snap-rating" class="text-xs" style="color:var(--text-secondary);">Loading…</p>
 
             </div>
 
@@ -1210,47 +1210,31 @@
 
           return `
 
-            <div class="rounded-[2rem] px-7 py-6 flex items-center gap-5 border transition-colors hover:-translate-y-0.5" style="background:var(--article-bg);border-color:var(--article-border);transition:transform 0.2s,box-shadow 0.2s;">
+            <div class="rounded-[2rem] px-7 py-6 flex flex-col gap-4 border transition-colors hover:-translate-y-0.5" style="background:var(--article-bg);border-color:var(--article-border);transition:transform 0.2s,box-shadow 0.2s;">
 
-              <div class="flex-1 min-w-0">
-
-                <div class="flex items-center gap-3 mb-1.5">
-
-                  <h3 class="font-bold text-lg" style="color:var(--text-primary);">${ev.title}</h3>
-
-                  <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border flex-shrink-0 ${statusColor}">${ev.status || 'published'}</span>
-
+              <div class="flex items-start justify-between gap-4">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-3 mb-2">
+                    <h3 class="font-bold text-lg" style="color:var(--text-primary);">${ev.title}</h3>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border flex-shrink-0 ${statusColor}">${ev.status || 'published'}</span>
+                  </div>
+                  <p class="text-sm" style="color:var(--text-muted);">${start}${ev.location?.city ? ' · ' + ev.location.city : ''}</p>
                 </div>
-
-                <p class="text-sm" style="color:var(--text-muted);">${start}${ev.location?.city ? ' · ' + ev.location.city : ''}</p>
-
               </div>
 
-              <div class="relative flex-shrink-0" id="${menuId}-wrap">
-                <button onclick="toggleEventMenu('${menuId}')"
-                  class="w-10 h-10 rounded-xl flex items-center justify-center border transition-all hover:opacity-80"
-                  style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);" title="Actions">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+              <div class="flex items-center gap-3 flex-wrap pt-1 border-t" style="border-color:var(--article-border);">
+                <a href="/event-info?id=${ev._id}" class="px-4 py-2 rounded-xl text-xs font-bold border transition-all hover:opacity-80" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
+                  View Event
+                </a>
+                <button onclick="scrollToVolunteers('${ev._id}')" class="px-4 py-2 rounded-xl text-xs font-bold border transition-all hover:opacity-80" style="background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:#60a5fa;">
+                  Volunteers
                 </button>
-                <div id="${menuId}" class="hidden absolute right-0 top-12 z-50 rounded-xl border shadow-xl overflow-hidden min-w-[170px]"
-                  style="background:var(--dropdown-bg);border-color:var(--dropdown-border);">
-                  <a href="/event-info?id=${ev._id}" class="flex items-center gap-3 px-4 py-3 text-xs font-semibold" style="color:var(--text-primary);" onmouseover="this.style.background='var(--dropdown-hover)'" onmouseout="this.style.background='transparent'">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                    View Event
-                  </a>
-                  <button onclick="scrollToVolunteers('${ev._id}');toggleEventMenu('${menuId}')" class="w-full flex items-center gap-3 px-4 py-3 text-xs font-semibold text-blue-400" style="background:transparent;" onmouseover="this.style.background='var(--dropdown-hover)'" onmouseout="this.style.background='transparent'">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    Manage Volunteers
-                  </button>
-                  ${!isPast ? `<button onclick="openScheduleModal('${ev._id}', '${ev.title.replace(/'/g,"\\'")}');toggleEventMenu('${menuId}')" class="w-full flex items-center gap-3 px-4 py-3 text-xs font-semibold text-teal-400" style="background:transparent;" onmouseover="this.style.background='var(--dropdown-hover)'" onmouseout="this.style.background='transparent'">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    Schedule
-                  </button>` : ''}
-                  ${!isPast ? `<a href="/event-overview?id=${ev._id}" class="flex items-center gap-3 px-4 py-3 text-xs font-semibold text-purple-400" style="background:transparent;" onmouseover="this.style.background='var(--dropdown-hover)'" onmouseout="this.style.background='transparent'">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                    Overview
-                  </a>` : ''}
-                </div>
+                ${!isPast ? `<button onclick="openScheduleModal('${ev._id}', '${ev.title.replace(/'/g,"\\'")}');" class="px-4 py-2 rounded-xl text-xs font-bold border transition-all hover:opacity-80" style="background:rgba(20,184,166,0.1);border-color:rgba(20,184,166,0.3);color:#2dd4bf;">
+                  Schedule
+                </button>` : ''}
+                ${!isPast ? `<a href="/event-overview?id=${ev._id}" class="px-4 py-2 rounded-xl text-xs font-bold border transition-all hover:opacity-80" style="background:rgba(168,85,247,0.1);border-color:rgba(168,85,247,0.3);color:#c084fc;">
+                  LiveOps
+                </a>` : ''}
               </div>
 
             </div>`;
