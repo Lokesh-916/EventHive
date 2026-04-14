@@ -1,4 +1,4 @@
-/* ============================================================
+﻿﻿/* ============================================================
    profile.js — EventHive User Profile Page
    Full detail display + inline editing for all roles.
    Skills rating scaled to 5 stars.
@@ -32,8 +32,8 @@ document.addEventListener('click', (e) => {
 
 // ====== LOGOUT ======
 document.getElementById('logoutBtn').addEventListener('click', () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
+  sessionStorage.removeItem('token');
+  sessionStorage.removeItem('user');
   window.location.href = '/';
 });
 
@@ -287,21 +287,26 @@ function buildVolunteerSections(p) {
     }).join('')}
   </div>`;
 
+  const reputationBody = `<div id="vol-reputation-body"><p class="field-value empty" style="padding:1rem 0;">Loading…</p></div>`;
+
   return [
-    sectionWrap({ id:'vol-account',  icon: ICONS.user, title:'Account',             subtitle:'Login credentials',                  body: acctBody   }),
-    sectionWrap({ id:'vol-personal', icon: ICONS.info, title:'Personal Information', subtitle:'Your personal and contact details',  body: persBody   }),
-    sectionWrap({ id:'vol-skills',   icon: ICONS.star, title:'Skills',               subtitle:'Your skills and proficiency (out of 5)', body: skillsBody }),
-    sectionWrap({ id:'vol-avail',    icon: ICONS.cal,  title:'Weekly Availability',  subtitle:'Days and time slots you are free',  body: availBody  }),
-    `<div class="profile-section" id="section-vol-reputation">
+    `<section class="profile-section" id="section-vol-reputation">
       <div class="section-header">
         <div class="section-icon">${ICONS.star}</div>
         <div class="section-title-wrap">
           <h2>Reputation &amp; Badges</h2>
-          <p>Your standing on EventHive</p>
+          <p>Your rank, XP and earned badges</p>
         </div>
+        <button class="rep-info-btn" id="open-progress-panel" title="How badges &amp; XP work">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </button>
       </div>
-      <div id="vol-reputation-body"><p class="field-value empty" style="padding:1rem 0;">Loading reputation…</p></div>
-    </div>`,
+      <div class="section-body" id="body-vol-reputation">${reputationBody}</div>
+    </section>`,
+    sectionWrap({ id:'vol-account',  icon: ICONS.user, title:'Account',             subtitle:'Login credentials',                  body: acctBody   }),
+    sectionWrap({ id:'vol-personal', icon: ICONS.info, title:'Personal Information', subtitle:'Your personal and contact details',  body: persBody   }),
+    sectionWrap({ id:'vol-skills',   icon: ICONS.star, title:'Skills',               subtitle:'Your skills and proficiency (out of 5)', body: skillsBody }),
+    sectionWrap({ id:'vol-avail',    icon: ICONS.cal,  title:'Weekly Availability',  subtitle:'Days and time slots you are free',  body: availBody  }),
     `<div class="profile-section" id="section-vol-history">
       <div class="section-header">
         <div class="section-icon">${ICONS.cal}</div>
@@ -706,7 +711,7 @@ function setStatus(sectionId, msg, isError = false) {
 }
 
 async function apiPut(payload) {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const res = await fetch('/api/auth/profile', {
     method: 'PUT',
     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -721,7 +726,7 @@ async function saveAndRefresh(sectionId, payload) {
     const data = await apiPut(payload);
     if (!data.success) { setStatus(sectionId, data.error || 'Error', true); return; }
     CURRENT_USER = data.data;
-    localStorage.setItem('user', JSON.stringify({
+    sessionStorage.setItem('user', JSON.stringify({
       id: data.data._id, username: data.data.username,
       email: data.data.email, role: data.data.role,
       profile: data.data.profile, createdAt: data.data.createdAt
@@ -731,6 +736,10 @@ async function saveAndRefresh(sectionId, payload) {
       delete EDIT_STATE[sectionId];
       renderProfile(CURRENT_USER);
       updateNavbar(CURRENT_USER);
+      // Re-inject reputation section after full re-render
+      if (CURRENT_USER.role === 'volunteer' && typeof loadReputationSection === 'function') {
+        loadReputationSection(CURRENT_USER._id);
+      }
     }, 700);
   } catch (e) {
     setStatus(sectionId, 'Network error', true);
@@ -935,7 +944,7 @@ window.handleAvatarUpload = function(input) {
     const fieldName = role === 'organizer' ? 'logo' : 'profilePic';
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const res   = await fetch('/api/auth/profile', {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -949,7 +958,7 @@ window.handleAvatarUpload = function(input) {
         const navBtn = document.getElementById('profileAvatarBtn');
         navBtn.innerHTML = `<img src="${base64}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
         // Cache update
-        localStorage.setItem('user', JSON.stringify({
+        sessionStorage.setItem('user', JSON.stringify({
           id: data.data._id, username: data.data.username,
           email: data.data.email, role: data.data.role,
           profile: data.data.profile, createdAt: data.data.createdAt
@@ -1052,14 +1061,14 @@ async function loadVolunteerHistory(token) {
   const viewId = urlParams.get('id');
 
   // Quick navbar from cache
-  const cached = JSON.parse(localStorage.getItem('user') || '{}');
+  const cached = JSON.parse(sessionStorage.getItem('user') || '{}');
   if (cached.username) {
     const p = cached.profile || {};
     document.getElementById('dropdownName').textContent = p.orgName || p.fullName || p.clientName || cached.username;
     document.getElementById('dropdownRole').textContent = cached.role ? cached.role.charAt(0).toUpperCase() + cached.role.slice(1) : '—';
   }
 
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   if (!token) { renderError('You are not logged in. Please sign in to view your profile.'); return; }
 
   try {
@@ -1068,8 +1077,8 @@ async function loadVolunteerHistory(token) {
     const res = await fetch(apiUrl, { headers: { 'Authorization': `Bearer ${token}` } });
 
     if (res.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
       window.location.href = '/';
       return;
     }
@@ -1083,7 +1092,7 @@ async function loadVolunteerHistory(token) {
       window._viewingOther = true;
     }
 
-    localStorage.setItem('user', JSON.stringify({
+    sessionStorage.setItem('user', JSON.stringify({
       id: CURRENT_USER._id, username: CURRENT_USER.username,
       email: CURRENT_USER.email, role: CURRENT_USER.role,
       profile: CURRENT_USER.profile, createdAt: CURRENT_USER.createdAt
@@ -1109,6 +1118,21 @@ async function loadVolunteerHistory(token) {
     // Load reputation badge section for volunteers
     if (CURRENT_USER.role === 'volunteer') {
       loadReputationSection(CURRENT_USER._id, token);
+      // Wire the info button to the progress panel
+      setTimeout(() => {
+        const infoBtn = document.getElementById('open-progress-panel');
+        const backdrop = document.getElementById('progress-panel-backdrop');
+        const closeBtn = document.getElementById('panel-close-btn');
+        if (infoBtn && backdrop) {
+          infoBtn.addEventListener('click', () => backdrop.classList.add('open'));
+        }
+        if (closeBtn && backdrop) {
+          closeBtn.addEventListener('click', () => backdrop.classList.remove('open'));
+        }
+        if (backdrop) {
+          backdrop.addEventListener('click', (e) => { if (e.target === backdrop) backdrop.classList.remove('open'); });
+        }
+      }, 300);
     }
     // Load event history for volunteers
     if (CURRENT_USER.role === 'volunteer' && !window._viewingOther) {
@@ -1128,14 +1152,17 @@ async function loadReputationSection(userId, token) {
   const RANK_XP    = { 'Newcomer': 0, 'Rising Star': 100, 'Reliable': 300, 'Veteran': 600, 'Elite': 1000, 'Legend': 2000 };
 
   try {
-    const res = await fetch(`/api/reputation/${userId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error('Failed to fetch reputation');
-    const d = await res.json();
-    if (!d.success) throw new Error('No reputation data');
+    const [repRes, catRes] = await Promise.all([
+      fetch(`/api/reputation/${userId}`, { headers: { Authorization: `Bearer ${token}` } }),
+      fetch('/api/reputation/catalog')
+    ]);
+    if (!repRes.ok) throw new Error();
+    const d = await repRes.json();
+    if (!d.success) throw new Error();
+    const catData = await catRes.json();
 
     const { xp = 0, rank = 'Newcomer', eventsCompleted = 0, badges = [] } = d.data;
+    const catalog = catData.badges || catData;
 
     // XP progress to next rank
     const rankIdx  = RANK_ORDER.indexOf(rank);
@@ -1182,6 +1209,10 @@ async function loadReputationSection(userId, token) {
       </div>
       <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.75rem;">Badges</div>
       <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">${badgesHtml}</div>`;
+
+    // Populate the progress panel (badge guide) using reputation.js functions
+    if (typeof injectSvgSprite === 'function') injectSvgSprite(catalog);
+    if (typeof renderProgressPanel === 'function') renderProgressPanel(badges, catalog, d.data);
 
   } catch {
     container.innerHTML = `<p class="field-value empty">Reputation data unavailable.</p>`;

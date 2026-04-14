@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -49,7 +49,7 @@
     </div>
 
     <script>
-        let token = localStorage.getItem('token');
+        let token = sessionStorage.getItem('token');
         let eventId = null;
 
         function showResult(elementId, message, isError = false) {

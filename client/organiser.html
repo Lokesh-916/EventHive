@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 
 
 <html lang="en" data-theme="dark">
@@ -866,7 +866,7 @@
     (async function checkAuth() {
 
 
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
 
 
       if (!token) return showUnauthorized('not-logged-in');
@@ -962,7 +962,7 @@
               ${isLoggedIn ? `
 
 
-              <button onclick="localStorage.removeItem('token');window.location.href='/register';"
+              <button onclick="sessionStorage.removeItem('token');window.location.href='/register';"
 
 
                 style="padding:0.75rem 1.5rem;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
@@ -1121,10 +1121,10 @@
       document.getElementById('dropdownLogoutBtn').addEventListener('click', () => {
 
 
-        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
 
 
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
 
 
         window.location.href = '/';
@@ -1145,7 +1145,7 @@
         try {
 
 
-          const cached = JSON.parse(localStorage.getItem('user') || '{}');
+          const cached = JSON.parse(sessionStorage.getItem('user') || '{}');
 
 
           const dName = cached.profile?.name || cached.profile?.orgName || cached.username;
@@ -1157,7 +1157,7 @@
 
 
 
-          const token = localStorage.getItem('token');
+          const token = sessionStorage.getItem('token');
 
 
           if (!token) return;
@@ -1244,7 +1244,7 @@
       async function loadDashboardStats() {
 
 
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
 
 
         if (!token) return;

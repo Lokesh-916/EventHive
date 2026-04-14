@@ -1,5 +1,17 @@
-// ===== Event Info Page – Dynamic Loader =====
+﻿// ===== Event Info Page – Dynamic Loader =====
 // Reads ?id= from URL, fetches from /api/events/:id, renders entire page
+
+// Global timetable day switcher (must be on window for inline onclick handlers)
+window.switchDay = function(day) {
+    document.querySelectorAll('.mac-day-tab').forEach(t => {
+        t.classList.toggle('active', parseInt(t.dataset.day) === day);
+    });
+    document.querySelectorAll('.day-group-container').forEach(g => {
+        const isTarget = g.id === `day-group-${day}`;
+        g.classList.toggle('active-day', isTarget);
+        g.classList.toggle('inactive-day', !isTarget);
+    });
+};
 
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -47,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // --- Check if user already applied ---
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     let existingApplication = null;
     if (token) {
         try {
@@ -430,18 +442,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         }
                     </style>
 
-                    <script>
-                        window.switchDay = (day) => {
-                            document.querySelectorAll('.mac-day-tab').forEach(t => {
-                                t.classList.toggle('active', parseInt(t.dataset.day) === day);
-                            });
-                            document.querySelectorAll('.day-group-container').forEach(g => {
-                                const isTarget = g.id === \`day-group-\${day}\`;
-                                g.classList.toggle('active-day', isTarget);
-                                g.classList.toggle('inactive-day', !isTarget);
-                            });
-                        }
-                    </script>
                     ` : ''}
 
                     <!-- Date & Venue -->
@@ -715,7 +715,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnConfirm.addEventListener('click', async () => {
             if (!selectedRole) return;
 
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             const roleName = document.querySelector(`[data-role-id="${selectedRole}"] .role-title-text`)?.textContent || selectedRole;
 
             if (token) {

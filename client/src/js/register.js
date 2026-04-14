@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ==========================================
  * REGISTRATION LOGIC
  * ==========================================
@@ -178,7 +178,7 @@ function initOrganizerFlow() {
                 submitBtn.disabled = false;
                 
                 if (result.success) {
-                    localStorage.setItem('token', result.token);
+                    sessionStorage.setItem('token', result.token);
                     alert('Organizer Registration Successful!');
                     window.location.href = '/organiser-home';
                 } else {
@@ -326,7 +326,7 @@ function initClientFlow() {
                 submitBtn.disabled = false;
                 
                 if (result.success) {
-                    localStorage.setItem('token', result.token);
+                    sessionStorage.setItem('token', result.token);
                     alert('Client Registration Successful!');
                     window.location.href = '/client-home';
                 } else {
@@ -509,7 +509,7 @@ function initVolunteerFlow() {
                     submitBtn.disabled = false;
                     
                     if (result.success) {
-                        localStorage.setItem('token', result.token);
+                        sessionStorage.setItem('token', result.token);
                         alert('Volunteer Registration Successful! Welcome aboard.');
                         window.location.href = '/home';
                     } else {

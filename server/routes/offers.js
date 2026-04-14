@@ -164,4 +164,83 @@ router.delete('/:id/expenses/:expenseId', protect, authorize('organizer'), async
   }
 });
 
+// @route   PUT /api/offers/:id/advance
+// @desc    Organizer sets or updates the advance amount
+// @access  Private (Organizer)
+router.put('/:id/advance', protect, authorize('organizer'), async (req, res) => {
+  try {
+    const { amount } = req.body;
+    if (amount === undefined || amount < 0) {
+      return res.status(400).json({ success: false, error: 'Valid amount is required' });
+    }
+
+    const offer = await ClientOffer.findOne({ _id: req.params.id, organizerId: req.user.id });
+    if (!offer) return res.status(404).json({ success: false, error: 'Offer not found' });
+    if (offer.status !== 'accepted') {
+      return res.status(400).json({ success: false, error: 'Advance can only be set on accepted offers' });
+    }
+
+    // Set or update the advance and reset status to pending (client needs to pay or negotiate)
+    offer.advance = {
+      amount: Number(amount),
+      status: 'pending',
+      requestedAmount: undefined,
+      negotiationMessage: undefined
+    };
+    
+    await offer.save();
+    res.json({ success: true, data: offer });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// @route   PUT /api/offers/:id/advance/negotiate
+// @desc    Client requests negotiation for the advance format
+// @access  Private (Client)
+router.put('/:id/advance/negotiate', protect, authorize('client'), async (req, res) => {
+  try {
+    const { requestedAmount, message } = req.body;
+    if (requestedAmount === undefined || requestedAmount < 0 || !message) {
+      return res.status(400).json({ success: false, error: 'Valid requestedAmount and message are required' });
+    }
+
+    const offer = await ClientOffer.findOne({ _id: req.params.id, clientId: req.user.id });
+    if (!offer) return res.status(404).json({ success: false, error: 'Offer not found' });
+    if (offer.status !== 'accepted' || !offer.advance || offer.advance.status !== 'pending') {
+      return res.status(400).json({ success: false, error: 'Offer must have a pending advance to negotiate' });
+    }
+
+    offer.advance.status = 'negotiating';
+    offer.advance.requestedAmount = Number(requestedAmount);
+    offer.advance.negotiationMessage = message;
+
+    await offer.save();
+    res.json({ success: true, data: offer });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// @route   POST /api/offers/:id/advance/pay
+// @desc    Client pays the advance via Mock Razorpay Dummy Gateway
+// @access  Private (Client)
+router.post('/:id/advance/pay', protect, authorize('client'), async (req, res) => {
+  try {
+    const offer = await ClientOffer.findOne({ _id: req.params.id, clientId: req.user.id });
+    if (!offer) return res.status(404).json({ success: false, error: 'Offer not found' });
+    if (offer.status !== 'accepted' || !offer.advance || offer.advance.status !== 'pending') {
+      return res.status(400).json({ success: false, error: 'Offer must have a pending advance to pay' });
+    }
+
+    // Mock successful payment
+    offer.advance.status = 'paid';
+    
+    await offer.save();
+    res.json({ success: true, data: offer });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = router;

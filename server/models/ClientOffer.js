@@ -20,7 +20,13 @@ const clientOfferSchema = new mongoose.Schema({
     enum: ['pending', 'accepted', 'rejected', 'completed'],
     default: 'pending'
   },
-  isRated: { type: Boolean, default: false }  // prevents double-rating
+  isRated: { type: Boolean, default: false }, // prevents double-rating
+  advance: {
+    amount: { type: Number },
+    status: { type: String, enum: ['pending', 'negotiating', 'paid'] },
+    negotiationMessage: { type: String },
+    requestedAmount: { type: Number }
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('ClientOffer', clientOfferSchema);

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
@@ -668,8 +668,8 @@
 
     // ====== LOGOUT ======
     document.getElementById('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
       window.location.href = '/';
     });
 
@@ -677,13 +677,13 @@
     (async function loadUserProfile() {
       try {
         // Seed basic info from localStorage immediately (fast path)
-        const cached = JSON.parse(localStorage.getItem('user') || '{}');
+        const cached = JSON.parse(sessionStorage.getItem('user') || '{}');
         const dName = cached.profile?.name || cached.profile?.orgName || cached.username;
         if (dName)       document.getElementById('dropdownName').textContent = dName;
         if (cached.role) document.getElementById('dropdownEmail').textContent = cached.role.charAt(0).toUpperCase() + cached.role.slice(1);
 
         // Then fetch full profile from API to get profilePic
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (!token) return;
 
         const res = await fetch('/api/auth/profile', {
@@ -699,7 +699,7 @@
         if (u.role)      document.getElementById('dropdownEmail').textContent = u.role.charAt(0).toUpperCase() + u.role.slice(1);
 
         // Update localStorage with latest user data
-        localStorage.setItem('user', JSON.stringify({ id: u._id, username: u.username, email: u.email, role: u.role, profile: u.profile }));
+        sessionStorage.setItem('user', JSON.stringify({ id: u._id, username: u.username, email: u.email, role: u.role, profile: u.profile }));
 
         const pic = u.profile?.profilePic;
         if (pic) {

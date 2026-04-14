@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -383,7 +383,7 @@
   <script>
     const params = new URLSearchParams(window.location.search);
     const organizerId = params.get('id');
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     
     let organizerName = 'Organizer';
 
@@ -605,7 +605,7 @@
 
     // ── Logout ──
     document.getElementById('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('token'); localStorage.removeItem('user');
+      sessionStorage.removeItem('token'); sessionStorage.removeItem('user');
       window.location.href = '/';
     });
 

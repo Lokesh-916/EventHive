@@ -1,10 +1,10 @@
-// ============================================================
+﻿// ============================================================
 // EVENT CHAT FEATURE
 // ============================================================
 
 class EventChat {
   constructor() {
-    this.token = localStorage.getItem('token');
+    this.token = sessionStorage.getItem('token');
     this.currentUserId = null;
     this.eventId = null;
     this.pollInterval = null;

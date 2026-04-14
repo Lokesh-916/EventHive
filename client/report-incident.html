@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 
 <head>
@@ -598,7 +598,7 @@
       // ── Profile Dropdown ──
       const avatarBtn = document.getElementById('profileAvatarBtn');
       const dropdown = document.getElementById('profileDropdown');
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
 
       avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('open'); });
       document.addEventListener('click', (e) => {
@@ -607,7 +607,7 @@
 
       // ── Logout ──
       document.getElementById('logoutBtn').addEventListener('click', () => {
-        localStorage.removeItem('token'); localStorage.removeItem('user');
+        sessionStorage.removeItem('token'); sessionStorage.removeItem('user');
         window.location.href = '/';
       });
 

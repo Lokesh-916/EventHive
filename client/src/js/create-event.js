@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', () => {
     let currentStep = 1;
     const totalSteps = 5;
 
@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         formData.append('status', 'published');
 
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (!token) {
             alert('Please login as organizer first');
             return;

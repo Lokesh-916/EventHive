@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="en" data-theme="dark">
 
@@ -597,7 +597,7 @@
 
   <script>
 
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
 
 
 
@@ -667,7 +667,7 @@
 
               ${isLoggedIn ? `
 
-              <button onclick="localStorage.removeItem('token');window.location.href='/register';"
+              <button onclick="sessionStorage.removeItem('token');window.location.href='/register';"
 
                 style="padding:0.75rem 1.5rem;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:0.75rem;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;">
 
@@ -1293,7 +1293,7 @@
 
       e.preventDefault();
 
-      localStorage.removeItem('token');
+      sessionStorage.removeItem('token');
 
       window.location.href = '/';
 
@@ -1625,7 +1625,7 @@
     // ============================================================
     // CHAT FEATURE (Organizer side)
     // ============================================================
-    const chatToken = localStorage.getItem('token');
+    const chatToken = sessionStorage.getItem('token');
     let chatCurrentUserId = null;
     let chatActiveClientId = null;
     let chatActiveType = 'direct'; // 'direct' or 'event'

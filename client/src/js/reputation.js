@@ -1,4 +1,4 @@
-/**
+﻿/**
  * reputation.js — Volunteer profile page logic
  * Vanilla JS only. No imports, no modules, no frameworks.
  * Exposes loadProfile as a global function called from profile.html.
@@ -229,7 +229,7 @@ function loadProfile(volunteerId) {
     return;
   }
 
-  var token = localStorage.getItem('token');
+  var token = sessionStorage.getItem('token');
 
   var reputationUrl = '/api/reputation/' + volunteerId;
   var catalogUrl = '/api/reputation/catalog';
@@ -290,20 +290,25 @@ function loadProfile(volunteerId) {
 /* ── loadReputationSection: injects badge section into profile page ── */
 function loadReputationSection(volunteerId) {
   if (!volunteerId) return;
-  var token = localStorage.getItem('token');
+  var token = sessionStorage.getItem('token');
   var headers = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = 'Bearer ' + token;
 
   Promise.all([
-    fetch('/api/reputation/' + volunteerId, { headers: headers }).then(function(r) { return r.ok ? r.json() : null; }),
-    fetch('/api/reputation/catalog').then(function(r) { return r.ok ? r.json() : null; })
+    fetch('/api/reputation/' + volunteerId, { headers: headers }).then(function(r) { return r.json(); }),
+    fetch('/api/reputation/catalog').then(function(r) { return r.json(); })
   ]).then(function(results) {
     var repData = results[0];
     var catData = results[1];
-    if (!repData || !catData) return;
 
-    var rep = repData.reputation || repData;
-    var catalog = catData.badges || catData;
+    console.log('[Reputation] repData:', repData);
+    console.log('[Reputation] catData:', catData);
+
+    if (!repData || !catData) { console.warn('[Reputation] Missing data, aborting'); return; }
+
+    var rep = repData.reputation || repData.data || repData;
+    var catalog = catData.badges || catData.data || catData;
+    if (!Array.isArray(catalog)) { console.warn('[Reputation] catalog not array:', catalog); return; }
     var earnedBadges = rep.badges || [];
 
     // Inject SVG sprite
@@ -340,7 +345,7 @@ function loadReputationSection(volunteerId) {
         '</div>',
         '<div style="display:flex;align-items:center;gap:0.5rem;">',
           '<span class="rank-chip ' + rankClass + '">' + rank + '</span>',
-          '<button class="rep-info-btn" id="open-progress-panel" title="View all badges and progress">i</button>',
+          '<button class="rep-info-btn" id="open-progress-panel" title="View all badges and progress"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'13\' height=\'13\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><circle cx=\'12\' cy=\'12\' r=\'10\'/><line x1=\'12\' y1=\'8\' x2=\'12\' y2=\'12\'/><line x1=\'12\' y1=\'16\' x2=\'12.01\' y2=\'16\'/></svg></button>',
         '</div>',
       '</div>',
       // XP bar
@@ -357,13 +362,17 @@ function loadReputationSection(volunteerId) {
       '<div class="badge-scroll" id="badge-grid"></div>',
     ].join('');
 
-    // Insert as 2nd child of profileMain (after hero, before all sections)
-    var main = document.getElementById('profileMain');
-    if (main) {
-      var secondChild = main.children[1];
-      if (secondChild) {
-        main.insertBefore(section, secondChild);
-      } else {
+    // Replace the placeholder div that was rendered synchronously at position 2
+    var placeholder = document.getElementById('reputation-section-placeholder');
+    if (placeholder) {
+      placeholder.parentNode.replaceChild(section, placeholder);
+    } else {
+      // Fallback: insert after hero
+      var main = document.getElementById('profileMain');
+      var hero = main && main.querySelector('#section-hero');
+      if (hero && hero.nextElementSibling) {
+        main.insertBefore(section, hero.nextElementSibling);
+      } else if (main) {
         main.appendChild(section);
       }
     }

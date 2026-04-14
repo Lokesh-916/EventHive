@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 
 <head>
@@ -1040,7 +1040,7 @@
   </footer>
 
   <script>
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const urlParams = new URLSearchParams(window.location.search);
     const eventId = urlParams.get('id');
     let currentUserRole = null;
@@ -1070,7 +1070,7 @@
 
     // ── Logout ──
     document.getElementById('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('token'); localStorage.removeItem('user');
+      sessionStorage.removeItem('token'); sessionStorage.removeItem('user');
       window.location.href = '/';
     });
 

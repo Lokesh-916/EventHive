@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -615,7 +615,7 @@
         if (themeToggle) themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
 
         // ── Auth Check ──
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         const authSection = document.getElementById('auth-section');
         const loggedInSection = document.getElementById('logged-in-section');
 
@@ -640,7 +640,7 @@
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
-                localStorage.removeItem('token'); localStorage.removeItem('user');
+                sessionStorage.removeItem('token'); sessionStorage.removeItem('user');
                 window.location.href = '/';
             });
         }

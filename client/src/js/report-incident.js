@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const form = document.getElementById('incident-form');
     const categorySelect = document.getElementById('category');
@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Token
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (!token) {
             alert('Please login to report an incident');
             return;

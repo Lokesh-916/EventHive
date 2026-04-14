@@ -1,7 +1,7 @@
-/* EventHive Analytics */
+﻿/* EventHive Analytics */
 'use strict';
 
-const TOKEN = localStorage.getItem('token');
+const TOKEN = sessionStorage.getItem('token');
 const COLORS = ['#60a5fa','#34d399','#a78bfa','#fbbf24','#f87171','#38bdf8','#fb923c','#e879f9'];
 const CAT_COLORS = { tech:'#60a5fa', social:'#34d399', arts:'#a78bfa', sports:'#fbbf24', music:'#f87171', other:'#94a3b8' };
 
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btn) btn.addEventListener('click', e => { e.stopPropagation(); dd.classList.toggle('open'); });
   document.addEventListener('click', e => { if (dd && !dd.contains(e.target) && e.target !== btn) dd.classList.remove('open'); });
   const logoutBtn = document.getElementById('logoutBtn');
-  if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem('token'); window.location.href = '/'; });
+  if (logoutBtn) logoutBtn.addEventListener('click', () => { sessionStorage.removeItem('token'); window.location.href = '/'; });
 
   // Theme
   const bg = document.getElementById('bgImage');

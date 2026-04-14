@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -290,7 +290,7 @@
     organizerId = params.get('organizerId');
     offerId = params.get('offerId');
 
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
 
     async function init() {
       if (!organizerId || !offerId || !token) {
@@ -468,7 +468,7 @@
 
     // ── Logout ──
     document.getElementById('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('token'); localStorage.removeItem('user');
+      sessionStorage.removeItem('token'); sessionStorage.removeItem('user');
       window.location.href = '/';
     });
 
