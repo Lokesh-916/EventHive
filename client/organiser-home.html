@@ -1220,14 +1220,14 @@
 
           return `
 
-            <div class="rounded-[1.5rem] px-7 py-5 flex items-center justify-between gap-5 border" style="background:var(--article-bg);border-color:var(--article-border);">
+            <div class="rounded-[1.5rem] px-8 py-6 flex items-center justify-between gap-5 border" style="background:var(--article-bg);border-color:var(--article-border);">
 
               <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-3 mb-1">
+                <div class="flex items-center gap-3 mb-2">
                   <h3 class="font-bold text-base" style="color:var(--text-primary);">${ev.title}</h3>
                   <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border flex-shrink-0 ${statusColor}">${ev.status || 'published'}</span>
                 </div>
-                <p class="text-xs" style="color:var(--text-muted);">${start}${ev.location?.city ? ' · ' + ev.location.city : ''}</p>
+                <p class="text-sm" style="color:var(--text-muted);">${start}${ev.location?.city ? ' · ' + ev.location.city : ''}</p>
               </div>
 
               <div class="flex items-center gap-2 flex-shrink-0">
