@@ -641,9 +641,9 @@
           const expenseList = expenses.length > 0 ? expenses.map(exp => {
             const expDate = new Date(exp.date).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
             if (exp.isDeleted) {
-              return `<li class="flex justify-between items-center text-white/30 line-through text-xs px-2 py-1"><span>${exp.description}</span><span>₹${exp.amount}</span></li>`;
+              return `<li class="flex justify-between items-center text-white/30 line-through text-sm px-2 py-1.5"><span>${exp.description}</span><span>₹${exp.amount}</span></li>`;
             }
-            return `<li class="flex justify-between items-center text-xs px-2 py-1 border-b last:border-0 hover:opacity-80" style="border-color:var(--card-border);color:var(--text-secondary);"><span>${expDate} - ${exp.description}</span><span class="font-bold text-red-400">₹${exp.amount}</span></li>`;
+            return `<li class="flex justify-between items-center text-sm px-2 py-1.5 border-b last:border-0 hover:opacity-80" style="border-color:var(--card-border);color:var(--text-secondary);"><span>${expDate} - ${exp.description}</span><span class="font-bold text-red-400">₹${exp.amount}</span></li>`;
           }).join('') : `<li class="text-xs italic px-2 py-1" style="color:var(--text-muted);">No expenses logged yet by the organizer.</li>`;
           
           const totalExpenses = expenses.filter(e => !e.isDeleted).reduce((sum, e) => sum + e.amount, 0);
@@ -770,14 +770,14 @@
           <div class="rounded-[2rem] border overflow-hidden" style="background:var(--article-bg);border-color:var(--article-border);box-shadow:var(--shadow);">
 
             <!-- Card Header -->
-            <div class="px-6 pt-5 pb-4 flex items-start gap-4 border-b" style="border-color:var(--article-border);">
+            <div class="px-7 pt-6 pb-5 flex items-start gap-4 border-b" style="border-color:var(--article-border);">
               <div class="flex-1 min-w-0">
-                <div class="flex flex-wrap items-center gap-2 mb-1">
-                  <h3 class="font-bold text-sm" style="color:var(--text-primary);">${offer.title}</h3>
-                  <span class="px-2 py-0.5 text-xs font-bold rounded-full flex-shrink-0 ${badgeClass}">${statusLabel}</span>
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                  <h3 class="font-bold text-lg" style="color:var(--text-primary);">${offer.title}</h3>
+                  <span class="px-2.5 py-0.5 text-xs font-bold rounded-full flex-shrink-0 ${badgeClass}">${statusLabel}</span>
                 </div>
-                <p class="text-xs mb-2" style="color:var(--text-secondary);">Organizer: <span class="font-semibold" style="color:var(--text-primary);">${orgName}</span></p>
-                <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs" style="color:var(--text-muted);">
+                <p class="text-sm mb-2" style="color:var(--text-secondary);">Organizer: <span class="font-semibold" style="color:var(--text-primary);">${orgName}</span></p>
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm" style="color:var(--text-muted);">
                   ${budgetStr ? `<span>${budgetStr}</span>` : ''}
                   ${budgetStr ? `<span style="opacity:0.3">·</span>` : ''}
                   <span>${date}</span>
@@ -786,7 +786,7 @@
               </div>
               <div class="flex flex-col gap-1.5 flex-shrink-0">
                 <button onclick="window.location.href='/organiser-profile?id=${offer.organizerId?._id}'"
-                  class="px-3 py-1.5 text-xs font-bold rounded-lg border transition-all hover:opacity-80 whitespace-nowrap" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
+                  class="px-4 py-2 text-xs font-bold rounded-lg border transition-all hover:opacity-80 whitespace-nowrap" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
                   View Profile
                 </button>
                 ${rateBtn}
