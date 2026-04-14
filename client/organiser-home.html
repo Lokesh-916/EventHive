@@ -988,33 +988,43 @@
               completedOffers.map(offer => {
                 const clientName = offer.clientId?.profile?.clientName || offer.clientId?.username || 'Client';
                 const date = offer.eventDate ? new Date(offer.eventDate).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }) : 'No date';
-                const totalValid = (offer.expenses || []).filter(e => !e.isDeleted).reduce((sum, e) => sum + e.amount, 0);
+                const expenses = (offer.expenses || []).filter(e => !e.isDeleted);
+                const totalValid = expenses.reduce((sum, e) => sum + e.amount, 0);
                 const advancePaid = offer.advance?.status === 'paid' ? offer.advance.amount : 0;
                 const finalPaid = offer.finalPayment?.status === 'paid' ? offer.finalPayment.amount : 0;
                 const totalReceived = advancePaid + finalPaid;
+                const expenseRows = expenses.length
+                  ? expenses.map(e => {
+                      const d = new Date(e.date).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+                      return `<div class="flex justify-between items-center py-2 border-b last:border-0" style="border-color:rgba(255,255,255,0.06);">
+                        <span class="text-sm" style="color:var(--text-secondary);">${d} - ${esc(e.description)}</span>
+                        <span class="text-sm font-bold" style="color:var(--text-primary);">₹${e.amount}</span>
+                      </div>`;
+                    }).join('')
+                  : `<p class="text-sm italic" style="color:var(--text-muted);">No expenses logged yet.</p>`;
                 return `
-                  <div class="rounded-[1.5rem] px-6 py-5 border flex flex-col sm:flex-row sm:items-center gap-4" style="background:var(--article-bg);border-color:var(--article-border);opacity:0.85;">
-                    <div class="flex-1 min-w-0">
+                  <div class="rounded-[1.5rem] px-7 py-6 border flex flex-col gap-4" style="background:var(--article-bg);border-color:var(--article-border);">
+                    <div>
                       <div class="flex items-center gap-3 mb-1">
-                        <h3 class="font-bold text-base" style="color:var(--text-primary);">${esc(offer.title)}</h3>
-                        <span class="px-2 py-0.5 rounded-full text-xs font-bold border text-white/40 border-white/10 bg-white/5">Completed</span>
+                        <h3 class="font-bold text-lg" style="color:var(--text-primary);">${esc(offer.title)}</h3>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border" style="color:#4ade80;border-color:rgba(74,222,128,0.3);background:rgba(74,222,128,0.1);">Completed</span>
                       </div>
-                      <p class="text-xs mb-2" style="color:var(--text-muted);">Client: <span style="color:var(--text-secondary);">${clientName}</span> · ${date}</p>
-                      <div class="flex flex-wrap gap-4 text-xs">
-                        <span style="color:var(--text-muted);">Expenses: <span class="font-bold text-red-400">₹${totalValid}</span></span>
-                        <span style="color:var(--text-muted);">Received: <span class="font-bold text-green-400">₹${totalReceived}</span></span>
-                        ${offer.refund?.status === 'refunded' ? `<span class="text-blue-400">Refund ₹${offer.refund.amount} issued</span>` : ''}
+                      <p class="text-sm" style="color:var(--text-muted);">Client: <span style="color:var(--text-secondary);font-weight:600;">${clientName}</span>, Date: <span style="color:var(--text-secondary);font-weight:600;">${date}</span></p>
+                    </div>
+                    <div class="rounded-xl px-5 py-4 border" style="background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.08);">
+                      <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-bold uppercase tracking-widest" style="color:var(--text-muted);">Tracked Expenses</span>
+                        <span class="text-sm font-bold" style="color:#f97316;">Total: ₹${totalValid}</span>
                       </div>
+                      ${expenseRows}
                     </div>
-                    <div class="flex gap-2 flex-shrink-0">
-                      ${offer.finalPayment?.status !== 'paid' && totalValid > advancePaid ? (() => {
-                        const dl = offer.finalPayment?.deadline;
-                        const dlStr = dl ? new Date(dl).toLocaleDateString('en-IN', { day:'numeric', month:'short' }) : null;
-                        const isOverdue = dl && new Date() > new Date(dl);
-                        return `<button onclick="openDeadlineModal('${offer._id}', '${dl ? new Date(dl).toISOString().split('T')[0] : ''}')" class="px-3 py-1.5 text-xs font-bold uppercase ${isOverdue ? 'text-red-400 border-red-500/30 bg-red-500/10' : 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10'} border rounded-lg transition-all">${dlStr ? (isOverdue ? 'Overdue' : `Due ${dlStr}`) : 'Set Deadline'}</button>`;
-                      })() : ''}
-                      ${offer.advance?.status === 'paid' && !offer.refund?.status && (offer.advance.amount - totalValid) > 0 ? `<button onclick="issueRefund('${offer._id}')" class="px-3 py-1.5 text-xs font-bold uppercase text-orange-400 border border-orange-500/30 bg-orange-500/10 rounded-lg transition-all">Issue Refund</button>` : ''}
-                    </div>
+                    ${offer.finalPayment?.status !== 'paid' && totalValid > advancePaid ? (() => {
+                      const dl = offer.finalPayment?.deadline;
+                      const dlStr = dl ? new Date(dl).toLocaleDateString('en-IN', { day:'numeric', month:'short' }) : null;
+                      const isOverdue = dl && new Date() > new Date(dl);
+                      return `<div class="flex gap-2"><button onclick="openDeadlineModal('${offer._id}', '${dl ? new Date(dl).toISOString().split('T')[0] : ''}')" class="px-3 py-1.5 text-xs font-bold uppercase ${isOverdue ? 'text-red-400 border-red-500/30 bg-red-500/10' : 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10'} border rounded-lg">${dlStr ? (isOverdue ? 'Overdue' : `Due ${dlStr}`) : 'Set Deadline'}</button></div>`;
+                    })() : ''}
+                    ${offer.advance?.status === 'paid' && !offer.refund?.status && (offer.advance.amount - totalValid) > 0 ? `<div class="flex gap-2"><button onclick="issueRefund('${offer._id}')" class="px-3 py-1.5 text-xs font-bold uppercase text-orange-400 border border-orange-500/30 bg-orange-500/10 rounded-lg">Issue Refund</button></div>` : ''}
                   </div>`;
               }).join('');
           }
@@ -1210,31 +1220,20 @@
 
           return `
 
-            <div class="rounded-[2rem] px-7 py-6 flex flex-col gap-4 border transition-colors hover:-translate-y-0.5" style="background:var(--article-bg);border-color:var(--article-border);transition:transform 0.2s,box-shadow 0.2s;">
+            <div class="rounded-[1.5rem] px-7 py-5 flex items-center justify-between gap-5 border" style="background:var(--article-bg);border-color:var(--article-border);">
 
-              <div class="flex items-start justify-between gap-4">
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-3 mb-2">
-                    <h3 class="font-bold text-lg" style="color:var(--text-primary);">${ev.title}</h3>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border flex-shrink-0 ${statusColor}">${ev.status || 'published'}</span>
-                  </div>
-                  <p class="text-sm" style="color:var(--text-muted);">${start}${ev.location?.city ? ' · ' + ev.location.city : ''}</p>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-3 mb-1">
+                  <h3 class="font-bold text-base" style="color:var(--text-primary);">${ev.title}</h3>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border flex-shrink-0 ${statusColor}">${ev.status || 'published'}</span>
                 </div>
+                <p class="text-xs" style="color:var(--text-muted);">${start}${ev.location?.city ? ' · ' + ev.location.city : ''}</p>
               </div>
 
-              <div class="flex items-center gap-3 flex-wrap pt-1 border-t" style="border-color:var(--article-border);">
-                <a href="/event-info?id=${ev._id}" class="px-4 py-2 rounded-xl text-xs font-bold border transition-all hover:opacity-80" style="background:var(--input-bg);border-color:var(--card-border);color:var(--text-primary);">
-                  View Event
-                </a>
-                <button onclick="scrollToVolunteers('${ev._id}')" class="px-4 py-2 rounded-xl text-xs font-bold border transition-all hover:opacity-80" style="background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:#60a5fa;">
-                  Volunteers
-                </button>
-                ${!isPast ? `<button onclick="openScheduleModal('${ev._id}', '${ev.title.replace(/'/g,"\\'")}');" class="px-4 py-2 rounded-xl text-xs font-bold border transition-all hover:opacity-80" style="background:rgba(20,184,166,0.1);border-color:rgba(20,184,166,0.3);color:#2dd4bf;">
-                  Schedule
-                </button>` : ''}
-                ${!isPast ? `<a href="/event-overview?id=${ev._id}" class="px-4 py-2 rounded-xl text-xs font-bold border transition-all hover:opacity-80" style="background:rgba(168,85,247,0.1);border-color:rgba(168,85,247,0.3);color:#c084fc;">
-                  LiveOps
-                </a>` : ''}
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <a href="/event-info?id=${ev._id}" class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide border transition-all hover:opacity-80" style="background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.12);color:var(--text-primary);">View</a>
+                <button onclick="scrollToVolunteers('${ev._id}')" class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide border transition-all hover:opacity-80" style="background:rgba(59,130,246,0.15);border-color:rgba(59,130,246,0.35);color:#60a5fa;">Manage</button>
+                ${!isPast ? `<a href="/event-overview?id=${ev._id}" class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide border transition-all hover:opacity-80" style="background:rgba(168,85,247,0.15);border-color:rgba(168,85,247,0.35);color:#c084fc;">Overview</a>` : ''}
               </div>
 
             </div>`;
